@@ -202,11 +202,6 @@ const PengabsenApp = () => {
             <div className="space-y-3">
               <div className="aspect-video max-w-md mx-auto overflow-hidden rounded-xl border bg-black">
                 <QrReader
-                  constraints={{
-                    video: {
-                      facingMode: { ideal: 'environment' },
-                    },
-                  }}
                   onResult={async (result, error) => {
                     if (!!result) {
                       try {
@@ -243,8 +238,7 @@ const PengabsenApp = () => {
                     }
                   }}
                   scanDelay={800}
-                  videoStyle={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  className="w-full h-full"
+                  style={{ width: '100%' }}
                 />
               </div>
 
