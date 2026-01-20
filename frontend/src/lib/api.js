@@ -26,6 +26,21 @@ export const santriAPI = {
   update: (id, data) => axios.put(`${API}/santri/${id}`, data, { headers: getAuthHeader() }),
   delete: (id) => axios.delete(`${API}/santri/${id}`, { headers: getAuthHeader() }),
   getQRCode: (id) => `${API}/santri/${id}/qr-code`,
+  downloadTemplate: () => axios.get(`${API}/santri/template/download`, { 
+    headers: getAuthHeader(),
+    responseType: 'blob'
+  }),
+  import: (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return axios.post(`${API}/santri/import`, formData, { 
+      headers: { ...getAuthHeader(), 'Content-Type': 'multipart/form-data' }
+    });
+  },
+  export: () => axios.get(`${API}/santri/export`, { 
+    headers: getAuthHeader(),
+    responseType: 'blob'
+  }),
 };
 
 // Wali Santri API
