@@ -146,9 +146,9 @@ const Pengabsen = () => {
         </div>
         <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>
           <DialogTrigger asChild>
-            <Button data-testid="add-pengabsen-button">
+            <Button data-testid="add-pengabsen-button" disabled={asramaList.length === 0}>
               <Plus className="mr-2" size={20} />
-              Tambah Pengabsen
+              {asramaList.length === 0 ? 'Loading...' : 'Tambah Pengabsen'}
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
