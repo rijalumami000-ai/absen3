@@ -786,6 +786,27 @@ async def export_santri(_: dict = Depends(get_current_admin)):
 
 # ==================== WALI SANTRI ENDPOINTS (AUTO-GENERATED) ====================
 
+
+class WaliLoginRequest(BaseModel):
+    username: str
+    password: str
+
+
+class WaliMeResponse(BaseModel):
+    id: str
+    nama: str
+    username: str
+    nomor_hp: str
+    email: Optional[str]
+    anak_ids: List[str]
+
+
+class WaliTokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: WaliMeResponse
+
+
 @api_router.get("/wali", response_model=List[WaliSantriResponse])
 async def get_wali(_: dict = Depends(get_current_admin)):
     """Get all wali santri (auto-generated from santri data)"""
