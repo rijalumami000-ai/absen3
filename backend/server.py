@@ -799,7 +799,10 @@ Pondok Pesantren"""
     if nomor_wa.startswith('0'):
         nomor_wa = '62' + nomor_wa[1:]
     
-    wa_link = f"https://wa.me/{nomor_wa}?text={message.replace(' ', '%20').replace('\n', '%0A')}"
+    # URL encode message
+    import urllib.parse
+    encoded_message = urllib.parse.quote(message)
+    wa_link = f"https://wa.me/{nomor_wa}?text={encoded_message}"
     
     return {
         "message": message,
