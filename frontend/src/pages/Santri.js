@@ -153,13 +153,40 @@ const Santri = () => {
     }
   };
 
-  const downloadQRCode = (santri) => {
-    const link = document.createElement('a');
-    link.href = santriAPI.getQRCode(santri.id);
-    link.download = `QR_${santri.nama}_${santri.nis}.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const downloadQRCode = async (santri) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(santriAPI.getQRCode(santri.id), {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `QR_${santri.nama}_${santri.nis}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        
+        toast({
+          title: "Sukses",
+          description: "QR Code berhasil didownload",
+        });
+      } else {
+        throw new Error('Failed to download');
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Gagal mendownload QR code",
+        variant: "destructive",
+      });
+    }
   };
 
   const downloadTemplate = async () => {
