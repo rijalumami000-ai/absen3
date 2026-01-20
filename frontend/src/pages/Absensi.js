@@ -167,7 +167,8 @@ const Absensi = () => {
                   <SelectItem value="minggu">Per Minggu</SelectItem>
                   <SelectItem value="2minggu">Per 2 Minggu</SelectItem>
                   <SelectItem value="bulan">Per Bulan</SelectItem>
-                  <SelectItem value="semester">Per Semester (6 Bulan)</SelectItem>
+                  <SelectItem value="semester1">Semester 1 (6 bulan pertama)</SelectItem>
+                  <SelectItem value="semester2">Semester 2 (6 bulan kedua)</SelectItem>
                   <SelectItem value="tahun">Per Tahun</SelectItem>
                 </SelectContent>
               </Select>
