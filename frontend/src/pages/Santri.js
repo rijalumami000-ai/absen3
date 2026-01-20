@@ -367,12 +367,12 @@ const Santri = () => {
           <div className="flex flex-wrap gap-4">
             <div className="flex-1 min-w-[200px]">
               <Label>Filter Jenis Kelamin</Label>
-              <Select value={filterGender} onValueChange={setFilterGender}>
+              <Select value={filterGender || 'all'} onValueChange={(val) => setFilterGender(val === 'all' ? '' : val)}>
                 <SelectTrigger data-testid="filter-gender-select">
                   <SelectValue placeholder="Semua" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Semua</SelectItem>
+                  <SelectItem value="all">Semua</SelectItem>
                   <SelectItem value="putra">Putra</SelectItem>
                   <SelectItem value="putri">Putri</SelectItem>
                 </SelectContent>
@@ -380,12 +380,12 @@ const Santri = () => {
             </div>
             <div className="flex-1 min-w-[200px]">
               <Label>Filter Asrama</Label>
-              <Select value={filterAsrama} onValueChange={setFilterAsrama}>
+              <Select value={filterAsrama || 'all'} onValueChange={(val) => setFilterAsrama(val === 'all' ? '' : val)}>
                 <SelectTrigger data-testid="filter-asrama-select">
                   <SelectValue placeholder="Semua" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Semua</SelectItem>
+                  <SelectItem value="all">Semua</SelectItem>
                   {asramaList.map((asrama) => (
                     <SelectItem key={asrama.id} value={asrama.id}>{asrama.nama} ({asrama.gender})</SelectItem>
                   ))}
