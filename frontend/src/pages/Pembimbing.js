@@ -19,6 +19,7 @@ const Pembimbing = () => {
     nama: '',
     username: '',
     password: '',
+    email_atau_hp: '',
     asrama_ids: []
   });
   const { toast } = useToast();
@@ -77,6 +78,7 @@ const Pembimbing = () => {
       nama: pembimbing.nama,
       username: pembimbing.username,
       password: '',
+      email_atau_hp: pembimbing.email_atau_hp,
       asrama_ids: pembimbing.asrama_ids || []
     });
     setEditMode(true);
@@ -110,7 +112,7 @@ const Pembimbing = () => {
   };
 
   const resetForm = () => {
-    setFormData({ nama: '', username: '', password: '', asrama_ids: [] });
+    setFormData({ nama: '', username: '', password: '', email_atau_hp: '', asrama_ids: [] });
     setSelectedPembimbing(null);
     setEditMode(false);
   };
@@ -152,6 +154,16 @@ const Pembimbing = () => {
                   placeholder="Nama pembimbing"
                   required
                   data-testid="pembimbing-nama-input"
+                />
+              </div>
+              <div>
+                <Label>Email atau Nomor HP</Label>
+                <Input
+                  value={formData.email_atau_hp}
+                  onChange={(e) => setFormData({ ...formData, email_atau_hp: e.target.value })}
+                  placeholder="email@example.com atau 08xxxxxxxxxx"
+                  required
+                  data-testid="pembimbing-contact-input"
                 />
               </div>
               <div>
@@ -206,6 +218,7 @@ const Pembimbing = () => {
           <thead className="bg-gray-50 border-b">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email/HP</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Username</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Asrama</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jumlah Asrama</th>
@@ -221,6 +234,7 @@ const Pembimbing = () => {
                     <span className="text-sm font-medium text-gray-900">{pembimbing.nama}</span>
                   </div>
                 </td>
+                <td className="px-6 py-4 text-sm text-gray-600">{pembimbing.email_atau_hp}</td>
                 <td className="px-6 py-4 text-sm text-gray-600">{pembimbing.username}</td>
                 <td className="px-6 py-4 text-sm text-gray-600">{getAsramaNames(pembimbing.asrama_ids)}</td>
                 <td className="px-6 py-4">
