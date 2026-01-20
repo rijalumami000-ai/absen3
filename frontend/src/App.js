@@ -74,6 +74,24 @@ const PengabsenProtectedRoute = ({ children }) => {
   return children;
 };
 
+const WaliProtectedRoute = ({ children }) => {
+  const { user, loading } = useWaliAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-gray-500">Memuat...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/wali-app/login" replace />;
+  }
+
+  return children;
+};
+
 function AppRoutes() {
   return (
     <Routes>
