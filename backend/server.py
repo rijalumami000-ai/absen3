@@ -446,6 +446,9 @@ async def fetch_prayer_times(date: str) -> Optional[dict]:
                 if response.status == 200:
                     data = await response.json()
                     timings = data['data']['timings']
+                    return {
+                        'subuh': timings['Fajr'],
+                        'dzuhur': timings['Dhuhr'],
                         'ashar': timings['Asr'],
                         'maghrib': timings['Maghrib'],
                         'isya': timings['Isha']
