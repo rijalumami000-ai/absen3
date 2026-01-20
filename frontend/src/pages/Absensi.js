@@ -76,11 +76,19 @@ const Absensi = () => {
         start = monthStart.toISOString().split('T')[0];
         end = monthEnd.toISOString().split('T')[0];
         break;
-      case 'semester':
-        const semStart = new Date(date);
-        semStart.setMonth(date.getMonth() - 5);
-        start = semStart.toISOString().split('T')[0];
-        end = filterTanggal;
+      case 'semester1':
+        // Semester 1: Jan - Jun
+        const sem1Start = new Date(date.getFullYear(), 0, 1); // Jan 1
+        const sem1End = new Date(date.getFullYear(), 5, 30); // Jun 30
+        start = sem1Start.toISOString().split('T')[0];
+        end = sem1End.toISOString().split('T')[0];
+        break;
+      case 'semester2':
+        // Semester 2: Jul - Dec
+        const sem2Start = new Date(date.getFullYear(), 6, 1); // Jul 1
+        const sem2End = new Date(date.getFullYear(), 11, 31); // Dec 31
+        start = sem2Start.toISOString().split('T')[0];
+        end = sem2End.toISOString().split('T')[0];
         break;
       case 'tahun':
         const yearStart = new Date(date.getFullYear(), 0, 1);
