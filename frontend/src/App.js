@@ -122,6 +122,24 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/wali-app/login"
+        element={
+          <WaliAuthProvider>
+            <WaliAppLogin />
+          </WaliAuthProvider>
+        }
+      />
+      <Route
+        path="/wali-app"
+        element={
+          <WaliAuthProvider>
+            <WaliProtectedRoute>
+              <WaliApp />
+            </WaliProtectedRoute>
+          </WaliAuthProvider>
+        }
+      />
+      <Route
         path="/dashboard"
         element={
           <ProtectedRoute>
