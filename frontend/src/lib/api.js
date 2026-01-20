@@ -46,9 +46,8 @@ export const santriAPI = {
 // Wali Santri API
 export const waliAPI = {
   getAll: () => axios.get(`${API}/wali`, { headers: getAuthHeader() }),
-  create: (data) => axios.post(`${API}/wali`, data, { headers: getAuthHeader() }),
   update: (id, data) => axios.put(`${API}/wali/${id}`, data, { headers: getAuthHeader() }),
-  delete: (id) => axios.delete(`${API}/wali/${id}`, { headers: getAuthHeader() }),
+  getWhatsAppMessage: (id) => axios.get(`${API}/wali/${id}/whatsapp-message`, { headers: getAuthHeader() }),
 };
 
 // Pengabsen API
