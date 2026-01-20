@@ -37,8 +37,10 @@ const Santri = () => {
   }, []);
 
   useEffect(() => {
-    loadSantri();
-  }, [filterGender, filterAsrama]);
+    if (asramaList.length > 0) {
+      loadSantri();
+    }
+  }, [filterGender, filterAsrama, asramaList.length]);
 
   const loadData = async () => {
     try {
