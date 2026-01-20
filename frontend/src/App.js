@@ -15,6 +15,9 @@ import WaktuSholat from '@/pages/WaktuSholat';
 import PengabsenAppLogin from '@/pages/PengabsenAppLogin';
 import PengabsenApp from '@/pages/PengabsenApp';
 import { PengabsenAuthProvider, usePengabsenAuth } from '@/contexts/PengabsenAuthContext';
+import WaliAppLogin from '@/pages/WaliAppLogin';
+import WaliApp from '@/pages/WaliApp';
+import { WaliAuthProvider, useWaliAuth } from '@/contexts/WaliAuthContext';
 import '@/App.css';
 
 const ProtectedRoute = ({ children }) => {
