@@ -301,6 +301,14 @@ const PengabsenApp = () => {
                 />
               </div>
 
+              {showScanSuccess && (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="bg-emerald-500/80 text-white px-6 py-3 rounded-full text-lg font-bold shadow-lg">
+                    HADIR
+                  </div>
+                </div>
+              )}
+
               {lastScan && (
                 <div className="text-xs text-gray-600 bg-emerald-50 border border-emerald-100 rounded-lg p-3">
                   <div className="font-semibold mb-1">Scan terakhir:</div>
