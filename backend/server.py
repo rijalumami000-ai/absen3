@@ -324,9 +324,6 @@ async def get_current_pengabsen(credentials: HTTPAuthorizationCredentials = Depe
         raise HTTPException(status_code=401, detail="Invalid authentication credentials")
 
 
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
-
 async def get_current_admin(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
     try:
         token = credentials.credentials
