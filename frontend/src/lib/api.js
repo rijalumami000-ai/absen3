@@ -71,6 +71,11 @@ const getPengabsenAuthHeader = () => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
+const getWaliAuthHeader = () => {
+  const token = localStorage.getItem('wali_token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
 // API khusus PWA Pengabsen
 export const pengabsenAppAPI = {
   login: (username, password) =>
@@ -90,6 +95,18 @@ export const pengabsenAppAPI = {
     axios.get(`${API}/pengabsen/santri-absensi-hari-ini`, {
       params,
       headers: getPengabsenAuthHeader(),
+    }),
+};
+
+// API khusus PWA Wali Santri
+export const waliAppAPI = {
+  login: (username, password) => axios.post(`${API}/wali/login`, { username, password }),
+  me: () => axios.get(`${API}/wali/me`, { headers: getWaliAuthHeader() }),
+  absensiHariIni: () => axios.get(`${API}/wali/anak-absensi-hari-ini`, { headers: getWaliAuthHeader() }),
+  absensiRiwayat: (params) =>
+    axios.get(`${API}/wali/anak-absensi-riwayat`, {
+      params,
+      headers: getWaliAuthHeader(),
     }),
 };
 
