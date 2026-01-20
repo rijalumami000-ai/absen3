@@ -1047,16 +1047,6 @@ async def get_santri_absensi_hari_ini(
     return {"tanggal": today, "waktu_sholat": waktu_sholat, "data": result}
 
 
-    
-    if update_data:
-        await db.pengabsen.update_one({"id": pengabsen_id}, {"$set": update_data})
-        pengabsen.update(update_data)
-    
-    if isinstance(pengabsen['created_at'], str):
-        pengabsen['created_at'] = datetime.fromisoformat(pengabsen['created_at'])
-    
-    return PengabsenResponse(**{k: v for k, v in pengabsen.items() if k != 'password_hash'})
-
 @api_router.delete("/pengabsen/{pengabsen_id}")
 async def delete_pengabsen(pengabsen_id: str, _: dict = Depends(get_current_admin)):
     result = await db.pengabsen.delete_one({"id": pengabsen_id})
