@@ -5,6 +5,7 @@ import { pengabsenAppAPI } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { QrReader } from 'react-qr-reader';
 
 const WAKTU_OPTIONS = [
   { value: 'subuh', label: 'Subuh' },
@@ -29,6 +30,8 @@ const PengabsenApp = () => {
   const [waktu, setWaktu] = useState('maghrib');
   const [data, setData] = useState([]);
   const [loadingData, setLoadingData] = useState(false);
+  const [scanning, setScanning] = useState(false);
+  const [lastScan, setLastScan] = useState(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
