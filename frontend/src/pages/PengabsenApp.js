@@ -201,44 +201,49 @@ const PengabsenApp = () => {
           ) : (
             <div className="space-y-3">
               <div className="aspect-video max-w-md mx-auto overflow-hidden rounded-xl border bg-black">
-                <QrReader
-                  onResult={async (result, error) => {
-                    if (!!result) {
-                      try {
-                        const text = result?.text || result.getText?.() || '';
-                        if (!text) return;
-                        const parsed = JSON.parse(text);
-                        if (!parsed.santri_id) {
-                          throw new Error('QR tidak berisi santri_id');
-                        }
-                        setLastScan({ raw: text, parsed, waktu });
-                        await pengabsenAppAPI.upsertAbsensi({
-                          santri_id: parsed.santri_id,
-                          waktu_sholat: waktu,
-                          status_absen: 'hadir',
-                        });
-                        await loadData(waktu);
-                        toast({
-                          title: 'Scan Berhasil',
-                          description: `Hadir: ${parsed.nama || 'Santri'} (${parsed.nis || '-'})`,
-                        });
-                      } catch (e) {
-                        console.error(e);
-                        toast({
-                          title: 'QR tidak valid',
-                          description: 'Pastikan QR berasal dari sistem ini.',
-                          variant: 'destructive',
-                        });
-                      }
-                    }
+                <Scanner
+                  onScan={async (detected) => {
+                    try {
+                      if (!detected || detected.length === 0) return;
+                      const code = detected[0];
+                      const text = code.rawValue || '';
+                      if (!text) return;
 
-                    if (!!error) {
-                      // error scanning diabaikan agar tidak spam, tapi bisa dilihat di console jika perlu
-                      // console.info(error);
+                      const parsed = JSON.parse(text);
+                      if (!parsed.santri_id) {
+                        throw new Error('QR tidak berisi santri_id');
+                      }
+
+                      setLastScan({ raw: text, parsed, waktu });
+                      await pengabsenAppAPI.upsertAbsensi({
+                        santri_id: parsed.santri_id,
+                        waktu_sholat: waktu,
+                        status_absen: 'hadir',
+                      });
+                      await loadData(waktu);
+                      toast({
+                        title: 'Scan Berhasil',
+                        description: `Hadir: ${parsed.nama || 'Santri'} (${parsed.nis || '-'})`,
+                      });
+                    } catch (e) {
+                      console.error(e);
+                      toast({
+                        title: 'QR tidak valid',
+                        description: 'Pastikan QR berasal dari sistem ini.',
+                        variant: 'destructive',
+                      });
                     }
                   }}
-                  scanDelay={800}
-                  style={{ width: '100%' }}
+                  onError={(error) => {
+                    console.warn(error);
+                  }}
+                  components={{
+                    audio: false,
+                  }}
+                  styles={{
+                    container: { width: '100%', height: '100%' },
+                    video: { width: '100%', height: '100%', objectFit: 'cover' },
+                  }}
                 />
               </div>
 
