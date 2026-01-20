@@ -72,7 +72,16 @@ export const absensiAPI = {
     const query = new URLSearchParams(params).toString();
     return axios.get(`${API}/absensi${query ? `?${query}` : ''}`, { headers: getAuthHeader() });
   },
-  getStats: (tanggal) => axios.get(`${API}/absensi/stats${tanggal ? `?tanggal=${tanggal}` : ''}`, { headers: getAuthHeader() }),
+  getStats: (params) => {
+    const query = new URLSearchParams(params).toString();
+    return axios.get(`${API}/absensi/stats${query ? `?${query}` : ''}`, { headers: getAuthHeader() });
+  },
+  getDetail: (tanggal, asrama_id, gender) => {
+    const params = new URLSearchParams({ tanggal });
+    if (asrama_id) params.append('asrama_id', asrama_id);
+    if (gender) params.append('gender', gender);
+    return axios.get(`${API}/absensi/detail?${params.toString()}`, { headers: getAuthHeader() });
+  },
   delete: (id) => axios.delete(`${API}/absensi/${id}`, { headers: getAuthHeader() }),
 };
 
