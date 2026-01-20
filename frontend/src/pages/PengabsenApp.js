@@ -32,6 +32,8 @@ const PengabsenApp = () => {
   const [loadingData, setLoadingData] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [lastScan, setLastScan] = useState(null);
+  const [lastScanAt, setLastScanAt] = useState(0);
+  const [showScanSuccess, setShowScanSuccess] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -93,6 +95,25 @@ const PengabsenApp = () => {
       </div>
     );
   }
+
+  const totalSantri = data.length;
+  const hadirCount = data.filter((row) => row.status === 'hadir').length;
+  const belumCount = data.filter((row) => row.status == null).length;
+
+  const groupedByAsrama = data.reduce((acc, row) => {
+    const key = row.asrama_id || 'tanpa-asrama';
+    if (!acc[key]) {
+      acc[key] = {
+        asramaId: row.asrama_id,
+        namaAsrama: row.nama_asrama || 'Tanpa Asrama',
+        items: [],
+      };
+    }
+    acc[key].items.push(row);
+    return acc;
+  }, {});
+
+  const groupedList = Object.values(groupedByAsrama);
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col" data-testid="pengabsen-app-page">
