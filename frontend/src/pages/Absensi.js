@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { ClipboardList, Users, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 
@@ -39,9 +38,9 @@ const Absensi = () => {
       await loadDetail();
     } catch (error) {
       toast({
-        title: \"Error\",
-        description: \"Gagal memuat data\",
-        variant: \"destructive\",
+        title: "Error",
+        description: "Gagal memuat data",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -131,68 +130,68 @@ const Absensi = () => {
     return colors[status] || 'bg-gray-100 text-gray-700';
   };
 
-  if (loading) return <div className=\"flex justify-center p-8\">Memuat data...</div>;
+  if (loading) return <div className="flex justify-center p-8">Memuat data...</div>;
 
   return (
-    <div data-testid=\"absensi-page\">
-      <div className=\"mb-6\">
-        <h1 className=\"text-3xl font-bold text-gray-800 flex items-center\">
-          <ClipboardList className=\"mr-3\" size={32} />
+    <div data-testid="absensi-page">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-gray-800 flex items-center">
+          <ClipboardList className="mr-3" size={32} />
           Riwayat Absensi
         </h1>
-        <p className=\"text-gray-600 mt-1\">Data absensi sholat santri per waktu</p>
+        <p className="text-gray-600 mt-1">Data absensi sholat santri per waktu</p>
       </div>
 
       {/* Filters */}
-      <Card className=\"mb-6\">
-        <CardContent className=\"p-4\">
-          <div className=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4\">
+      <Card className="mb-6">
+        <CardContent className="p-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <Label>Periode</Label>
               <Select value={filterPeriode} onValueChange={setFilterPeriode}>
-                <SelectTrigger data-testid=\"filter-periode-select\">
+                <SelectTrigger data-testid="filter-periode-select">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value=\"hari\">Per Hari</SelectItem>
-                  <SelectItem value=\"minggu\">Per Minggu</SelectItem>
-                  <SelectItem value=\"2minggu\">Per 2 Minggu</SelectItem>
-                  <SelectItem value=\"bulan\">Per Bulan</SelectItem>
-                  <SelectItem value=\"semester\">Per Semester (6 Bulan)</SelectItem>
-                  <SelectItem value=\"tahun\">Per Tahun</SelectItem>
+                  <SelectItem value="hari">Per Hari</SelectItem>
+                  <SelectItem value="minggu">Per Minggu</SelectItem>
+                  <SelectItem value="2minggu">Per 2 Minggu</SelectItem>
+                  <SelectItem value="bulan">Per Bulan</SelectItem>
+                  <SelectItem value="semester">Per Semester (6 Bulan)</SelectItem>
+                  <SelectItem value="tahun">Per Tahun</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
               <Label>Tanggal</Label>
               <Input
-                type=\"date\"
+                type="date"
                 value={filterTanggal}
                 onChange={(e) => setFilterTanggal(e.target.value)}
-                data-testid=\"filter-tanggal-input\"
+                data-testid="filter-tanggal-input"
               />
             </div>
             <div>
               <Label>Gender</Label>
               <Select value={filterGender} onValueChange={setFilterGender}>
-                <SelectTrigger data-testid=\"filter-gender-select\">
-                  <SelectValue placeholder=\"Semua\" />
+                <SelectTrigger data-testid="filter-gender-select">
+                  <SelectValue placeholder="Semua" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value=\"\">Semua</SelectItem>
-                  <SelectItem value=\"putra\">Putra</SelectItem>
-                  <SelectItem value=\"putri\">Putri</SelectItem>
+                  <SelectItem value="">Semua</SelectItem>
+                  <SelectItem value="putra">Putra</SelectItem>
+                  <SelectItem value="putri">Putri</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
               <Label>Asrama</Label>
               <Select value={filterAsrama} onValueChange={setFilterAsrama}>
-                <SelectTrigger data-testid=\"filter-asrama-select\">
-                  <SelectValue placeholder=\"Semua\" />
+                <SelectTrigger data-testid="filter-asrama-select">
+                  <SelectValue placeholder="Semua" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value=\"\">Semua</SelectItem>
+                  <SelectItem value="">Semua</SelectItem>
                   {asramaList
                     .filter(a => !filterGender || a.gender === filterGender)
                     .map((asrama) => (
@@ -204,7 +203,7 @@ const Absensi = () => {
               </Select>
             </div>
           </div>
-          <div className=\"mt-4 text-sm text-gray-600\">
+          <div className="mt-4 text-sm text-gray-600">
             Menampilkan data: <strong>{tanggalStart}</strong> s/d <strong>{tanggalEnd}</strong>
           </div>
         </CardContent>
@@ -212,19 +211,19 @@ const Absensi = () => {
 
       {/* Detail per Waktu Sholat */}
       {detailData ? (
-        <div className=\"space-y-6\">
+        <div className="space-y-6">
           {waktuSholatList.map((waktu) => (
             <Card key={waktu.key}>
               <CardHeader className={`bg-${waktu.color}-50`}>
-                <CardTitle className=\"flex items-center text-xl\">
-                  <span className=\"capitalize\">{waktu.name}</span>
-                  <span className=\"ml-auto text-sm font-normal text-gray-600\">
+                <CardTitle className="flex items-center text-xl">
+                  <span className="capitalize">{waktu.name}</span>
+                  <span className="ml-auto text-sm font-normal text-gray-600">
                     Total: {Object.values(detailData[waktu.key] || {}).reduce((sum, arr) => sum + arr.length, 0)} record
                   </span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className=\"p-6\">
-                <div className=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4\">
+              <CardContent className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {statusInfo.map((status) => {
                     const Icon = status.icon;
                     const santriList = detailData[waktu.key]?.[status.key] || [];
@@ -234,28 +233,28 @@ const Absensi = () => {
                         className={`border-2 rounded-lg p-4 ${getStatusColor(status.key)}`}
                         data-testid={`${waktu.key}-${status.key}`}
                       >
-                        <div className=\"flex items-center justify-between mb-3\">
-                          <div className=\"flex items-center\">
-                            <Icon size={20} className=\"mr-2\" />
-                            <span className=\"font-semibold\">{status.name}</span>
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center">
+                            <Icon size={20} className="mr-2" />
+                            <span className="font-semibold">{status.name}</span>
                           </div>
-                          <span className=\"text-2xl font-bold\">{santriList.length}</span>
+                          <span className="text-2xl font-bold">{santriList.length}</span>
                         </div>
                         {santriList.length > 0 && (
-                          <div className=\"mt-2 space-y-1 max-h-40 overflow-y-auto\">
+                          <div className="mt-2 space-y-1 max-h-40 overflow-y-auto">
                             {santriList.map((santri, idx) => (
                               <div
                                 key={idx}
-                                className=\"text-xs p-2 bg-white bg-opacity-50 rounded\"
+                                className="text-xs p-2 bg-white bg-opacity-50 rounded"
                               >
-                                <div className=\"font-medium\">{santri.nama}</div>
-                                <div className=\"text-gray-600\">NIS: {santri.nis}</div>
+                                <div className="font-medium">{santri.nama}</div>
+                                <div className="text-gray-600">NIS: {santri.nis}</div>
                               </div>
                             ))}
                           </div>
                         )}
                         {santriList.length === 0 && (
-                          <p className=\"text-xs opacity-60 mt-2\">Tidak ada data</p>
+                          <p className="text-xs opacity-60 mt-2">Tidak ada data</p>
                         )}
                       </div>
                     );
@@ -267,10 +266,10 @@ const Absensi = () => {
         </div>
       ) : (
         <Card>
-          <CardContent className=\"p-12 text-center text-gray-500\">
-            <ClipboardList size={48} className=\"mx-auto mb-4 opacity-30\" />
+          <CardContent className="p-12 text-center text-gray-500">
+            <ClipboardList size={48} className="mx-auto mb-4 opacity-30" />
             <p>Tidak ada data absensi untuk filter yang dipilih</p>
-            <p className=\"text-sm mt-2\">Coba ubah filter tanggal, gender, atau asrama</p>
+            <p className="text-sm mt-2">Coba ubah filter tanggal, gender, atau asrama</p>
           </CardContent>
         </Card>
       )}
