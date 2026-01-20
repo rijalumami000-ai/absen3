@@ -874,6 +874,86 @@ async def get_current_wali(credentials: HTTPAuthorizationCredentials = Depends(s
 @api_router.post("/wali/login", response_model=WaliTokenResponse)
 async def login_wali(request: WaliLoginRequest):
     # Temukan wali berdasarkan username
+
+
+@api_router.get("/wali/anak-absensi-hari-ini")
+async def get_wali_anak_absensi_hari_ini(current_wali: dict = Depends(get_current_wali)):
+    today = datetime.now(timezone.utc).astimezone().date().isoformat()
+    anak_ids: List[str] = current_wali.get("anak_ids", [])
+    if not anak_ids:
+        return {"tanggal": today, "data": []}
+
+    santri_list = await db.santri.find({"id": {"$in": anak_ids}}, {"_id": 0}).to_list(100)
+    santri_by_id = {s["id"]: s for s in santri_list}
+
+    asrama_map = {a["id"]: a["nama"] for a in await db.asrama.find({}, {"_id": 0}).to_list(1000)}
+
+    absensi_list = await db.absensi.find(
+        {"tanggal": today, "santri_id": {"$in": list(santri_by_id.keys())}}, {"_id": 0}
+    ).to_list(1000)
+
+    status_by_santri: dict = {sid: {} for sid in santri_by_id.keys()}
+    for a in absensi_list:
+        sid = a["santri_id"]
+        waktu_sholat = a["waktu_sholat"]
+        status_val = a["status"]
+        if sid in status_by_santri:
+            status_by_santri[sid][waktu_sholat] = status_val
+
+    result = []
+    for sid, santri in santri_by_id.items():
+        result.append(
+            {
+                "santri_id": sid,
+                "nama": santri["nama"],
+                "nis": santri["nis"],
+                "asrama_id": santri["asrama_id"],
+                "nama_asrama": asrama_map.get(santri["asrama_id"], "-"),
+                "status": status_by_santri.get(sid, {}),
+            }
+        )
+
+    return {"tanggal": today, "data": result}
+
+
+@api_router.get("/wali/anak-absensi-riwayat")
+async def get_wali_anak_absensi_riwayat(tanggal: str, current_wali: dict = Depends(get_current_wali)):
+    anak_ids: List[str] = current_wali.get("anak_ids", [])
+    if not anak_ids:
+        return {"tanggal": tanggal, "data": []}
+
+    santri_list = await db.santri.find({"id": {"$in": anak_ids}}, {"_id": 0}).to_list(100)
+    santri_by_id = {s["id"]: s for s in santri_list}
+
+    asrama_map = {a["id"]: a["nama"] for a in await db.asrama.find({}, {"_id": 0}).to_list(1000)}
+
+    absensi_list = await db.absensi.find(
+        {"tanggal": tanggal, "santri_id": {"$in": list(santri_by_id.keys())}}, {"_id": 0}
+    ).to_list(1000)
+
+    status_by_santri: dict = {sid: {} for sid in santri_by_id.keys()}
+    for a in absensi_list:
+        sid = a["santri_id"]
+        waktu_sholat = a["waktu_sholat"]
+        status_val = a["status"]
+        if sid in status_by_santri:
+            status_by_santri[sid][waktu_sholat] = status_val
+
+    result = []
+    for sid, santri in santri_by_id.items():
+        result.append(
+            {
+                "santri_id": sid,
+                "nama": santri["nama"],
+                "nis": santri["nis"],
+                "asrama_id": santri["asrama_id"],
+                "nama_asrama": asrama_map.get(santri["asrama_id"], "-"),
+                "status": status_by_santri.get(sid, {}),
+            }
+        )
+
+    return {"tanggal": tanggal, "data": result}
+
     wali = await db.wali_santri.find_one({"username": request.username}, {"_id": 0})
 
     # Jika belum ada password_hash, anggap password default "password123"
