@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { santriAPI, asramaAPI, waliAPI } from '@/lib/api';
+import React, { useState, useEffect, useRef } from 'react';
+import { santriAPI, asramaAPI } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,12 +7,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit, Trash2, QrCode, Download } from 'lucide-react';
+import { Plus, Edit, Trash2, QrCode, Download, Upload, FileDown, FileSpreadsheet } from 'lucide-react';
 
 const Santri = () => {
   const [santriList, setSantriList] = useState([]);
   const [asramaList, setAsramaList] = useState([]);
-  const [waliList, setWaliList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [qrDialogOpen, setQrDialogOpen] = useState(false);
@@ -20,13 +19,17 @@ const Santri = () => {
   const [selectedSantri, setSelectedSantri] = useState(null);
   const [filterGender, setFilterGender] = useState('');
   const [filterAsrama, setFilterAsrama] = useState('');
+  const [importing, setImporting] = useState(false);
   const [formData, setFormData] = useState({
     nama: '',
     nis: '',
     gender: 'putra',
     asrama_id: '',
-    wali_id: ''
+    nama_wali: '',
+    nomor_hp_wali: '',
+    email_wali: ''
   });
+  const fileInputRef = useRef(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -39,12 +42,8 @@ const Santri = () => {
 
   const loadData = async () => {
     try {
-      const [asramaRes, waliRes] = await Promise.all([
-        asramaAPI.getAll(),
-        waliAPI.getAll()
-      ]);
+      const asramaRes = await asramaAPI.getAll();
       setAsramaList(asramaRes.data);
-      setWaliList(waliRes.data);
       await loadSantri();
     } catch (error) {
       toast({
@@ -73,7 +72,7 @@ const Santri = () => {
     e.preventDefault();
     try {
       const submitData = { ...formData };
-      if (!submitData.wali_id) delete submitData.wali_id;
+      if (!submitData.email_wali) delete submitData.email_wali;
       
       if (editMode) {
         await santriAPI.update(selectedSantri.id, submitData);
@@ -101,7 +100,9 @@ const Santri = () => {
       nis: santri.nis,
       gender: santri.gender,
       asrama_id: santri.asrama_id,
-      wali_id: santri.wali_id || ''
+      nama_wali: santri.nama_wali,
+      nomor_hp_wali: santri.nomor_hp_wali,
+      email_wali: santri.email_wali || ''
     });
     setEditMode(true);
     setDialogOpen(true);
@@ -136,8 +137,83 @@ const Santri = () => {
     document.body.removeChild(link);
   };
 
+  const downloadTemplate = async () => {
+    try {
+      const response = await santriAPI.downloadTemplate();
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'template_santri.xlsx');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      toast({ title: "Sukses", description: "Template berhasil didownload" });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Gagal download template",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleImport = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setImporting(true);
+    try {
+      const response = await santriAPI.import(file);
+      toast({ 
+        title: "Import Selesai", 
+        description: `Berhasil: ${response.data.success}, Error: ${response.data.errors.length}` 
+      });
+      if (response.data.errors.length > 0) {
+        console.log('Import errors:', response.data.errors);
+      }
+      loadSantri();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.response?.data?.detail || "Gagal import data",
+        variant: "destructive",
+      });
+    } finally {
+      setImporting(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handleExport = async () => {
+    try {
+      const response = await santriAPI.export();
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'data_santri.xlsx');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      toast({ title: "Sukses", description: "Data berhasil diexport" });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Gagal export data",
+        variant: "destructive",
+      });
+    }
+  };
+
   const resetForm = () => {
-    setFormData({ nama: '', nis: '', gender: 'putra', asrama_id: '', wali_id: '' });
+    setFormData({ 
+      nama: '', 
+      nis: '', 
+      gender: 'putra', 
+      asrama_id: '', 
+      nama_wali: '', 
+      nomor_hp_wali: '', 
+      email_wali: '' 
+    });
     setSelectedSantri(null);
     setEditMode(false);
   };
@@ -145,12 +221,6 @@ const Santri = () => {
   const getAsramaName = (asramaId) => {
     const asrama = asramaList.find(a => a.id === asramaId);
     return asrama ? asrama.nama : '-';
-  };
-
-  const getWaliName = (waliId) => {
-    if (!waliId) return '-';
-    const wali = waliList.find(w => w.id === waliId);
-    return wali ? wali.nama : '-';
   };
 
   if (loading) return <div className="flex justify-center p-8">Memuat data...</div>;
@@ -162,83 +232,133 @@ const Santri = () => {
           <h1 className="text-3xl font-bold text-gray-800">Kelola Santri</h1>
           <p className="text-gray-600 mt-1">Manajemen data santri dan QR code</p>
         </div>
-        <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>
-          <DialogTrigger asChild>
-            <Button data-testid="add-santri-button">
-              <Plus className="mr-2" size={20} />
-              Tambah Santri
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>{editMode ? 'Edit Santri' : 'Tambah Santri'}</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <Label>Nama Lengkap</Label>
-                <Input
-                  value={formData.nama}
-                  onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
-                  placeholder="Nama santri"
-                  required
-                  data-testid="santri-nama-input"
-                />
-              </div>
-              <div>
-                <Label>NIS</Label>
-                <Input
-                  value={formData.nis}
-                  onChange={(e) => setFormData({ ...formData, nis: e.target.value })}
-                  placeholder="Nomor Induk Santri"
-                  required
-                  data-testid="santri-nis-input"
-                />
-              </div>
-              <div>
-                <Label>Jenis Kelamin</Label>
-                <Select value={formData.gender} onValueChange={(value) => setFormData({ ...formData, gender: value })}>
-                  <SelectTrigger data-testid="santri-gender-select">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="putra">Putra</SelectItem>
-                    <SelectItem value="putri">Putri</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label>Asrama</Label>
-                <Select value={formData.asrama_id} onValueChange={(value) => setFormData({ ...formData, asrama_id: value })} required>
-                  <SelectTrigger data-testid="santri-asrama-select">
-                    <SelectValue placeholder="Pilih asrama" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {asramaList.filter(a => a.gender === formData.gender).map((asrama) => (
-                      <SelectItem key={asrama.id} value={asrama.id}>{asrama.nama}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label>Wali Santri (Opsional)</Label>
-                <Select value={formData.wali_id} onValueChange={(value) => setFormData({ ...formData, wali_id: value })}>
-                  <SelectTrigger data-testid="santri-wali-select">
-                    <SelectValue placeholder="Pilih wali santri" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">Tidak ada</SelectItem>
-                    {waliList.map((wali) => (
-                      <SelectItem key={wali.id} value={wali.id}>{wali.nama}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <Button type="submit" className="w-full" data-testid="submit-santri-button">
-                {editMode ? 'Update' : 'Tambah & Generate QR'}
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={downloadTemplate} data-testid="download-template-button">
+            <FileSpreadsheet className="mr-2" size={20} />
+            Template
+          </Button>
+          <Button variant="outline" onClick={() => fileInputRef.current?.click()} disabled={importing} data-testid="import-button">
+            <Upload className="mr-2" size={20} />
+            {importing ? 'Importing...' : 'Import'}
+          </Button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".xlsx,.xls"
+            onChange={handleImport}
+            style={{ display: 'none' }}
+          />
+          <Button variant="outline" onClick={handleExport} data-testid="export-button">
+            <FileDown className="mr-2" size={20} />
+            Export
+          </Button>
+          <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>
+            <DialogTrigger asChild>
+              <Button data-testid="add-santri-button">
+                <Plus className="mr-2" size={20} />
+                Tambah Santri
               </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>{editMode ? 'Edit Santri' : 'Tambah Santri'}</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Nama Santri</Label>
+                    <Input
+                      value={formData.nama}
+                      onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
+                      placeholder="Nama lengkap santri"
+                      required
+                      data-testid="santri-nama-input"
+                    />
+                  </div>
+                  <div>
+                    <Label>NIS</Label>
+                    <Input
+                      value={formData.nis}
+                      onChange={(e) => setFormData({ ...formData, nis: e.target.value })}
+                      placeholder="Nomor Induk Santri"
+                      required
+                      data-testid="santri-nis-input"
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Jenis Kelamin</Label>
+                    <Select value={formData.gender} onValueChange={(value) => setFormData({ ...formData, gender: value, asrama_id: '' })}>
+                      <SelectTrigger data-testid="santri-gender-select">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="putra">Putra</SelectItem>
+                        <SelectItem value="putri">Putri</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>Asrama</Label>
+                    <Select value={formData.asrama_id} onValueChange={(value) => setFormData({ ...formData, asrama_id: value })} required>
+                      <SelectTrigger data-testid="santri-asrama-select">
+                        <SelectValue placeholder="Pilih asrama" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {asramaList.filter(a => a.gender === formData.gender).map((asrama) => (
+                          <SelectItem key={asrama.id} value={asrama.id}>{asrama.nama}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <hr className="my-4" />
+                <h3 className="font-semibold text-gray-700">Data Wali Santri</h3>
+
+                <div>
+                  <Label>Nama Wali (Ayah/Ibu)</Label>
+                  <Input
+                    value={formData.nama_wali}
+                    onChange={(e) => setFormData({ ...formData, nama_wali: e.target.value })}
+                    placeholder="Nama lengkap wali"
+                    required
+                    data-testid="wali-nama-input"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Nomor HP Wali</Label>
+                    <Input
+                      value={formData.nomor_hp_wali}
+                      onChange={(e) => setFormData({ ...formData, nomor_hp_wali: e.target.value })}
+                      placeholder="08xxxxxxxxxx"
+                      required
+                      data-testid="wali-hp-input"
+                    />
+                  </div>
+                  <div>
+                    <Label>Email Wali (Opsional)</Label>
+                    <Input
+                      type="email"
+                      value={formData.email_wali}
+                      onChange={(e) => setFormData({ ...formData, email_wali: e.target.value })}
+                      placeholder="email@example.com"
+                      data-testid="wali-email-input"
+                    />
+                  </div>
+                </div>
+
+                <Button type="submit" className="w-full" data-testid="submit-santri-button">
+                  {editMode ? 'Update' : 'Tambah & Generate QR'}
+                </Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {/* Filters */}
@@ -286,6 +406,7 @@ const Santri = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Gender</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Asrama</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Wali</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">HP Wali</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
             </tr>
           </thead>
@@ -300,7 +421,8 @@ const Santri = () => {
                   </span>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-600">{getAsramaName(santri.asrama_id)}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">{getWaliName(santri.wali_id)}</td>
+                <td className="px-6 py-4 text-sm text-gray-600">{santri.nama_wali}</td>
+                <td className="px-6 py-4 text-sm text-gray-600">{santri.nomor_hp_wali}</td>
                 <td className="px-6 py-4 text-sm">
                   <div className="flex space-x-2">
                     <Button size="sm" variant="outline" onClick={() => showQRCode(santri)} data-testid={`qr-santri-${santri.id}`}>
