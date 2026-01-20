@@ -815,13 +815,27 @@ Pondok Pesantren"""
 
 @api_router.get("/pengabsen", response_model=List[PengabsenResponse])
 async def get_pengabsen(_: dict = Depends(get_current_admin)):
-    pengabsen_list = await db.pengabsen.find({}, {"_id": 0, "password_hash": 0}).to_list(1000)
-    
-    for pengabsen in pengabsen_list:
-        if isinstance(pengabsen['created_at'], str):
+    raw_list = await db.pengabsen.find({}, {"_id": 0}).to_list(1000)
+
+    normalized: List[PengabsenResponse] = []
+    for pengabsen in raw_list:
+        # Backward compatibility untuk data lama yang masih pakai field nip/asrama_id tunggal
+        if 'email_atau_hp' not in pengabsen:
+            pengabsen['email_atau_hp'] = pengabsen.get('nip', '')
+        if 'asrama_ids' not in pengabsen:
+            if 'asrama_id' in pengabsen:
+                pengabsen['asrama_ids'] = [pengabsen['asrama_id']]
+            else:
+                pengabsen['asrama_ids'] = []
+
+        if isinstance(pengabsen.get('created_at'), str):
             pengabsen['created_at'] = datetime.fromisoformat(pengabsen['created_at'])
-    
-    return pengabsen_list
+
+        # Pastikan password_hash tidak ikut ter-serialize
+        data = {k: v for k, v in pengabsen.items() if k != 'password_hash'}
+        normalized.append(PengabsenResponse(**data))
+
+    return normalized
 
 @api_router.post("/pengabsen", response_model=PengabsenResponse)
 async def create_pengabsen(data: PengabsenCreate, _: dict = Depends(get_current_admin)):
@@ -885,13 +899,26 @@ async def delete_pengabsen(pengabsen_id: str, _: dict = Depends(get_current_admi
 
 @api_router.get("/pembimbing", response_model=List[PembimbingResponse])
 async def get_pembimbing(_: dict = Depends(get_current_admin)):
-    pembimbing_list = await db.pembimbing.find({}, {"_id": 0, "password_hash": 0}).to_list(1000)
-    
-    for pembimbing in pembimbing_list:
-        if isinstance(pembimbing['created_at'], str):
+    raw_list = await db.pembimbing.find({}, {"_id": 0}).to_list(1000)
+
+    normalized: List[PembimbingResponse] = []
+    for pembimbing in raw_list:
+        # Backward compatibility untuk data lama yang belum punya email_atau_hp / asrama_ids
+        if 'email_atau_hp' not in pembimbing:
+            pembimbing['email_atau_hp'] = ''
+        if 'asrama_ids' not in pembimbing:
+            if 'asrama_id' in pembimbing:
+                pembimbing['asrama_ids'] = [pembimbing['asrama_id']]
+            else:
+                pembimbing['asrama_ids'] = []
+
+        if isinstance(pembimbing.get('created_at'), str):
             pembimbing['created_at'] = datetime.fromisoformat(pembimbing['created_at'])
-    
-    return pembimbing_list
+
+        data = {k: v for k, v in pembimbing.items() if k != 'password_hash'}
+        normalized.append(PembimbingResponse(**data))
+
+    return normalized
 
 @api_router.post("/pembimbing", response_model=PembimbingResponse)
 async def create_pembimbing(data: PembimbingCreate, _: dict = Depends(get_current_admin)):
