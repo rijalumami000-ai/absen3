@@ -448,30 +448,6 @@ async def fetch_prayer_times(date: str) -> Optional[dict]:
                     timings = data['data']['timings']
                     return {
                         'subuh': timings['Fajr'],
-@api_router.post("/pengabsen/login", response_model=PengabsenTokenResponse)
-async def login_pengabsen(request: PengabsenLoginRequest):
-    pengabsen = await db.pengabsen.find_one({"username": request.username}, {"_id": 0})
-
-    if not pengabsen or not verify_password(request.password, pengabsen['password_hash']):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Username atau password salah"
-        )
-
-    access_token = create_access_token(data={"sub": pengabsen['id'], "role": "pengabsen"})
-
-    return {
-        "access_token": access_token,
-        "token_type": "bearer",
-        "user": PengabsenMeResponse(**{k: v for k, v in pengabsen.items() if k != 'password_hash'})
-    }
-
-
-@api_router.get("/pengabsen/me", response_model=PengabsenMeResponse)
-async def get_pengabsen_me(current_pengabsen: dict = Depends(get_current_pengabsen)):
-    return PengabsenMeResponse(**{k: v for k, v in current_pengabsen.items() if k != 'password_hash'})
-
-
                         'dzuhur': timings['Dhuhr'],
                         'ashar': timings['Asr'],
                         'maghrib': timings['Maghrib'],
