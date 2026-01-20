@@ -132,7 +132,7 @@ const WaktuSholat = () => {
               <ul className="list-disc list-inside space-y-2 text-sm text-gray-600">
                 <li>Waktu sholat diambil dari API Aladhan</li>
                 <li>Data disinkronkan otomatis saat pertama kali dibuka</li>
-                <li>Klik tombol "Sinkronkan" untuk memperbarui data</li>
+                <li>Klik tombol Sinkronkan untuk memperbarui data</li>
                 <li>Lokasi: Desa Cintamulya, Candipuro, Lampung Selatan</li>
               </ul>
             </CardContent>
