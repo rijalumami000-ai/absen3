@@ -183,12 +183,12 @@ const Absensi = () => {
             </div>
             <div>
               <Label>Gender</Label>
-              <Select value={filterGender} onValueChange={setFilterGender}>
+              <Select value={filterGender || 'all'} onValueChange={(val) => setFilterGender(val === 'all' ? '' : val)}>
                 <SelectTrigger data-testid="filter-gender-select">
                   <SelectValue placeholder="Semua" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Semua</SelectItem>
+                  <SelectItem value="all">Semua</SelectItem>
                   <SelectItem value="putra">Putra</SelectItem>
                   <SelectItem value="putri">Putri</SelectItem>
                 </SelectContent>
@@ -196,12 +196,12 @@ const Absensi = () => {
             </div>
             <div>
               <Label>Asrama</Label>
-              <Select value={filterAsrama} onValueChange={setFilterAsrama}>
+              <Select value={filterAsrama || 'all'} onValueChange={(val) => setFilterAsrama(val === 'all' ? '' : val)}>
                 <SelectTrigger data-testid="filter-asrama-select">
                   <SelectValue placeholder="Semua" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Semua</SelectItem>
+                  <SelectItem value="all">Semua</SelectItem>
                   {asramaList
                     .filter(a => !filterGender || a.gender === filterGender)
                     .map((asrama) => (
