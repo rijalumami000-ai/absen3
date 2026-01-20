@@ -199,21 +199,27 @@ const Pengabsen = () => {
               </div>
               <div>
                 <Label className="mb-3 block">Asrama yang Dikelola (Pilih minimal 1)</Label>
-                <div className="space-y-2 max-h-60 overflow-y-auto border rounded-lg p-3">
-                  {asramaList.map((asrama) => (
-                    <div key={asrama.id} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`asrama-${asrama.id}`}
-                        checked={formData.asrama_ids.includes(asrama.id)}
-                        onCheckedChange={() => toggleAsrama(asrama.id)}
-                        data-testid={`pengabsen-asrama-${asrama.id}`}
-                      />
-                      <label htmlFor={`asrama-${asrama.id}`} className="text-sm cursor-pointer">
-                        {asrama.nama} ({asrama.gender})
-                      </label>
-                    </div>
-                  ))}
-                </div>
+                {asramaList.length === 0 ? (
+                  <div className="p-4 text-sm text-gray-500 border rounded-lg">
+                    Memuat data asrama...
+                  </div>
+                ) : (
+                  <div className="space-y-2 max-h-60 overflow-y-auto border rounded-lg p-3">
+                    {asramaList.map((asrama) => (
+                      <div key={asrama.id} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`asrama-${asrama.id}`}
+                          checked={formData.asrama_ids.includes(asrama.id)}
+                          onCheckedChange={() => toggleAsrama(asrama.id)}
+                          data-testid={`pengabsen-asrama-${asrama.id}`}
+                        />
+                        <label htmlFor={`asrama-${asrama.id}`} className="text-sm cursor-pointer">
+                          {asrama.nama} ({asrama.gender})
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 <p className="text-xs text-gray-500 mt-2">
                   Dipilih: {formData.asrama_ids.length} asrama
                 </p>
