@@ -194,21 +194,26 @@ const Pembimbing = () => {
                     Memuat data asrama...
                   </div>
                 ) : (
-                  <div className="space-y-2 max-h-60 overflow-y-auto border rounded-lg p-3">
-                    {asramaList.map((asrama) => (
-                      <div key={asrama.id} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`asrama-${asrama.id}`}
-                          checked={formData.asrama_ids.includes(asrama.id)}
-                          onCheckedChange={() => toggleAsrama(asrama.id)}
-                          data-testid={`pembimbing-asrama-${asrama.id}`}
-                        />
-                        <label htmlFor={`asrama-${asrama.id}`} className="text-sm cursor-pointer">
-                          {asrama.nama} ({asrama.gender})
-                        </label>
-                      </div>
-                    ))}
-                  </div>
+                  <>
+                    <p className="text-xs text-gray-600 mb-2">
+                      Total {asramaList.length} asrama tersedia
+                    </p>
+                    <div className="space-y-2 max-h-60 overflow-y-auto border rounded-lg p-3 bg-gray-50">
+                      {asramaList.map((asrama) => (
+                        <div key={asrama.id} className="flex items-center space-x-2 p-2 bg-white rounded hover:bg-gray-100">
+                          <Checkbox
+                            id={`asrama-${asrama.id}`}
+                            checked={formData.asrama_ids.includes(asrama.id)}
+                            onCheckedChange={() => toggleAsrama(asrama.id)}
+                            data-testid={`pembimbing-asrama-${asrama.id}`}
+                          />
+                          <label htmlFor={`asrama-${asrama.id}`} className="text-sm cursor-pointer flex-1">
+                            {asrama.nama} ({asrama.gender})
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </>
                 )}
               </div>
               <Button type="submit" className="w-full" data-testid="submit-pembimbing-button">
