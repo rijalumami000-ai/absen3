@@ -258,6 +258,16 @@ const PengabsenApp = () => {
                         throw new Error('QR tidak berisi santri_id');
                       }
 
+                      const now = Date.now();
+                      if (now - lastScanAt < 1500) {
+                        // dalam 1.5 detik, abaikan untuk mencegah double scan
+                        return;
+                      }
+
+                      setLastScanAt(now);
+                      setShowScanSuccess(true);
+                      setTimeout(() => setShowScanSuccess(false), 1000);
+
                       setLastScan({ raw: text, parsed, waktu });
                       await pengabsenAppAPI.upsertAbsensi({
                         santri_id: parsed.santri_id,
