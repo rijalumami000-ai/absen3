@@ -182,11 +182,72 @@ const PengabsenApp = () => {
         </section>
 
         <section className="bg-white rounded-lg shadow p-4">
-          <h2 className="text-sm font-semibold text-gray-700 mb-2">Scan QR (Coming Soon)</h2>
-          <p className="text-xs text-gray-500">
-            Fitur kamera untuk scan QR santri akan ditambahkan pada tahap berikutnya. Saat ini Anda sudah dapat
-            mengelola status hadir/alfa/sakit/izin/haid/istihadhoh secara manual dari daftar di atas.
-          </p>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-semibold text-gray-700">Scan QR Santri</h2>
+            <Button
+              variant={scanning ? 'outline' : 'default'}
+              size="sm"
+              onClick={() => setScanning((prev) => !prev)}
+            >
+              {scanning ? 'Stop Kamera' : 'Mulai Scan'}
+            </Button>
+          </div>
+
+          {!scanning ? (
+            <p className="text-xs text-gray-500">
+              Tekan tombol <span className="font-semibold">Mulai Scan</span> untuk mengaktifkan kamera dan scan QR
+              santri. Pastikan Anda mengizinkan akses kamera di browser.
+            </p>
+          ) : (
+            <div className="space-y-3">
+              <div className="aspect-video max-w-md mx-auto overflow-hidden rounded-xl border bg-black">
+                <QrReader
+                  constraints={{ facingMode: 'environment' }}
+                  onResult={async (result, error) => {
+                    if (!!result) {
+                      try {
+                        const text = result.getText();
+                        const parsed = JSON.parse(text);
+                        if (!parsed.santri_id) {
+                          throw new Error('QR tidak berisi santri_id');
+                        }
+                        setLastScan({ raw: text, parsed, waktu });
+                        await pengabsenAppAPI.upsertAbsensi({
+                          santri_id: parsed.santri_id,
+                          waktu_sholat: waktu,
+                          status_absen: 'hadir',
+                        });
+                        await loadData(waktu);
+                        toast({
+                          title: 'Scan Berhasil',
+                          description: `Hadir: ${parsed.nama || 'Santri'} (${parsed.nis || '-'})`,
+                        });
+                      } catch (e) {
+                        console.error(e);
+                        toast({
+                          title: 'QR tidak valid',
+                          description: 'Pastikan QR berasal dari sistem ini.',
+                          variant: 'destructive',
+                        });
+                      }
+                    }
+                    // error noise diabaikan agar tidak spam
+                  }}
+                  videoStyle={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  className="w-full h-full"
+                />
+              </div>
+
+              {lastScan && (
+                <div className="text-xs text-gray-600 bg-emerald-50 border border-emerald-100 rounded-lg p-3">
+                  <div className="font-semibold mb-1">Scan terakhir:</div>
+                  <div>Nama: {lastScan.parsed.nama}</div>
+                  <div>NIS: {lastScan.parsed.nis}</div>
+                  <div>Waktu Sholat: {WAKTU_OPTIONS.find((w) => w.value === lastScan.waktu)?.label}</div>
+                </div>
+              )}
+            </div>
+          )}
         </section>
       </main>
     </div>
