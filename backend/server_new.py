@@ -807,3 +807,365 @@ Pondok Pesantren"""
         "nomor_whatsapp": nomor_wa
     }
 
+
+# ==================== PENGABSEN ENDPOINTS (REVISED - Multi Asrama) ====================
+
+@api_router.get("/pengabsen", response_model=List[PengabsenResponse])
+async def get_pengabsen(_: dict = Depends(get_current_admin)):
+    pengabsen_list = await db.pengabsen.find({}, {"_id": 0, "password_hash": 0}).to_list(1000)
+    
+    for pengabsen in pengabsen_list:
+        if isinstance(pengabsen['created_at'], str):
+            pengabsen['created_at'] = datetime.fromisoformat(pengabsen['created_at'])
+    
+    return pengabsen_list
+
+@api_router.post("/pengabsen", response_model=PengabsenResponse)
+async def create_pengabsen(data: PengabsenCreate, _: dict = Depends(get_current_admin)):
+    # Check if username already exists
+    existing = await db.pengabsen.find_one({"username": data.username})
+    if existing:
+        raise HTTPException(status_code=400, detail="Username sudah digunakan")
+    
+    # Verify all asrama exist
+    for asrama_id in data.asrama_ids:
+        asrama = await db.asrama.find_one({"id": asrama_id})
+        if not asrama:
+            raise HTTPException(status_code=404, detail=f"Asrama {asrama_id} tidak ditemukan")
+    
+    pengabsen_dict = data.model_dump()
+    password = pengabsen_dict.pop('password')
+    pengabsen_dict['password_hash'] = hash_password(password)
+    
+    pengabsen_obj = Pengabsen(**pengabsen_dict)
+    doc = pengabsen_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    
+    await db.pengabsen.insert_one(doc)
+    
+    return PengabsenResponse(**pengabsen_obj.model_dump())
+
+@api_router.put("/pengabsen/{pengabsen_id}", response_model=PengabsenResponse)
+async def update_pengabsen(pengabsen_id: str, data: PengabsenUpdate, _: dict = Depends(get_current_admin)):
+    pengabsen = await db.pengabsen.find_one({"id": pengabsen_id}, {"_id": 0})
+    if not pengabsen:
+        raise HTTPException(status_code=404, detail="Pengabsen tidak ditemukan")
+    
+    update_data = {k: v for k, v in data.model_dump().items() if v is not None}
+    
+    if 'asrama_ids' in update_data:
+        for asrama_id in update_data['asrama_ids']:
+            asrama = await db.asrama.find_one({"id": asrama_id})
+            if not asrama:
+                raise HTTPException(status_code=404, detail=f"Asrama {asrama_id} tidak ditemukan")
+    
+    if 'password' in update_data:
+        update_data['password_hash'] = hash_password(update_data.pop('password'))
+    
+    if update_data:
+        await db.pengabsen.update_one({"id": pengabsen_id}, {"$set": update_data})
+        pengabsen.update(update_data)
+    
+    if isinstance(pengabsen['created_at'], str):
+        pengabsen['created_at'] = datetime.fromisoformat(pengabsen['created_at'])
+    
+    return PengabsenResponse(**{k: v for k, v in pengabsen.items() if k != 'password_hash'})
+
+@api_router.delete("/pengabsen/{pengabsen_id}")
+async def delete_pengabsen(pengabsen_id: str, _: dict = Depends(get_current_admin)):
+    result = await db.pengabsen.delete_one({"id": pengabsen_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Pengabsen tidak ditemukan")
+    return {"message": "Pengabsen berhasil dihapus"}
+
+# ==================== PEMBIMBING ENDPOINTS (REVISED - Add Contact) ====================
+
+@api_router.get("/pembimbing", response_model=List[PembimbingResponse])
+async def get_pembimbing(_: dict = Depends(get_current_admin)):
+    pembimbing_list = await db.pembimbing.find({}, {"_id": 0, "password_hash": 0}).to_list(1000)
+    
+    for pembimbing in pembimbing_list:
+        if isinstance(pembimbing['created_at'], str):
+            pembimbing['created_at'] = datetime.fromisoformat(pembimbing['created_at'])
+    
+    return pembimbing_list
+
+@api_router.post("/pembimbing", response_model=PembimbingResponse)
+async def create_pembimbing(data: PembimbingCreate, _: dict = Depends(get_current_admin)):
+    existing = await db.pembimbing.find_one({"username": data.username})
+    if existing:
+        raise HTTPException(status_code=400, detail="Username sudah digunakan")
+    
+    pembimbing_dict = data.model_dump()
+    password = pembimbing_dict.pop('password')
+    pembimbing_dict['password_hash'] = hash_password(password)
+    
+    pembimbing_obj = Pembimbing(**pembimbing_dict)
+    doc = pembimbing_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    
+    await db.pembimbing.insert_one(doc)
+    
+    return PembimbingResponse(**pembimbing_obj.model_dump())
+
+@api_router.put("/pembimbing/{pembimbing_id}", response_model=PembimbingResponse)
+async def update_pembimbing(pembimbing_id: str, data: PembimbingUpdate, _: dict = Depends(get_current_admin)):
+    pembimbing = await db.pembimbing.find_one({"id": pembimbing_id}, {"_id": 0})
+    if not pembimbing:
+        raise HTTPException(status_code=404, detail="Pembimbing tidak ditemukan")
+    
+    update_data = {k: v for k, v in data.model_dump().items() if v is not None}
+    
+    if 'password' in update_data:
+        update_data['password_hash'] = hash_password(update_data.pop('password'))
+    
+    if update_data:
+        await db.pembimbing.update_one({"id": pembimbing_id}, {"$set": update_data})
+        pembimbing.update(update_data)
+    
+    if isinstance(pembimbing['created_at'], str):
+        pembimbing['created_at'] = datetime.fromisoformat(pembimbing['created_at'])
+    
+    return PembimbingResponse(**{k: v for k, v in pembimbing.items() if k != 'password_hash'})
+
+@api_router.delete("/pembimbing/{pembimbing_id}")
+async def delete_pembimbing(pembimbing_id: str, _: dict = Depends(get_current_admin)):
+    result = await db.pembimbing.delete_one({"id": pembimbing_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Pembimbing tidak ditemukan")
+    return {"message": "Pembimbing berhasil dihapus"}
+
+# ==================== ABSENSI ENDPOINTS (REVISED) ====================
+
+@api_router.get("/absensi", response_model=List[AbsensiResponse])
+async def get_absensi(
+    tanggal_start: Optional[str] = None,
+    tanggal_end: Optional[str] = None,
+    santri_id: Optional[str] = None,
+    waktu_sholat: Optional[str] = None,
+    asrama_id: Optional[str] = None,
+    gender: Optional[str] = None,
+    _: dict = Depends(get_current_admin)
+):
+    """Get absensi with advanced filters"""
+    query = {}
+    
+    # Date range filter
+    if tanggal_start and tanggal_end:
+        query['tanggal'] = {"$gte": tanggal_start, "$lte": tanggal_end}
+    elif tanggal_start:
+        query['tanggal'] = tanggal_start
+    
+    if santri_id:
+        query['santri_id'] = santri_id
+    if waktu_sholat:
+        query['waktu_sholat'] = waktu_sholat
+    
+    absensi_list = await db.absensi.find(query, {"_id": 0}).to_list(10000)
+    
+    # Filter by asrama or gender if needed
+    if asrama_id or gender:
+        santri_query = {}
+        if asrama_id:
+            santri_query['asrama_id'] = asrama_id
+        if gender:
+            santri_query['gender'] = gender
+        
+        santri_ids = [s['id'] for s in await db.santri.find(santri_query, {"_id": 0, "id": 1}).to_list(10000)]
+        absensi_list = [a for a in absensi_list if a['santri_id'] in santri_ids]
+    
+    for absensi in absensi_list:
+        if isinstance(absensi['waktu_absen'], str):
+            absensi['waktu_absen'] = datetime.fromisoformat(absensi['waktu_absen'])
+        if isinstance(absensi['created_at'], str):
+            absensi['created_at'] = datetime.fromisoformat(absensi['created_at'])
+    
+    return absensi_list
+
+@api_router.get("/absensi/stats")
+async def get_absensi_stats(
+    tanggal_start: Optional[str] = None,
+    tanggal_end: Optional[str] = None,
+    asrama_id: Optional[str] = None,
+    gender: Optional[str] = None,
+    _: dict = Depends(get_current_admin)
+):
+    """Get absensi statistics with filters"""
+    query = {}
+    
+    if tanggal_start and tanggal_end:
+        query['tanggal'] = {"$gte": tanggal_start, "$lte": tanggal_end}
+    elif tanggal_start:
+        query['tanggal'] = tanggal_start
+    
+    # Filter by asrama or gender
+    if asrama_id or gender:
+        santri_query = {}
+        if asrama_id:
+            santri_query['asrama_id'] = asrama_id
+        if gender:
+            santri_query['gender'] = gender
+        
+        santri_ids = [s['id'] for s in await db.santri.find(santri_query, {"_id": 0, "id": 1}).to_list(10000)]
+        query['santri_id'] = {"$in": santri_ids}
+    
+    total = await db.absensi.count_documents(query)
+    hadir = await db.absensi.count_documents({**query, "status": "hadir"})
+    alfa = await db.absensi.count_documents({**query, "status": "alfa"})
+    sakit = await db.absensi.count_documents({**query, "status": "sakit"})
+    izin = await db.absensi.count_documents({**query, "status": "izin"})
+    haid = await db.absensi.count_documents({**query, "status": "haid"})
+    istihadhoh = await db.absensi.count_documents({**query, "status": "istihadhoh"})
+    
+    return {
+        "total": total,
+        "hadir": hadir,
+        "alfa": alfa,
+        "sakit": sakit,
+        "izin": izin,
+        "haid": haid,
+        "istihadhoh": istihadhoh
+    }
+
+@api_router.get("/absensi/detail")
+async def get_absensi_detail(
+    tanggal: str,
+    asrama_id: Optional[str] = None,
+    gender: Optional[str] = None,
+    _: dict = Depends(get_current_admin)
+):
+    """Get detailed absensi per waktu sholat for specific date"""
+    # Get all santri with filters
+    santri_query = {}
+    if asrama_id:
+        santri_query['asrama_id'] = asrama_id
+    if gender:
+        santri_query['gender'] = gender
+    
+    all_santri = await db.santri.find(santri_query, {"_id": 0}).to_list(10000)
+    santri_dict = {s['id']: s for s in all_santri}
+    
+    # Get absensi for the date
+    absensi_list = await db.absensi.find({"tanggal": tanggal}, {"_id": 0}).to_list(10000)
+    
+    # Organize by waktu sholat and status
+    waktu_sholat_list = ["subuh", "dzuhur", "ashar", "maghrib", "isya"]
+    status_list = ["hadir", "alfa", "sakit", "izin", "haid", "istihadhoh"]
+    
+    result = {}
+    for waktu in waktu_sholat_list:
+        result[waktu] = {}
+        for status in status_list:
+            santri_ids = [a['santri_id'] for a in absensi_list if a['waktu_sholat'] == waktu and a['status'] == status and a['santri_id'] in santri_dict]
+            result[waktu][status] = [
+                {
+                    "santri_id": sid,
+                    "nama": santri_dict[sid]['nama'],
+                    "nis": santri_dict[sid]['nis'],
+                    "asrama_id": santri_dict[sid]['asrama_id']
+                }
+                for sid in santri_ids
+            ]
+    
+    return result
+
+@api_router.delete("/absensi/{absensi_id}")
+async def delete_absensi(absensi_id: str, _: dict = Depends(get_current_admin)):
+    result = await db.absensi.delete_one({"id": absensi_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Data absensi tidak ditemukan")
+    return {"message": "Data absensi berhasil dihapus"}
+
+# ==================== WAKTU SHOLAT ENDPOINTS ====================
+
+@api_router.get("/waktu-sholat", response_model=WaktuSholatResponse)
+async def get_waktu_sholat(tanggal: str, _: dict = Depends(get_current_admin)):
+    waktu = await db.waktu_sholat.find_one({"tanggal": tanggal}, {"_id": 0})
+    
+    if waktu:
+        if isinstance(waktu['created_at'], str):
+            waktu['created_at'] = datetime.fromisoformat(waktu['created_at'])
+        return WaktuSholatResponse(**waktu)
+    
+    # Fetch from API
+    date_parts = tanggal.split('-')
+    api_date = f"{date_parts[2]}-{date_parts[1]}-{date_parts[0]}"
+    
+    prayer_times = await fetch_prayer_times(api_date)
+    if not prayer_times:
+        raise HTTPException(status_code=500, detail="Gagal mengambil data waktu sholat")
+    
+    waktu_obj = WaktuSholat(tanggal=tanggal, **prayer_times)
+    doc = waktu_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    
+    await db.waktu_sholat.insert_one(doc)
+    
+    return WaktuSholatResponse(**waktu_obj.model_dump())
+
+@api_router.post("/waktu-sholat/sync")
+async def sync_waktu_sholat(tanggal: str, _: dict = Depends(get_current_admin)):
+    date_parts = tanggal.split('-')
+    api_date = f"{date_parts[2]}-{date_parts[1]}-{date_parts[0]}"
+    
+    prayer_times = await fetch_prayer_times(api_date)
+    if not prayer_times:
+        raise HTTPException(status_code=500, detail="Gagal mengambil data waktu sholat dari API")
+    
+    await db.waktu_sholat.delete_one({"tanggal": tanggal})
+    
+    waktu_obj = WaktuSholat(tanggal=tanggal, **prayer_times)
+    doc = waktu_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    
+    await db.waktu_sholat.insert_one(doc)
+    
+    return WaktuSholatResponse(**waktu_obj.model_dump())
+
+# ==================== INITIALIZATION ====================
+
+@api_router.get("/")
+async def root():
+    return {"message": "Absensi Sholat API - Admin Panel v2"}
+
+@api_router.post("/init/admin")
+async def initialize_admin():
+    existing = await db.admins.find_one({})
+    if existing:
+        raise HTTPException(status_code=400, detail="Admin sudah ada")
+    
+    admin = Admin(
+        username="admin",
+        nama="Administrator",
+        password_hash=hash_password("admin123")
+    )
+    
+    doc = admin.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    
+    await db.admins.insert_one(doc)
+    
+    return {"message": "Admin default berhasil dibuat", "username": "admin", "password": "admin123"}
+
+# Include router
+app.include_router(api_router)
+
+# CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_credentials=True,
+    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+@app.on_event("shutdown")
+async def shutdown_db_client():
+    client.close()
