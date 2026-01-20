@@ -1086,9 +1086,9 @@ async def get_absensi_detail(
     result = {}
     for waktu in waktu_sholat_list:
         result[waktu] = {}
-        for status in status_list:
-            santri_ids = [a['santri_id'] for a in absensi_list if a['waktu_sholat'] == waktu and a['status'] == status and a['santri_id'] in santri_dict]
-            result[waktu][status] = [
+        for st in status_list:
+            santri_ids = [a['santri_id'] for a in absensi_list if a['waktu_sholat'] == waktu and a['status'] == st and a['santri_id'] in santri_dict]
+            result[waktu][st] = [
                 {
                     "santri_id": sid,
                     "nama": santri_dict[sid]['nama'],
