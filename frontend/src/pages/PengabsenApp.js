@@ -5,7 +5,7 @@ import { pengabsenAppAPI } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { QrReader } from 'react-qr-reader';
+import { Scanner } from '@yudiel/react-qr-scanner';
 
 const WAKTU_OPTIONS = [
   { value: 'subuh', label: 'Subuh' },
