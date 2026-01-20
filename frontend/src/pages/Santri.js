@@ -482,12 +482,18 @@ const Santri = () => {
           <div className="flex flex-col items-center space-y-4">
             {selectedSantri && (
               <>
-                <img 
-                  src={santriAPI.getQRCode(selectedSantri.id)} 
-                  alt="QR Code" 
-                  className="w-64 h-64 border-2 border-gray-200 rounded-lg"
-                  data-testid="qr-code-image"
-                />
+                {selectedSantri.qrUrl ? (
+                  <img 
+                    src={selectedSantri.qrUrl} 
+                    alt="QR Code" 
+                    className="w-64 h-64 border-2 border-gray-200 rounded-lg"
+                    data-testid="qr-code-image"
+                  />
+                ) : (
+                  <div className="w-64 h-64 border-2 border-gray-200 rounded-lg flex items-center justify-center">
+                    <p className="text-gray-500">Memuat QR Code...</p>
+                  </div>
+                )}
                 <div className="text-center">
                   <p className="font-semibold text-gray-800">{selectedSantri.nama}</p>
                   <p className="text-sm text-gray-600">NIS: {selectedSantri.nis}</p>
