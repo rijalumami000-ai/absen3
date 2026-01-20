@@ -29,6 +29,7 @@ const Pengabsen = () => {
   }, []);
 
   const loadData = async () => {
+    setLoading(true);
     try {
       const [pengabsenRes, asramaRes] = await Promise.all([
         pengabsenAPI.getAll(),
@@ -36,6 +37,7 @@ const Pengabsen = () => {
       ]);
       setPengabsenList(pengabsenRes.data);
       setAsramaList(asramaRes.data);
+      console.log('Asrama loaded:', asramaRes.data.length); // Debug
     } catch (error) {
       toast({
         title: "Error",
