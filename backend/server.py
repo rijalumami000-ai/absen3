@@ -938,6 +938,111 @@ async def update_pengabsen(pengabsen_id: str, data: PengabsenUpdate, _: dict = D
     
     if 'password' in update_data:
         update_data['password_hash'] = hash_password(update_data.pop('password'))
+@api_router.post("/pengabsen/absensi")
+async def upsert_absensi_pengabsen(
+    santri_id: str,
+    waktu_sholat: Literal["subuh", "dzuhur", "ashar", "maghrib", "isya"],
+    status_absen: Literal["hadir", "alfa", "sakit", "izin", "haid", "istihadhoh"] = "hadir",
+    current_pengabsen: dict = Depends(get_current_pengabsen)
+):
+    today = datetime.now(timezone.utc).astimezone().date().isoformat()
+
+    santri = await db.santri.find_one({"id": santri_id}, {"_id": 0})
+    if not santri:
+        raise HTTPException(status_code=404, detail="Santri tidak ditemukan")
+
+    if santri['asrama_id'] not in current_pengabsen.get('asrama_ids', []):
+        raise HTTPException(status_code=403, detail="Santri bukan asrama yang Anda kelola")
+
+    existing = await db.absensi.find_one({
+        "santri_id": santri_id,
+        "waktu_sholat": waktu_sholat,
+        "tanggal": today
+    })
+
+    doc = {
+        "santri_id": santri_id,
+        "waktu_sholat": waktu_sholat,
+        "status": status_absen,
+        "tanggal": today,
+        "pengabsen_id": current_pengabsen['id'],
+        "waktu_absen": datetime.now(timezone.utc).isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+
+    if existing:
+        await db.absensi.update_one({"id": existing.get("id")}, {"$set": doc})
+    else:
+        doc["id"] = str(uuid.uuid4())
+        await db.absensi.insert_one(doc)
+
+    return {"message": "Absensi tersimpan", "tanggal": today}
+
+
+@api_router.delete("/pengabsen/absensi")
+async def delete_absensi_pengabsen(
+    santri_id: str,
+    waktu_sholat: Literal["subuh", "dzuhur", "ashar", "maghrib", "isya"],
+    current_pengabsen: dict = Depends(get_current_pengabsen)
+):
+    today = datetime.now(timezone.utc).astimezone().date().isoformat()
+
+    santri = await db.santri.find_one({"id": santri_id}, {"_id": 0})
+    if not santri:
+        raise HTTPException(status_code=404, detail="Santri tidak ditemukan")
+
+    if santri['asrama_id'] not in current_pengabsen.get('asrama_ids', []):
+        raise HTTPException(status_code=403, detail="Santri bukan asrama yang Anda kelola")
+
+    result = await db.absensi.delete_one({
+        "santri_id": santri_id,
+        "waktu_sholat": waktu_sholat,
+        "tanggal": today
+    })
+
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Data absensi tidak ditemukan")
+
+    return {"message": "Absensi dihapus", "tanggal": today}
+
+
+@api_router.get("/pengabsen/santri-absensi-hari-ini")
+async def get_santri_absensi_hari_ini(
+    waktu_sholat: Literal["subuh", "dzuhur", "ashar", "maghrib", "isya"],
+    current_pengabsen: dict = Depends(get_current_pengabsen)
+):
+    today = datetime.now(timezone.utc).astimezone().date().isoformat()
+
+    asrama_ids = current_pengabsen.get('asrama_ids', [])
+    santri_list = await db.santri.find({"asrama_id": {"$in": asrama_ids}}, {"_id": 0}).to_list(10000)
+    santri_by_id = {s['id']: s for s in santri_list}
+
+    absensi_list = await db.absensi.find({
+        "tanggal": today,
+        "waktu_sholat": waktu_sholat,
+        "santri_id": {"$in": list(santri_by_id.keys())}
+    }, {"_id": 0}).to_list(10000)
+
+    absensi_by_santri = {a['santri_id']: a for a in absensi_list}
+
+    asrama_map = {a['id']: a['nama'] for a in await db.asrama.find({}, {"_id": 0}).to_list(10000)}
+
+    result = []
+    for sid, santri in santri_by_id.items():
+        absensi = absensi_by_santri.get(sid)
+        status_val = absensi['status'] if absensi else None
+        result.append({
+            "santri_id": sid,
+            "nama": santri['nama'],
+            "nis": santri['nis'],
+            "asrama_id": santri['asrama_id'],
+            "nama_asrama": asrama_map.get(santri['asrama_id'], "-"),
+            "status": status_val
+        })
+
+    return {"tanggal": today, "waktu_sholat": waktu_sholat, "data": result}
+
+
     
     if update_data:
         await db.pengabsen.update_one({"id": pengabsen_id}, {"$set": update_data})
