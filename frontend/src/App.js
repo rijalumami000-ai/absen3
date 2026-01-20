@@ -12,6 +12,9 @@ import Pengabsen from '@/pages/Pengabsen';
 import Pembimbing from '@/pages/Pembimbing';
 import Absensi from '@/pages/Absensi';
 import WaktuSholat from '@/pages/WaktuSholat';
+import PengabsenAppLogin from '@/pages/PengabsenAppLogin';
+import PengabsenApp from '@/pages/PengabsenApp';
+import { PengabsenAuthProvider, usePengabsenAuth } from '@/contexts/PengabsenAuthContext';
 import '@/App.css';
 
 const ProtectedRoute = ({ children }) => {

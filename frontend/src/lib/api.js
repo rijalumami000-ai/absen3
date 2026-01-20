@@ -66,6 +66,33 @@ export const pembimbingAPI = {
   delete: (id) => axios.delete(`${API}/pembimbing/${id}`, { headers: getAuthHeader() }),
 };
 
+const getPengabsenAuthHeader = () => {
+  const token = localStorage.getItem('pengabsen_token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
+// API khusus PWA Pengabsen
+export const pengabsenAppAPI = {
+  login: (username, password) =>
+    axios.post(`${API}/pengabsen/login`, { username, password }),
+  me: () => axios.get(`${API}/pengabsen/me`, { headers: getPengabsenAuthHeader() }),
+  upsertAbsensi: (params) =>
+    axios.post(`${API}/pengabsen/absensi`, null, {
+      params,
+      headers: getPengabsenAuthHeader(),
+    }),
+  deleteAbsensi: (params) =>
+    axios.delete(`${API}/pengabsen/absensi`, {
+      params,
+      headers: getPengabsenAuthHeader(),
+    }),
+  listHariIni: (params) =>
+    axios.get(`${API}/pengabsen/santri-absensi-hari-ini`, {
+      params,
+      headers: getPengabsenAuthHeader(),
+    }),
+};
+
 // Absensi API
 export const absensiAPI = {
   getAll: (params) => {
