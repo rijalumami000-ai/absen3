@@ -240,7 +240,11 @@ const PengabsenApp = () => {
             </p>
           ) : (
             <div className="space-y-3">
-              <div className="aspect-video max-w-md mx-auto overflow-hidden rounded-xl border bg-black">
+              <div
+                className={`aspect-video max-w-md mx-auto overflow-hidden rounded-xl border bg-black transition-colors duration-300 ${
+                  showScanSuccess ? 'border-emerald-500' : 'border-gray-300'
+                }`}
+              >
                 <Scanner
                   onScan={async (detected) => {
                     try {
