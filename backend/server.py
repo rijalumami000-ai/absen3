@@ -228,6 +228,24 @@ class PembimbingResponse(BaseModel):
     email_atau_hp: str
     asrama_ids: List[str]
     created_at: datetime
+class PengabsenLoginRequest(BaseModel):
+    username: str
+    password: str
+
+class PengabsenMeResponse(BaseModel):
+    id: str
+    nama: str
+    username: str
+    email_atau_hp: str
+    asrama_ids: List[str]
+    created_at: datetime
+
+class PengabsenTokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: PengabsenMeResponse
+
+
 
 # Absensi Models
 class Absensi(BaseModel):
@@ -289,6 +307,23 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     else:
         expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
+async def get_current_pengabsen(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
+    try:
+        token = credentials.credentials
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        pengabsen_id: str = payload.get("sub")
+        if pengabsen_id is None:
+            raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+
+        pengabsen = await db.pengabsen.find_one({"id": pengabsen_id}, {"_id": 0})
+        if pengabsen is None:
+            raise HTTPException(status_code=401, detail="Pengabsen not found")
+
+        return pengabsen
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+
+
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
