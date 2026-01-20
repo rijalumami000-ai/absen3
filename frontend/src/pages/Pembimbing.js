@@ -193,9 +193,13 @@ const Pembimbing = () => {
               </div>
               <div>
                 <Label className="mb-3 block">Asrama yang Dibimbing</Label>
-                {asramaList.length === 0 ? (
+                {asramaLoading ? (
                   <div className="p-4 text-sm text-gray-500 border rounded-lg">
                     Memuat data asrama...
+                  </div>
+                ) : asramaList.length === 0 ? (
+                  <div className="p-4 text-sm text-gray-500 border rounded-lg">
+                    Belum ada data asrama. Silakan tambahkan asrama terlebih dahulu di menu Asrama.
                   </div>
                 ) : (
                   <>
