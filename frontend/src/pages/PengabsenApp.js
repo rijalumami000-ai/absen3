@@ -202,11 +202,16 @@ const PengabsenApp = () => {
             <div className="space-y-3">
               <div className="aspect-video max-w-md mx-auto overflow-hidden rounded-xl border bg-black">
                 <QrReader
-                  constraints={{ facingMode: 'environment' }}
+                  constraints={{
+                    video: {
+                      facingMode: { ideal: 'environment' },
+                    },
+                  }}
                   onResult={async (result, error) => {
                     if (!!result) {
                       try {
-                        const text = result.getText();
+                        const text = result?.text || result.getText?.() || '';
+                        if (!text) return;
                         const parsed = JSON.parse(text);
                         if (!parsed.santri_id) {
                           throw new Error('QR tidak berisi santri_id');
@@ -231,8 +236,13 @@ const PengabsenApp = () => {
                         });
                       }
                     }
-                    // error noise diabaikan agar tidak spam
+
+                    if (!!error) {
+                      // error scanning diabaikan agar tidak spam, tapi bisa dilihat di console jika perlu
+                      // console.info(error);
+                    }
                   }}
+                  scanDelay={800}
                   videoStyle={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   className="w-full h-full"
                 />
