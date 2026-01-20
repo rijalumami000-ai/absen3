@@ -853,6 +853,73 @@ async def update_wali(wali_id: str, data: WaliSantriUpdate, _: dict = Depends(ge
     
     return WaliSantriResponse(**{k: v for k, v in wali.items() if k != 'password_hash'})
 
+
+async def get_current_wali(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
+    try:
+        token = credentials.credentials
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        wali_id: str = payload.get("sub")
+        if wali_id is None:
+            raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+
+        wali = await db.wali_santri.find_one({"id": wali_id}, {"_id": 0})
+        if wali is None:
+            raise HTTPException(status_code=401, detail="Wali tidak ditemukan")
+
+        return wali
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+
+
+@api_router.post("/wali/login", response_model=WaliTokenResponse)
+async def login_wali(request: WaliLoginRequest):
+    # Temukan wali berdasarkan username
+    wali = await db.wali_santri.find_one({"username": request.username}, {"_id": 0})
+
+    # Jika belum ada password_hash, anggap password default "password123"
+    password_hash = wali.get("password_hash") if wali else None
+
+    if not wali:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Username atau password salah")
+
+    # Jika belum pernah di-set password (password_hash kosong), gunakan default password123
+    if not password_hash:
+        if request.password != "password123":
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Username atau password salah")
+    else:
+        if not verify_password(request.password, password_hash):
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Username atau password salah")
+
+    access_token = create_access_token(data={"sub": wali["id"], "role": "wali"})
+
+    user_data = WaliMeResponse(
+        id=wali["id"],
+        nama=wali["nama"],
+        username=wali["username"],
+        nomor_hp=wali["nomor_hp"],
+        email=wali.get("email"),
+        anak_ids=wali.get("anak_ids", []),
+    )
+
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": user_data,
+    }
+
+
+@api_router.get("/wali/me", response_model=WaliMeResponse)
+async def get_wali_me(current_wali: dict = Depends(get_current_wali)):
+    return WaliMeResponse(
+        id=current_wali["id"],
+        nama=current_wali["nama"],
+        username=current_wali["username"],
+        nomor_hp=current_wali["nomor_hp"],
+        email=current_wali.get("email"),
+        anak_ids=current_wali.get("anak_ids", []),
+    )
+
+
 @api_router.get("/wali/{wali_id}/whatsapp-message")
 async def get_wali_whatsapp_message(wali_id: str, _: dict = Depends(get_current_admin)):
     """Generate WhatsApp message for wali"""
