@@ -150,8 +150,14 @@ const PengabsenApp = () => {
 
         <section className="bg-white rounded-lg shadow p-4">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-gray-700">Daftar Santri & Status</h2>
-            <span className="text-xs text-gray-500">Total: {data.length} santri</span>
+            <div>
+              <h2 className="text-sm font-semibold text-gray-700">Daftar Santri & Status</h2>
+              <p className="text-xs text-gray-500 mt-1">
+                Total: <span className="font-semibold">{totalSantri}</span> santri &mdash; Hadir:{' '}
+                <span className="text-emerald-600 font-semibold">{hadirCount}</span> &mdash; Belum:{' '}
+                <span className="text-amber-600 font-semibold">{belumCount}</span>
+              </p>
+            </div>
           </div>
 
           {loadingData ? (
@@ -161,43 +167,56 @@ const PengabsenApp = () => {
               Belum ada santri untuk asrama yang Anda kelola.
             </div>
           ) : (
-            <div className="max-h-[60vh] overflow-y-auto">
-              <table className="w-full text-sm">
-                <thead className="sticky top-0 bg-gray-50 border-b text-xs text-gray-500">
-                  <tr>
-                    <th className="px-3 py-2 text-left">Nama</th>
-                    <th className="px-3 py-2 text-left">NIS</th>
-                    <th className="px-3 py-2 text-left">Asrama</th>
-                    <th className="px-3 py-2 text-left">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y">
-                  {data.map((row) => (
-                    <tr key={row.santri_id}>
-                      <td className="px-3 py-2 text-gray-800">{row.nama}</td>
-                      <td className="px-3 py-2 text-gray-600">{row.nis}</td>
-                      <td className="px-3 py-2 text-gray-600">{row.nama_asrama}</td>
-                      <td className="px-3 py-2">
-                        <Select
-                          value={row.status ?? 'null'}
-                          onValueChange={(val) => handleStatusChange(row.santri_id, val)}
-                        >
-                          <SelectTrigger className="w-32 h-8 text-xs">
-                            <SelectValue placeholder="Pilih status" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {STATUS_OPTIONS.map((opt) => (
-                              <SelectItem key={opt.value} value={opt.value}>
-                                {opt.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="max-h-[60vh] overflow-y-auto space-y-4">
+              {groupedList.map((group) => (
+                <div key={group.asramaId || 'tanpa-asrama'} className="border rounded-lg overflow-hidden bg-white">
+                  <div className="px-3 py-2 bg-gray-50 border-b flex items-center justify-between">
+                    <div className="text-xs font-semibold text-gray-700 flex items-center gap-2">
+                      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">
+                        {group.namaAsrama?.[0] || 'A'}
+                      </span>
+                      <span>{group.namaAsrama}</span>
+                    </div>
+                    <div className="text-[10px] text-gray-500">
+                      {group.items.length} santri
+                    </div>
+                  </div>
+                  <table className="w-full text-sm">
+                    <thead className="bg-gray-50 border-b text-xs text-gray-500">
+                      <tr>
+                        <th className="px-3 py-2 text-left">Nama</th>
+                        <th className="px-3 py-2 text-left">NIS</th>
+                        <th className="px-3 py-2 text-left">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      {group.items.map((row) => (
+                        <tr key={row.santri_id}>
+                          <td className="px-3 py-2 text-gray-800">{row.nama}</td>
+                          <td className="px-3 py-2 text-gray-600">{row.nis}</td>
+                          <td className="px-3 py-2">
+                            <Select
+                              value={row.status ?? 'null'}
+                              onValueChange={(val) => handleStatusChange(row.santri_id, val)}
+                            >
+                              <SelectTrigger className="w-32 h-8 text-xs">
+                                <SelectValue placeholder="Pilih status" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {STATUS_OPTIONS.map((opt) => (
+                                  <SelectItem key={opt.value} value={opt.value}>
+                                    {opt.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ))}
             </div>
           )}
         </section>
