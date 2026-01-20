@@ -125,9 +125,32 @@ const Santri = () => {
     }
   };
 
-  const showQRCode = (santri) => {
+  const showQRCode = async (santri) => {
     setSelectedSantri(santri);
     setQrDialogOpen(true);
+    
+    // Fetch QR code with authorization
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(santriAPI.getQRCode(santri.id), {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const blob = await response.blob();
+        const qrUrl = URL.createObjectURL(blob);
+        setSelectedSantri({ ...santri, qrUrl });
+      }
+    } catch (error) {
+      console.error('Error loading QR code:', error);
+      toast({
+        title: "Error",
+        description: "Gagal memuat QR code",
+        variant: "destructive",
+      });
+    }
   };
 
   const downloadQRCode = (santri) => {
