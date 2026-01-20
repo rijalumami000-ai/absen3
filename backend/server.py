@@ -690,7 +690,7 @@ async def import_santri(file: UploadFile = File(...), _: dict = Depends(get_curr
         await sync_wali_santri()
         
         return {
-            "message": f"Import selesai",
+            "message": "Import selesai",
             "success": success_count,
             "errors": error_list
         }
