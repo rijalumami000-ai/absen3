@@ -11,6 +11,7 @@ import { Plus, Edit, Trash2, UserCheck } from 'lucide-react';
 const Pengabsen = () => {
   const [pengabsenList, setPengabsenList] = useState([]);
   const [asramaList, setAsramaList] = useState([]);
+  const [asramaLoading, setAsramaLoading] = useState(true);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -30,6 +31,7 @@ const Pengabsen = () => {
 
   const loadData = async () => {
     setLoading(true);
+    setAsramaLoading(true);
     try {
       const [pengabsenRes, asramaRes] = await Promise.all([
         pengabsenAPI.getAll(),
@@ -46,6 +48,7 @@ const Pengabsen = () => {
       });
     } finally {
       setLoading(false);
+      setAsramaLoading(false);
     }
   };
 
