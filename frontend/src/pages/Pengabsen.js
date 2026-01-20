@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Edit, Trash2, UserCheck } from 'lucide-react';
 
@@ -17,10 +17,10 @@ const Pengabsen = () => {
   const [selectedPengabsen, setSelectedPengabsen] = useState(null);
   const [formData, setFormData] = useState({
     nama: '',
-    nip: '',
+    email_atau_hp: '',
     username: '',
     password: '',
-    asrama_id: ''
+    asrama_ids: []
   });
   const { toast } = useToast();
 
@@ -49,6 +49,16 @@ const Pengabsen = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (formData.asrama_ids.length === 0) {
+      toast({
+        title: "Error",
+        description: "Pilih minimal 1 asrama",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const submitData = { ...formData };
       if (editMode && !submitData.password) delete submitData.password;
@@ -76,10 +86,10 @@ const Pengabsen = () => {
     setSelectedPengabsen(pengabsen);
     setFormData({
       nama: pengabsen.nama,
-      nip: pengabsen.nip,
+      email_atau_hp: pengabsen.email_atau_hp,
       username: pengabsen.username,
       password: '',
-      asrama_id: pengabsen.asrama_id
+      asrama_ids: pengabsen.asrama_ids || []
     });
     setEditMode(true);
     setDialogOpen(true);
@@ -100,15 +110,29 @@ const Pengabsen = () => {
     }
   };
 
+  const toggleAsrama = (asramaId) => {
+    setFormData(prev => {
+      const asramaIds = [...prev.asrama_ids];
+      if (asramaIds.includes(asramaId)) {
+        return { ...prev, asrama_ids: asramaIds.filter(id => id !== asramaId) };
+      } else {
+        return { ...prev, asrama_ids: [...asramaIds, asramaId] };
+      }
+    });
+  };
+
   const resetForm = () => {
-    setFormData({ nama: '', nip: '', username: '', password: '', asrama_id: '' });
+    setFormData({ nama: '', email_atau_hp: '', username: '', password: '', asrama_ids: [] });
     setSelectedPengabsen(null);
     setEditMode(false);
   };
 
-  const getAsramaName = (asramaId) => {
-    const asrama = asramaList.find(a => a.id === asramaId);
-    return asrama ? `${asrama.nama} (${asrama.gender})` : '-';
+  const getAsramaNames = (asramaIds) => {
+    if (!asramaIds || asramaIds.length === 0) return '-';
+    return asramaIds.map(id => {
+      const asrama = asramaList.find(a => a.id === id);
+      return asrama ? `${asrama.nama} (${asrama.gender})` : '';
+    }).filter(Boolean).join(', ');
   };
 
   if (loading) return <div className="flex justify-center p-8">Memuat data...</div>;
@@ -118,7 +142,7 @@ const Pengabsen = () => {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-800">Kelola Pengabsen</h1>
-          <p className="text-gray-600 mt-1">Manajemen akun pengabsen per asrama</p>
+          <p className="text-gray-600 mt-1">Manajemen akun pengabsen (bisa multi-asrama)</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>
           <DialogTrigger asChild>
@@ -127,7 +151,7 @@ const Pengabsen = () => {
               Tambah Pengabsen
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editMode ? 'Edit Pengabsen' : 'Tambah Pengabsen'}</DialogTitle>
             </DialogHeader>
@@ -143,13 +167,13 @@ const Pengabsen = () => {
                 />
               </div>
               <div>
-                <Label>NIP</Label>
+                <Label>Email atau Nomor HP</Label>
                 <Input
-                  value={formData.nip}
-                  onChange={(e) => setFormData({ ...formData, nip: e.target.value })}
-                  placeholder="Nomor Induk Pengurus"
+                  value={formData.email_atau_hp}
+                  onChange={(e) => setFormData({ ...formData, email_atau_hp: e.target.value })}
+                  placeholder="email@example.com atau 08xxxxxxxxxx"
                   required
-                  data-testid="pengabsen-nip-input"
+                  data-testid="pengabsen-contact-input"
                 />
               </div>
               <div>
@@ -174,19 +198,25 @@ const Pengabsen = () => {
                 />
               </div>
               <div>
-                <Label>Asrama</Label>
-                <Select value={formData.asrama_id} onValueChange={(value) => setFormData({ ...formData, asrama_id: value })} required>
-                  <SelectTrigger data-testid="pengabsen-asrama-select">
-                    <SelectValue placeholder="Pilih asrama" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {asramaList.map((asrama) => (
-                      <SelectItem key={asrama.id} value={asrama.id}>
+                <Label className="mb-3 block">Asrama yang Dikelola (Pilih minimal 1)</Label>
+                <div className="space-y-2 max-h-60 overflow-y-auto border rounded-lg p-3">
+                  {asramaList.map((asrama) => (
+                    <div key={asrama.id} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`asrama-${asrama.id}`}
+                        checked={formData.asrama_ids.includes(asrama.id)}
+                        onCheckedChange={() => toggleAsrama(asrama.id)}
+                        data-testid={`pengabsen-asrama-${asrama.id}`}
+                      />
+                      <label htmlFor={`asrama-${asrama.id}`} className="text-sm cursor-pointer">
                         {asrama.nama} ({asrama.gender})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                      </label>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  Dipilih: {formData.asrama_ids.length} asrama
+                </p>
               </div>
               <Button type="submit" className="w-full" data-testid="submit-pengabsen-button">
                 {editMode ? 'Update' : 'Tambah'}
@@ -201,9 +231,10 @@ const Pengabsen = () => {
           <thead className="bg-gray-50 border-b">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">NIP</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email/HP</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Username</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Asrama</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jumlah Asrama</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
             </tr>
           </thead>
@@ -216,9 +247,18 @@ const Pengabsen = () => {
                     <span className="text-sm font-medium text-gray-900">{pengabsen.nama}</span>
                   </div>
                 </td>
-                <td className="px-6 py-4 text-sm text-gray-600">{pengabsen.nip}</td>
+                <td className="px-6 py-4 text-sm text-gray-600">{pengabsen.email_atau_hp}</td>
                 <td className="px-6 py-4 text-sm text-gray-600">{pengabsen.username}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">{getAsramaName(pengabsen.asrama_id)}</td>
+                <td className="px-6 py-4 text-sm text-gray-600 max-w-xs">
+                  <div className="truncate" title={getAsramaNames(pengabsen.asrama_ids)}>
+                    {getAsramaNames(pengabsen.asrama_ids)}
+                  </div>
+                </td>
+                <td className="px-6 py-4">
+                  <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                    {pengabsen.asrama_ids?.length || 0} asrama
+                  </span>
+                </td>
                 <td className="px-6 py-4">
                   <div className="flex space-x-2">
                     <Button size="sm" variant="outline" onClick={() => handleEdit(pengabsen)} data-testid={`edit-pengabsen-${pengabsen.id}`}>
