@@ -1,5 +1,4 @@
 from fastapi import FastAPI, APIRouter, HTTPException, Depends, status, UploadFile, File
-from fastapi import status
 
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.responses import Response, StreamingResponse
