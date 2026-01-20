@@ -485,17 +485,6 @@ async def get_pengabsen_me(current_pengabsen: dict = Depends(get_current_pengabs
     return PengabsenMeResponse(**{k: v for k, v in current_pengabsen.items() if k != 'password_hash'})
 
 
-                    return {
-                        'subuh': timings['Fajr'],
-                        'dzuhur': timings['Dhuhr'],
-                        'ashar': timings['Asr'],
-                        'maghrib': timings['Maghrib'],
-                        'isya': timings['Isha']
-                    }
-        return None
-    except Exception as e:
-        logging.error(f"Error fetching prayer times: {e}")
-        return None
 # ==================== AUTHENTICATION ENDPOINTS ====================
 
 @api_router.post("/auth/login", response_model=TokenResponse)
