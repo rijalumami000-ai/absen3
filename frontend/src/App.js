@@ -53,6 +53,24 @@ const PublicRoute = ({ children }) => {
   return children;
 };
 
+const PengabsenProtectedRoute = ({ children }) => {
+  const { user, loading } = usePengabsenAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-gray-500">Memuat...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/pengabsen-app/login" replace />;
+  }
+
+  return children;
+};
+
 function AppRoutes() {
   return (
     <Routes>
@@ -62,6 +80,24 @@ function AppRoutes() {
           <PublicRoute>
             <Login />
           </PublicRoute>
+        }
+      />
+      <Route
+        path="/pengabsen-app/login"
+        element={
+          <PengabsenAuthProvider>
+            <PengabsenAppLogin />
+          </PengabsenAuthProvider>
+        }
+      />
+      <Route
+        path="/pengabsen-app"
+        element={
+          <PengabsenAuthProvider>
+            <PengabsenProtectedRoute>
+              <PengabsenApp />
+            </PengabsenProtectedRoute>
+          </PengabsenAuthProvider>
         }
       />
       <Route
