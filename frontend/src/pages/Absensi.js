@@ -53,38 +53,48 @@ const Absensi = () => {
 
     switch(filterPeriode) {
       case 'hari':
-        start = end = filterTanggal;
+        start = filterTanggal;
+        end = filterTanggal;
         break;
       case 'minggu':
-        start = new Date(date);
-        start.setDate(date.getDate() - date.getDay());
-        end = new Date(start);
-        end.setDate(start.getDate() + 6);
+        const weekStart = new Date(date);
+        weekStart.setDate(date.getDate() - date.getDay());
+        const weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekStart.getDate() + 6);
+        start = weekStart.toISOString().split('T')[0];
+        end = weekEnd.toISOString().split('T')[0];
         break;
       case '2minggu':
-        start = new Date(date);
-        start.setDate(date.getDate() - 13);
-        end = date;
+        const twoWeekStart = new Date(date);
+        twoWeekStart.setDate(date.getDate() - 13);
+        start = twoWeekStart.toISOString().split('T')[0];
+        end = filterTanggal;
         break;
       case 'bulan':
-        start = new Date(date.getFullYear(), date.getMonth(), 1);
-        end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+        const monthStart = new Date(date.getFullYear(), date.getMonth(), 1);
+        const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+        start = monthStart.toISOString().split('T')[0];
+        end = monthEnd.toISOString().split('T')[0];
         break;
       case 'semester':
-        start = new Date(date);
-        start.setMonth(date.getMonth() - 5);
-        end = date;
+        const semStart = new Date(date);
+        semStart.setMonth(date.getMonth() - 5);
+        start = semStart.toISOString().split('T')[0];
+        end = filterTanggal;
         break;
       case 'tahun':
-        start = new Date(date.getFullYear(), 0, 1);
-        end = new Date(date.getFullYear(), 11, 31);
+        const yearStart = new Date(date.getFullYear(), 0, 1);
+        const yearEnd = new Date(date.getFullYear(), 11, 31);
+        start = yearStart.toISOString().split('T')[0];
+        end = yearEnd.toISOString().split('T')[0];
         break;
       default:
-        start = end = filterTanggal;
+        start = filterTanggal;
+        end = filterTanggal;
     }
 
-    setTanggalStart(start.toISOString().split('T')[0]);
-    setTanggalEnd(end.toISOString().split('T')[0]);
+    setTanggalStart(start);
+    setTanggalEnd(end);
   };
 
   const loadDetail = async () => {
