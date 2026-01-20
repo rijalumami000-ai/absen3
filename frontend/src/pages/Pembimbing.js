@@ -11,6 +11,7 @@ import { Plus, Edit, Trash2, UserCog } from 'lucide-react';
 const Pembimbing = () => {
   const [pembimbingList, setPembimbingList] = useState([]);
   const [asramaList, setAsramaList] = useState([]);
+  const [asramaLoading, setAsramaLoading] = useState(true);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -29,6 +30,8 @@ const Pembimbing = () => {
   }, []);
 
   const loadData = async () => {
+    setLoading(true);
+    setAsramaLoading(true);
     try {
       const [pembimbingRes, asramaRes] = await Promise.all([
         pembimbingAPI.getAll(),
@@ -44,6 +47,7 @@ const Pembimbing = () => {
       });
     } finally {
       setLoading(false);
+      setAsramaLoading(false);
     }
   };
 
