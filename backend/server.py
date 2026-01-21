@@ -334,11 +334,17 @@ async def send_wali_push_notification(wali: dict, title: str, body: str):
         if not tokens:
             return
 
-        message = messaging.MulticastMessage(
-            tokens=tokens,
-            notification=messaging.Notification(title=title, body=body),
-        )
-        response = messaging.send_multicast(message)
+        # Build individual messages for each token (firebase-admin 7.x uses send_each)
+        messages = [
+            messaging.Message(
+                notification=messaging.Notification(title=title, body=body),
+                token=token,
+            )
+            for token in tokens
+        ]
+        
+        # Send each message
+        response = messaging.send_each(messages)
         logging.info(f"Sent FCM to wali {wali.get('id')} count={len(tokens)} success={response.success_count}")
     except Exception as e:
         logging.error(f"Failed to send FCM notification: {e}")
