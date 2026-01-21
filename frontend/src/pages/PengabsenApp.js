@@ -117,9 +117,6 @@ const PengabsenApp = () => {
     }
   };
 
-    );
-  }
-
   const totalSantri = data.length;
   const hadirCount = data.filter((row) => row.status === 'hadir').length;
   const belumCount = data.filter((row) => row.status == null).length;
