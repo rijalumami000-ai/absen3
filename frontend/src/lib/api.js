@@ -85,8 +85,8 @@ const getPembimbingAuthHeader = () => {
 
 // API khusus PWA Pengabsen
 export const pengabsenAppAPI = {
-  login: (username, password) =>
-    axios.post(`${API}/pengabsen/login`, { username, password }),
+  login: (username, kode_akses) =>
+    axios.post(`${API}/pengabsen/login`, { username, kode_akses }),
   me: () => axios.get(`${API}/pengabsen/me`, { headers: getPengabsenAuthHeader() }),
   upsertAbsensi: (params) =>
     axios.post(`${API}/pengabsen/absensi`, null, {
