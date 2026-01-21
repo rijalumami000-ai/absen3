@@ -883,11 +883,6 @@ async def register_wali_fcm_token(payload: WaliFcmTokenRequest, current_wali: di
 
     return {"status": "ok"}
 
-            wali['created_at'] = datetime.fromisoformat(wali['created_at'])
-        if isinstance(wali['updated_at'], str):
-            wali['updated_at'] = datetime.fromisoformat(wali['updated_at'])
-    
-    return wali_list
 
 @api_router.put("/wali/{wali_id}", response_model=WaliSantriResponse)
 async def update_wali(wali_id: str, data: WaliSantriUpdate, _: dict = Depends(get_current_admin)):
