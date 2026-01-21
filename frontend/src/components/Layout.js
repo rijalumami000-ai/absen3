@@ -13,7 +13,8 @@ import {
   Clock,
   LogOut,
   Menu,
-  X
+  X,
+  Settings
 } from 'lucide-react';
 
 const Layout = ({ children }) => {
@@ -31,6 +32,7 @@ const Layout = ({ children }) => {
     { path: '/pembimbing', icon: UserCog, label: 'Pembimbing' },
     { path: '/absensi', icon: ClipboardList, label: 'Riwayat Absensi' },
     { path: '/waktu-sholat', icon: Clock, label: 'Waktu Sholat' },
+    { path: '/settings', icon: Settings, label: 'Pengaturan' },
   ];
 
   const handleLogout = () => {
