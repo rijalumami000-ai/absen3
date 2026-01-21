@@ -146,3 +146,9 @@ export const waktuSholatAPI = {
   get: (tanggal) => axios.get(`${API}/waktu-sholat?tanggal=${tanggal}`, { headers: getAuthHeader() }),
   sync: (tanggal) => axios.post(`${API}/waktu-sholat/sync?tanggal=${tanggal}`, {}, { headers: getAuthHeader() }),
 };
+
+// Settings API
+export const settingsAPI = {
+  getWaliNotifikasi: () => axios.get(`${API}/settings/wali-notifikasi`, { headers: getAuthHeader() }),
+  updateWaliNotifikasi: (data) => axios.put(`${API}/settings/wali-notifikasi`, data, { headers: getAuthHeader() }),
+};
