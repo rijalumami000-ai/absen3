@@ -179,19 +179,57 @@ const WaliApp = () => {
 
         {/* Riwayat */}
         <section className="bg-white rounded-lg shadow p-4">
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <h2 className="text-sm font-semibold text-gray-700">Riwayat per Tanggal</h2>
-              <p className="text-xs text-gray-500 mt-1">
-                Pilih tanggal untuk melihat status absensi sholat anak Anda pada hari tersebut.
-              </p>
-            </div>
-            <input
-              type="date"
-              value={historyDate}
-              onChange={(e) => setHistoryDate(e.target.value)}
-              className="border rounded px-2 py-1 text-xs"
-            />
+          <div className="mb-3">
+            <h2 className="text-sm font-semibold text-gray-700">Riwayat per Tanggal</h2>
+            <p className="text-xs text-gray-500 mt-1">
+              Pilih bulan lalu tanggal untuk melihat status absensi sholat anak Anda pada hari tersebut.
+            </p>
+          </div>
+
+          {/* Grid bulan */}
+          <div className="grid grid-cols-4 gap-2 mb-3">
+            {months.map((m, idx) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => {
+                  setSelectedMonth(idx);
+                  const newDate = new Date(currentYear, idx, selectedDay);
+                  const iso = newDate.toISOString().slice(0, 10);
+                  setHistoryDate(iso);
+                }}
+                className={`text-xs px-2 py-1 rounded border transition-colors ${
+                  selectedMonth === idx
+                    ? 'bg-emerald-500 text-white border-emerald-500'
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                }`}
+              >
+                {m}
+              </button>
+            ))}
+          </div>
+
+          {/* Grid tanggal */}
+          <div className="grid grid-cols-7 gap-1 mb-3">
+            {Array.from({ length: getDaysInMonth(currentYear, selectedMonth) }, (_, i) => i + 1).map((day) => (
+              <button
+                key={day}
+                type="button"
+                onClick={() => {
+                  setSelectedDay(day);
+                  const newDate = new Date(currentYear, selectedMonth, day);
+                  const iso = newDate.toISOString().slice(0, 10);
+                  setHistoryDate(iso);
+                }}
+                className={`text-[10px] h-7 rounded border flex items-center justify-center transition-colors ${
+                  selectedDay === day
+                    ? 'bg-emerald-500 text-white border-emerald-500'
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                }`}
+              >
+                {day}
+              </button>
+            ))}
           </div>
 
           {loadingHistory ? (
