@@ -20,7 +20,7 @@ Build a comprehensive prayer attendance application for a school (Pesantren). Th
 - [x] CRUD for Asrama (Dormitories)
 - [x] CRUD for Santri (Students) with QR code generation
 - [x] CRUD for Wali Santri (Guardians) - auto-generated from Santri data
-- [x] CRUD for Pengabsen (Attendants)
+- [x] CRUD for Pengabsen (Attendants) with kode_akses management
 - [x] CRUD for Pembimbing (Supervisors) with kode_akses management
 - [x] Attendance history view with filters
 - [x] Prayer times integration (Al-Adhan API)
@@ -28,7 +28,7 @@ Build a comprehensive prayer attendance application for a school (Pesantren). Th
 - [x] WhatsApp message generation for Wali credentials
 
 ### Phase 2 - Pengabsen PWA ✅ COMPLETED
-- [x] Login authentication
+- [x] Login with username + kode_akses (9-digit)
 - [x] QR code scanning with @yudiel/react-qr-scanner
 - [x] Manual status update (hadir, alfa, sakit, izin, haid, istihadhoh)
 - [x] History view for recorded attendance
