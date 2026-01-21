@@ -943,6 +943,20 @@ async def get_wali_anak_absensi_hari_ini(current_wali: dict = Depends(get_curren
         if sid in status_by_santri:
             status_by_santri[sid][waktu_sholat] = status_val
 
+    # Map pengabsen_id -> nama untuk referensi
+    pengabsen_map = {
+        p["id"]: p.get("nama", "-")
+        for p in await db.pengabsen.find({}, {"_id": 0, "id": 1, "nama": 1}).to_list(1000)
+    }
+
+    # Hitung pengabsen "utama" per santri (mis. entry terakhir hari itu)
+    pengabsen_by_santri: dict[str, Optional[str]] = {}
+    for a in absensi_list:
+        sid = a["santri_id"]
+        pid = a.get("pengabsen_id")
+        if sid in santri_by_id and pid:
+            pengabsen_by_santri[sid] = pengabsen_map.get(pid, "-")
+
     result = []
     for sid, santri in santri_by_id.items():
         result.append(
@@ -953,6 +967,7 @@ async def get_wali_anak_absensi_hari_ini(current_wali: dict = Depends(get_curren
                 "asrama_id": santri["asrama_id"],
                 "nama_asrama": asrama_map.get(santri["asrama_id"], "-"),
                 "status": status_by_santri.get(sid, {}),
+                "pengabsen_nama": pengabsen_by_santri.get(sid),
             }
         )
 
