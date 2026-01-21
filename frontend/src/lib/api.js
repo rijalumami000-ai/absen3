@@ -160,3 +160,25 @@ export const settingsAPI = {
   getWaliNotifikasi: () => axios.get(`${API}/settings/wali-notifikasi`, { headers: getAuthHeader() }),
   updateWaliNotifikasi: (data) => axios.put(`${API}/settings/wali-notifikasi`, data, { headers: getAuthHeader() }),
 };
+
+// Pembimbing PWA API
+export const pembimbingAppAPI = {
+  login: (username, kode_akses) =>
+    axios.post(`${API}/pembimbing/login`, { username, kode_akses }),
+  me: () => axios.get(`${API}/pembimbing/me`, { headers: getPembimbingAuthHeader() }),
+  absensiHariIni: (params) =>
+    axios.get(`${API}/pembimbing/santri-absensi-hari-ini`, {
+      params,
+      headers: getPembimbingAuthHeader(),
+    }),
+  absensiRiwayat: (params) =>
+    axios.get(`${API}/pembimbing/absensi-riwayat`, {
+      params,
+      headers: getPembimbingAuthHeader(),
+    }),
+  statistik: (params) =>
+    axios.get(`${API}/pembimbing/statistik`, {
+      params,
+      headers: getPembimbingAuthHeader(),
+    }),
+};
