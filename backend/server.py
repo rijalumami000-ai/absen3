@@ -21,6 +21,9 @@ import pandas as pd
 from pathlib import Path
 import re
 
+import firebase_admin
+from firebase_admin import credentials, messaging
+
 # ==================== SETUP ====================
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
