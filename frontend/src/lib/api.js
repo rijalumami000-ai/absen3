@@ -81,8 +81,6 @@ const getPembimbingAuthHeader = () => {
   const token = localStorage.getItem('pembimbing_token');
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
 
 // API khusus PWA Pengabsen
 export const pengabsenAppAPI = {
