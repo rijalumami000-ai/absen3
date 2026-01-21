@@ -216,35 +216,54 @@ const WaliApp = () => {
       <main className="flex-1 p-4 space-y-4 max-w-4xl mx-auto w-full">
         {/* Notification Status Banner */}
         {notificationStatus === 'denied' && (
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-center gap-3">
-            <span className="text-amber-600 text-sm">
-              Notifikasi dinonaktifkan. Aktifkan di pengaturan browser untuk menerima update absensi anak Anda.
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center gap-3">
+            <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
+              <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+            </div>
+            <span className="text-amber-700 text-sm">
+              Notifikasi dinonaktifkan. Aktifkan di pengaturan browser untuk menerima update absensi.
             </span>
           </div>
         )}
         {notificationStatus === 'unsupported' && (
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
-            <span className="text-gray-600 text-sm">
+          <div className="bg-muted border border-border rounded-2xl p-4 flex items-center gap-3">
+            <div className="w-10 h-10 bg-muted-foreground/10 rounded-xl flex items-center justify-center shrink-0">
+              <svg className="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+              </svg>
+            </div>
+            <span className="text-muted-foreground text-sm">
               Browser Anda tidak mendukung notifikasi push.
             </span>
           </div>
         )}
         {notificationStatus === 'unknown' && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center justify-between">
-            <span className="text-blue-700 text-sm">
-              Aktifkan notifikasi untuk menerima update absensi sholat anak Anda secara real-time.
-            </span>
-            <Button variant="outline" size="sm" onClick={registerFcmToken} className="ml-2 shrink-0">
+          <div className="bg-primary-50 border border-primary-200 rounded-2xl p-4 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5 text-primary-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+              </div>
+              <span className="text-primary-800 text-sm">
+                Aktifkan notifikasi untuk update absensi real-time
+              </span>
+            </div>
+            <Button size="sm" onClick={registerFcmToken} className="shrink-0 bg-primary-700 hover:bg-primary-800">
               Aktifkan
             </Button>
           </div>
         )}
         {notificationStatus === 'granted' && (
-          <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
-            <span className="text-emerald-700 text-sm flex items-center gap-2">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-primary-50 border border-primary-200 rounded-2xl p-4 flex items-center gap-3">
+            <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center shrink-0">
+              <svg className="w-5 h-5 text-primary-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
+            </div>
+            <span className="text-primary-800 text-sm">
               Notifikasi aktif. Anda akan menerima update absensi sholat anak Anda.
             </span>
           </div>
