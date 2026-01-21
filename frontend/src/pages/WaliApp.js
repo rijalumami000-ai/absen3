@@ -207,6 +207,41 @@ const WaliApp = () => {
       </header>
 
       <main className="flex-1 p-4 space-y-4 max-w-4xl mx-auto w-full">
+        {/* Notification Status Banner */}
+        {notificationStatus === 'denied' && (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-center gap-3">
+            <span className="text-amber-600 text-sm">
+              Notifikasi dinonaktifkan. Aktifkan di pengaturan browser untuk menerima update absensi anak Anda.
+            </span>
+          </div>
+        )}
+        {notificationStatus === 'unsupported' && (
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+            <span className="text-gray-600 text-sm">
+              Browser Anda tidak mendukung notifikasi push.
+            </span>
+          </div>
+        )}
+        {notificationStatus === 'unknown' && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center justify-between">
+            <span className="text-blue-700 text-sm">
+              Aktifkan notifikasi untuk menerima update absensi sholat anak Anda secara real-time.
+            </span>
+            <Button variant="outline" size="sm" onClick={registerFcmToken} className="ml-2 shrink-0">
+              Aktifkan
+            </Button>
+          </div>
+        )}
+        {notificationStatus === 'granted' && (
+          <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
+            <span className="text-emerald-700 text-sm flex items-center gap-2">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              Notifikasi aktif. Anda akan menerima update absensi sholat anak Anda.
+            </span>
+          </div>
+        )}
         {/* Hari Ini */}
         <section className="bg-white rounded-lg shadow p-4">
           <div className="flex items-center justify-between mb-3">
