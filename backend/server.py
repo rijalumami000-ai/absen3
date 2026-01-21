@@ -37,6 +37,19 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Initialize Firebase Admin for FCM
+firebase_cred_path = ROOT_DIR / 'firebase_config.json'
+if firebase_cred_path.exists():
+    try:
+        firebase_cred = credentials.Certificate(str(firebase_cred_path))
+        if not firebase_admin._apps:
+            firebase_app = firebase_admin.initialize_app(firebase_cred)
+    except Exception as e:
+        logging.error(f"Failed to initialize Firebase Admin: {e}")
+else:
+    logging.warning("Firebase config file not found; FCM notifications will be disabled.")
+
+
 security = HTTPBearer()
 
 app = FastAPI(title="Absensi Sholat API")
