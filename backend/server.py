@@ -1016,7 +1016,7 @@ Berikut informasi akun Wali Santri Anda:
 
 👤 Nama: {wali['nama']}
 📱 Username: {wali['username']}
-🔑 Password: password123
+🔑 Password: 12345
 📞 Nomor HP: {wali['nomor_hp']}
 📧 Email: {wali.get('email', '-')}
 
