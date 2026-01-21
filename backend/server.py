@@ -854,6 +854,11 @@ async def get_wali(_: dict = Depends(get_current_admin)):
     
     for wali in wali_list:
         if isinstance(wali['created_at'], str):
+            wali['created_at'] = datetime.fromisoformat(wali['created_at'])
+        if isinstance(wali['updated_at'], str):
+            wali['updated_at'] = datetime.fromisoformat(wali['updated_at'])
+    
+    return wali_list
 
 class WaliFcmTokenRequest(BaseModel):
     token: str
