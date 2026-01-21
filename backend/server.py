@@ -1239,14 +1239,33 @@ async def update_pengabsen(pengabsen_id: str, data: PengabsenUpdate, _: dict = D
             if not asrama:
                 raise HTTPException(status_code=404, detail=f"Asrama {asrama_id} tidak ditemukan")
     
-    if 'password' in update_data:
-        update_data['password_hash'] = hash_password(update_data.pop('password'))
-    
     if update_data:
         await db.pengabsen.update_one({"id": pengabsen_id}, {"$set": update_data})
         pengabsen.update(update_data)
     
+    # Ensure kode_akses exists
+    if 'kode_akses' not in pengabsen:
+        pengabsen['kode_akses'] = generate_kode_akses()
+        await db.pengabsen.update_one({"id": pengabsen_id}, {"$set": {"kode_akses": pengabsen['kode_akses']}})
+    
     if isinstance(pengabsen.get('created_at'), str):
+        pengabsen['created_at'] = datetime.fromisoformat(pengabsen['created_at'])
+    
+    return PengabsenResponse(**{k: v for k, v in pengabsen.items() if k != 'password_hash'})
+
+
+@api_router.post("/pengabsen/{pengabsen_id}/regenerate-kode-akses", response_model=PengabsenResponse)
+async def regenerate_pengabsen_kode_akses(pengabsen_id: str, _: dict = Depends(get_current_admin)):
+    """Regenerate kode akses untuk pengabsen"""
+    pengabsen = await db.pengabsen.find_one({"id": pengabsen_id}, {"_id": 0})
+    if not pengabsen:
+        raise HTTPException(status_code=404, detail="Pengabsen tidak ditemukan")
+    
+    new_kode = generate_kode_akses()
+    await db.pengabsen.update_one({"id": pengabsen_id}, {"$set": {"kode_akses": new_kode}})
+    pengabsen['kode_akses'] = new_kode
+    
+    if isinstance(pengabsen['created_at'], str):
         pengabsen['created_at'] = datetime.fromisoformat(pengabsen['created_at'])
     
     return PengabsenResponse(**{k: v for k, v in pengabsen.items() if k != 'password_hash'})
