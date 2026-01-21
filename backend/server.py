@@ -876,19 +876,23 @@ async def login_wali(request: WaliLoginRequest):
     # Temukan wali berdasarkan username
     wali = await db.wali_santri.find_one({"username": request.username}, {"_id": 0})
 
-    # Jika belum ada password_hash, anggap password default "password123"
-    password_hash = wali.get("password_hash") if wali else None
-
     if not wali:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Username atau password salah")
 
-    # Jika belum pernah di-set password (password_hash kosong), gunakan default password123
-    if not password_hash:
-        if request.password != "password123":
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Username atau password salah")
-    else:
+    # Password default untuk SEMUA wali: "12345".
+    # Jika wali sudah punya password_hash khusus, ia juga boleh login dengan password tersebut.
+    password_hash = wali.get("password_hash")
+    default_password = "12345"
+
+    if request.password == default_password:
+        # Selalu terima password default, terlepas dari ada/tidaknya password_hash khusus
+        pass
+    elif password_hash:
         if not verify_password(request.password, password_hash):
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Username atau password salah")
+    else:
+        # Tidak pakai default dan belum ada password tersimpan
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Username atau password salah")
 
     access_token = create_access_token(data={"sub": wali["id"], "role": "wali"})
 
