@@ -96,6 +96,24 @@ const WaliProtectedRoute = ({ children }) => {
   return children;
 };
 
+const PembimbingProtectedRoute = ({ children }) => {
+  const { user, loading } = usePembimbingAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-gray-500">Memuat...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/pembimbing-app/login" replace />;
+  }
+
+  return children;
+};
+
 function AppRoutes() {
   return (
     <Routes>
