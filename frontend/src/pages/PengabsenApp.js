@@ -113,6 +113,26 @@ const PengabsenApp = () => {
         title: 'Error',
         description: 'Gagal memuat riwayat absensi',
         variant: 'destructive',
+  const loadHistoryDetail = async (item) => {
+    try {
+      setLoadingHistoryDetail(true);
+      const resp = await pengabsenAppAPI.riwayatDetail({
+        tanggal: item.tanggal,
+        waktu_sholat: item.waktu_sholat,
+        asrama_id: item.asrama_id,
+      });
+      setHistoryDetail(resp.data);
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Gagal memuat detail riwayat',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoadingHistoryDetail(false);
+    }
+  };
+
       });
     } finally {
       setLoadingHistory(false);
