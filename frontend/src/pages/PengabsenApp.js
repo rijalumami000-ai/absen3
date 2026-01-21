@@ -358,8 +358,6 @@ const PengabsenApp = () => {
           </section>
         )}
 
-        </section>
-
         <section className="bg-white rounded-lg shadow p-4">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold text-gray-700">Scan QR Santri</h2>
