@@ -195,13 +195,20 @@ const WaliApp = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col" data-testid="wali-app-page">
-      <header className="bg-white shadow-sm px-4 py-3 flex items-center justify-between">
-        <div>
-          <h1 className="text-lg font-semibold text-gray-800">Absensi Sholat - Wali Santri</h1>
-          <p className="text-xs text-gray-500">{user.nama}</p>
+    <div className="min-h-screen bg-gradient-to-b from-secondary-50 to-background flex flex-col" data-testid="wali-app-page">
+      <header className="bg-card/95 backdrop-blur-md shadow-sm px-4 py-4 flex items-center justify-between sticky top-0 z-10 border-b border-border/50">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-secondary-600 rounded-xl flex items-center justify-center">
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+          </div>
+          <div>
+            <h1 className="font-display text-lg font-bold text-foreground">Wali Santri</h1>
+            <p className="text-xs text-muted-foreground">{user.nama}</p>
+          </div>
         </div>
-        <Button variant="outline" size="sm" onClick={logout}>
+        <Button variant="outline" size="sm" onClick={logout} className="hover:bg-destructive/10 hover:text-destructive hover:border-destructive">
           Logout
         </Button>
       </header>
