@@ -56,6 +56,7 @@ export const pengabsenAPI = {
   create: (data) => axios.post(`${API}/pengabsen`, data, { headers: getAuthHeader() }),
   update: (id, data) => axios.put(`${API}/pengabsen/${id}`, data, { headers: getAuthHeader() }),
   delete: (id) => axios.delete(`${API}/pengabsen/${id}`, { headers: getAuthHeader() }),
+  regenerateKodeAkses: (id) => axios.post(`${API}/pengabsen/${id}/regenerate-kode-akses`, {}, { headers: getAuthHeader() }),
 };
 
 // Pembimbing API (Admin)
