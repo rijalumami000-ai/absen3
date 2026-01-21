@@ -3,282 +3,348 @@ import { pembimbingAPI, asramaAPI } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit, Trash2, UserCog } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { RefreshCw, Copy, Check, Plus, Pencil, Trash2 } from 'lucide-react';
 
 const Pembimbing = () => {
-  const [pembimbingList, setPembimbingList] = useState([]);
-  const [asramaList, setAsramaList] = useState([]);
-  const [asramaLoading, setAsramaLoading] = useState(true);
+  const [pembimbing, setPembimbing] = useState([]);
+  const [asrama, setAsrama] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
-  const [selectedPembimbing, setSelectedPembimbing] = useState(null);
-  const [formData, setFormData] = useState({
+  const [currentPembimbing, setCurrentPembimbing] = useState(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [toDelete, setToDelete] = useState(null);
+  const [copiedId, setCopiedId] = useState(null);
+  const [regeneratingId, setRegeneratingId] = useState(null);
+  const [form, setForm] = useState({
     nama: '',
     username: '',
-    password: '',
     email_atau_hp: '',
-    asrama_ids: []
+    asrama_ids: [],
   });
   const { toast } = useToast();
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
   const loadData = async () => {
-    setLoading(true);
-    setAsramaLoading(true);
     try {
-      const [pembimbingRes, asramaRes] = await Promise.all([
-        pembimbingAPI.getAll(),
-        asramaAPI.getAll()
-      ]);
-      setPembimbingList(pembimbingRes.data);
-      setAsramaList(asramaRes.data);
+      setLoading(true);
+      const [pembRes, asramaRes] = await Promise.all([pembimbingAPI.getAll(), asramaAPI.getAll()]);
+      setPembimbing(pembRes.data);
+      setAsrama(asramaRes.data);
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Gagal memuat data",
-        variant: "destructive",
-      });
+      toast({ title: 'Error', description: 'Gagal memuat data', variant: 'destructive' });
     } finally {
       setLoading(false);
-      setAsramaLoading(false);
     }
+  };
+
+  useEffect(() => {
+    loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const openAddDialog = () => {
+    setForm({ nama: '', username: '', email_atau_hp: '', asrama_ids: [] });
+    setEditMode(false);
+    setCurrentPembimbing(null);
+    setDialogOpen(true);
+  };
+
+  const openEditDialog = (p) => {
+    setForm({
+      nama: p.nama,
+      username: p.username,
+      email_atau_hp: p.email_atau_hp || '',
+      asrama_ids: p.asrama_ids || [],
+    });
+    setEditMode(true);
+    setCurrentPembimbing(p);
+    setDialogOpen(true);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const submitData = { ...formData };
-      if (editMode && !submitData.password) delete submitData.password;
-
       if (editMode) {
-        await pembimbingAPI.update(selectedPembimbing.id, submitData);
-        toast({ title: "Sukses", description: "Pembimbing berhasil diupdate" });
+        await pembimbingAPI.update(currentPembimbing.id, form);
+        toast({ title: 'Sukses', description: 'Pembimbing berhasil diperbarui' });
       } else {
-        await pembimbingAPI.create(submitData);
-        toast({ title: "Sukses", description: "Pembimbing berhasil ditambahkan" });
+        await pembimbingAPI.create(form);
+        toast({ title: 'Sukses', description: 'Pembimbing berhasil ditambahkan' });
       }
       setDialogOpen(false);
-      resetForm();
       loadData();
     } catch (error) {
       toast({
-        title: "Error",
-        description: error.response?.data?.detail || "Gagal menyimpan data",
-        variant: "destructive",
+        title: 'Error',
+        description: error.response?.data?.detail || 'Gagal menyimpan data',
+        variant: 'destructive',
       });
     }
   };
 
-  const handleEdit = (pembimbing) => {
-    setSelectedPembimbing(pembimbing);
-    setFormData({
-      nama: pembimbing.nama,
-      username: pembimbing.username,
-      password: '',
-      email_atau_hp: pembimbing.email_atau_hp,
-      asrama_ids: pembimbing.asrama_ids || []
-    });
-    setEditMode(true);
-    setDialogOpen(true);
+  const confirmDelete = (p) => {
+    setToDelete(p);
+    setDeleteDialogOpen(true);
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Yakin ingin menghapus pembimbing ini?')) return;
+  const handleDelete = async () => {
+    if (!toDelete) return;
     try {
-      await pembimbingAPI.delete(id);
-      toast({ title: "Sukses", description: "Pembimbing berhasil dihapus" });
+      await pembimbingAPI.delete(toDelete.id);
+      toast({ title: 'Sukses', description: 'Pembimbing berhasil dihapus' });
+      setDeleteDialogOpen(false);
       loadData();
     } catch (error) {
-      toast({
-        title: "Error",
-        description: error.response?.data?.detail || "Gagal menghapus data",
-        variant: "destructive",
-      });
+      toast({ title: 'Error', description: 'Gagal menghapus data', variant: 'destructive' });
     }
+  };
+
+  const handleRegenerateKodeAkses = async (p) => {
+    try {
+      setRegeneratingId(p.id);
+      const response = await pembimbingAPI.regenerateKodeAkses(p.id);
+      toast({
+        title: 'Sukses',
+        description: `Kode akses baru: ${response.data.kode_akses}`,
+      });
+      loadData();
+    } catch (error) {
+      toast({ title: 'Error', description: 'Gagal mengubah kode akses', variant: 'destructive' });
+    } finally {
+      setRegeneratingId(null);
+    }
+  };
+
+  const copyToClipboard = (text, id) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
   };
 
   const toggleAsrama = (asramaId) => {
-    setFormData(prev => {
-      const asramaIds = [...prev.asrama_ids];
-      if (asramaIds.includes(asramaId)) {
-        return { ...prev, asrama_ids: asramaIds.filter(id => id !== asramaId) };
-      } else {
-        return { ...prev, asrama_ids: [...asramaIds, asramaId] };
-      }
-    });
+    setForm((prev) => ({
+      ...prev,
+      asrama_ids: prev.asrama_ids.includes(asramaId)
+        ? prev.asrama_ids.filter((id) => id !== asramaId)
+        : [...prev.asrama_ids, asramaId],
+    }));
   };
 
-  const resetForm = () => {
-    setFormData({ nama: '', username: '', password: '', email_atau_hp: '', asrama_ids: [] });
-    setSelectedPembimbing(null);
-    setEditMode(false);
+  const getAsramaNames = (ids) => {
+    if (!ids || ids.length === 0) return '-';
+    return ids
+      .map((id) => asrama.find((a) => a.id === id)?.nama || id)
+      .join(', ');
   };
 
-  const getAsramaNames = (asramaIds) => {
-    if (!asramaIds || asramaIds.length === 0) return '-';
-    return asramaIds.map(id => {
-      const asrama = asramaList.find(a => a.id === id);
-      return asrama ? asrama.nama : '';
-    }).filter(Boolean).join(', ');
-  };
-
-  if (loading) return <div className="flex justify-center p-8">Memuat data...</div>;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-gray-500">Memuat data...</div>
+      </div>
+    );
+  }
 
   return (
-    <div data-testid="pembimbing-page">
-      <div className="flex justify-between items-center mb-6">
+    <div className="space-y-6" data-testid="pembimbing-admin-page">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Kelola Pembimbing</h1>
-          <p className="text-gray-600 mt-1">Manajemen akun pembimbing multi-asrama</p>
+          <h1 className="text-2xl font-bold text-gray-800">Kelola Pembimbing</h1>
+          <p className="text-gray-500 mt-1">Daftar pembimbing yang bertugas mengawasi santri</p>
         </div>
-        <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>
-          <DialogTrigger asChild>
-            <Button data-testid="add-pembimbing-button" disabled={loading}>
-              <Plus className="mr-2" size={20} />
-              {loading ? 'Loading...' : 'Tambah Pembimbing'}
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>{editMode ? 'Edit Pembimbing' : 'Tambah Pembimbing'}</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <Label>Nama Lengkap</Label>
-                <Input
-                  value={formData.nama}
-                  onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
-                  placeholder="Nama pembimbing"
-                  required
-                  data-testid="pembimbing-nama-input"
-                />
-              </div>
-              <div>
-                <Label>Email atau Nomor HP</Label>
-                <Input
-                  value={formData.email_atau_hp}
-                  onChange={(e) => setFormData({ ...formData, email_atau_hp: e.target.value })}
-                  placeholder="email@example.com atau 08xxxxxxxxxx"
-                  required
-                  data-testid="pembimbing-contact-input"
-                />
-              </div>
-              <div>
-                <Label>Username</Label>
-                <Input
-                  value={formData.username}
-                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                  placeholder="Username untuk login"
-                  required
-                  data-testid="pembimbing-username-input"
-                />
-              </div>
-              <div>
-                <Label>Password {editMode && '(Kosongkan jika tidak diubah)'}</Label>
-                <Input
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  placeholder="Password"
-                  required={!editMode}
-                  data-testid="pembimbing-password-input"
-                />
-              </div>
-              <div>
-                <Label className="mb-3 block">Asrama yang Dibimbing</Label>
-                {asramaLoading ? (
-                  <div className="p-4 text-sm text-gray-500 border rounded-lg">
-                    Memuat data asrama...
-                  </div>
-                ) : asramaList.length === 0 ? (
-                  <div className="p-4 text-sm text-gray-500 border rounded-lg">
-                    Belum ada data asrama. Silakan tambahkan asrama terlebih dahulu di menu Asrama.
-                  </div>
-                ) : (
-                  <>
-                    <p className="text-xs text-gray-600 mb-2">
-                      Total {asramaList.length} asrama tersedia
-                    </p>
-                    <div className="space-y-2 max-h-60 overflow-y-auto border rounded-lg p-3 bg-gray-50">
-                      {asramaList.map((asrama) => (
-                        <div key={asrama.id} className="flex items-center space-x-2 p-2 bg-white rounded hover:bg-gray-100">
-                          <Checkbox
-                            id={`asrama-${asrama.id}`}
-                            checked={formData.asrama_ids.includes(asrama.id)}
-                            onCheckedChange={() => toggleAsrama(asrama.id)}
-                            data-testid={`pembimbing-asrama-${asrama.id}`}
-                          />
-                          <label htmlFor={`asrama-${asrama.id}`} className="text-sm cursor-pointer flex-1">
-                            {asrama.nama} ({asrama.gender})
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
-              <Button type="submit" className="w-full" data-testid="submit-pembimbing-button">
-                {editMode ? 'Update' : 'Tambah'}
-              </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
+        <Button onClick={openAddDialog} data-testid="add-pembimbing-btn">
+          <Plus className="w-4 h-4 mr-2" />
+          Tambah Pembimbing
+        </Button>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email/HP</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Username</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Asrama</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jumlah Asrama</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {pembimbingList.map((pembimbing) => (
-              <tr key={pembimbing.id} data-testid={`pembimbing-row-${pembimbing.id}`}>
-                <td className="px-6 py-4">
-                  <div className="flex items-center">
-                    <UserCog className="mr-2 text-gray-400" size={20} />
-                    <span className="text-sm font-medium text-gray-900">{pembimbing.nama}</span>
-                  </div>
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-600">{pembimbing.email_atau_hp}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">{pembimbing.username}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">{getAsramaNames(pembimbing.asrama_ids)}</td>
-                <td className="px-6 py-4">
-                  <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
-                    {pembimbing.asrama_ids?.length || 0} asrama
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="flex space-x-2">
-                    <Button size="sm" variant="outline" onClick={() => handleEdit(pembimbing)} data-testid={`edit-pembimbing-${pembimbing.id}`}>
-                      <Edit size={16} />
-                    </Button>
-                    <Button size="sm" variant="destructive" onClick={() => handleDelete(pembimbing.id)} data-testid={`delete-pembimbing-${pembimbing.id}`}>
-                      <Trash2 size={16} />
-                    </Button>
-                  </div>
-                </td>
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Username</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kode Akses</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kontak</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Asrama</th>
+                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Aksi</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-        {pembimbingList.length === 0 && (
-          <div className="text-center py-12 text-gray-500">Belum ada data pembimbing</div>
-        )}
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {pembimbing.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
+                    Belum ada data pembimbing
+                  </td>
+                </tr>
+              ) : (
+                pembimbing.map((p) => (
+                  <tr key={p.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3">
+                      <div className="font-medium text-gray-900">{p.nama}</div>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-700">{p.username}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <code className="bg-gray-100 px-2 py-1 rounded text-sm font-mono">
+                          {p.kode_akses || '-'}
+                        </code>
+                        <button
+                          onClick={() => copyToClipboard(p.kode_akses, p.id)}
+                          className="p-1 hover:bg-gray-200 rounded"
+                          title="Salin kode akses"
+                        >
+                          {copiedId === p.id ? (
+                            <Check className="w-4 h-4 text-emerald-500" />
+                          ) : (
+                            <Copy className="w-4 h-4 text-gray-500" />
+                          )}
+                        </button>
+                        <button
+                          onClick={() => handleRegenerateKodeAkses(p)}
+                          disabled={regeneratingId === p.id}
+                          className="p-1 hover:bg-gray-200 rounded"
+                          title="Generate kode akses baru"
+                        >
+                          <RefreshCw
+                            className={`w-4 h-4 text-blue-500 ${
+                              regeneratingId === p.id ? 'animate-spin' : ''
+                            }`}
+                          />
+                        </button>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-700">{p.email_atau_hp || '-'}</td>
+                    <td className="px-4 py-3 text-sm text-gray-700">{getAsramaNames(p.asrama_ids)}</td>
+                    <td className="px-4 py-3 text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button variant="outline" size="sm" onClick={() => openEditDialog(p)}>
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => confirmDelete(p)}>
+                          <Trash2 className="w-4 h-4 text-red-500" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
+
+      {/* Dialog Tambah/Edit */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editMode ? 'Edit Pembimbing' : 'Tambah Pembimbing'}</DialogTitle>
+            <DialogDescription>
+              {editMode
+                ? 'Perbarui data pembimbing'
+                : 'Masukkan data pembimbing baru. Kode akses akan dibuat otomatis.'}
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmit}>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="nama">Nama Lengkap</Label>
+                <Input
+                  id="nama"
+                  value={form.nama}
+                  onChange={(e) => setForm({ ...form, nama: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="username">Username</Label>
+                <Input
+                  id="username"
+                  value={form.username}
+                  onChange={(e) => setForm({ ...form, username: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="email_atau_hp">Email/HP</Label>
+                <Input
+                  id="email_atau_hp"
+                  value={form.email_atau_hp}
+                  onChange={(e) => setForm({ ...form, email_atau_hp: e.target.value })}
+                  placeholder="email@example.com atau 08123456789"
+                />
+              </div>
+              <div>
+                <Label>Asrama yang Dikelola</Label>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {asrama.map((a) => (
+                    <button
+                      key={a.id}
+                      type="button"
+                      onClick={() => toggleAsrama(a.id)}
+                      className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
+                        form.asrama_ids.includes(a.id)
+                          ? 'bg-blue-500 text-white border-blue-500'
+                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      {a.nama}
+                    </button>
+                  ))}
+                </div>
+                {asrama.length === 0 && (
+                  <p className="text-sm text-gray-500 mt-2">Belum ada asrama. Tambahkan asrama terlebih dahulu.</p>
+                )}
+              </div>
+            </div>
+            <DialogFooter className="mt-6">
+              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
+                Batal
+              </Button>
+              <Button type="submit">{editMode ? 'Simpan' : 'Tambah'}</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog Konfirmasi Hapus */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Pembimbing?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus <strong>{toDelete?.nama}</strong>? Tindakan ini tidak
+              dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-red-500 hover:bg-red-600">
+              Hapus
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
