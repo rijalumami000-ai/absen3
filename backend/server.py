@@ -218,22 +218,20 @@ class Pembimbing(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     nama: str
     username: str
-    password_hash: str
-    email_atau_hp: str  # NEW
+    kode_akses: str  # Changed from password_hash to kode_akses (access code)
+    email_atau_hp: str
     asrama_ids: List[str] = []
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class PembimbingCreate(BaseModel):
     nama: str
     username: str
-    password: str
     email_atau_hp: str
     asrama_ids: List[str] = []
 
 class PembimbingUpdate(BaseModel):
     nama: Optional[str] = None
     username: Optional[str] = None
-    password: Optional[str] = None
     email_atau_hp: Optional[str] = None
     asrama_ids: Optional[List[str]] = None
 
@@ -241,9 +239,29 @@ class PembimbingResponse(BaseModel):
     id: str
     nama: str
     username: str
+    kode_akses: str  # Include kode_akses in response for Admin to see
     email_atau_hp: str
     asrama_ids: List[str]
     created_at: datetime
+
+
+# Pembimbing PWA Models
+class PembimbingLoginRequest(BaseModel):
+    username: str
+    kode_akses: str
+
+class PembimbingMeResponse(BaseModel):
+    id: str
+    nama: str
+    username: str
+    email_atau_hp: str
+    asrama_ids: List[str]
+    created_at: datetime
+
+class PembimbingTokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: PembimbingMeResponse
 class PengabsenLoginRequest(BaseModel):
     username: str
     password: str
