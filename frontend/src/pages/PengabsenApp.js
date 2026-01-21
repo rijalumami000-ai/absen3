@@ -39,6 +39,8 @@ const PengabsenApp = () => {
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [historyStart, setHistoryStart] = useState(() => new Date().toISOString().split('T')[0]);
   const [historyEnd, setHistoryEnd] = useState(() => new Date().toISOString().split('T')[0]);
+  const [historyDetail, setHistoryDetail] = useState(null);
+  const [loadingHistoryDetail, setLoadingHistoryDetail] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
