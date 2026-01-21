@@ -873,6 +873,9 @@ async def get_current_wali(credentials: HTTPAuthorizationCredentials = Depends(s
 
 @api_router.post("/wali/login", response_model=WaliTokenResponse)
 async def login_wali(request: WaliLoginRequest):
+    # Pastikan data wali dan anak_ids sudah tersinkron dari data santri
+    await sync_wali_santri()
+
     # Temukan wali berdasarkan username
     wali = await db.wali_santri.find_one({"username": request.username}, {"_id": 0})
 

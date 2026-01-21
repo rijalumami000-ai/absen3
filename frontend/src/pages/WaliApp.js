@@ -8,7 +8,11 @@ import { useToast } from '@/hooks/use-toast';
 const WaliApp = () => {
   const { user, loading, logout } = useWaliAuth();
   const [todayData, setTodayData] = useState(null);
-  const [historyDate, setHistoryDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const [selectedMonth, setSelectedMonth] = useState(now.getMonth()); // 0-11
+  const [selectedDay, setSelectedDay] = useState(now.getDate());
+  const [historyDate, setHistoryDate] = useState(() => now.toISOString().slice(0, 10));
   const [historyData, setHistoryData] = useState(null);
   const [loadingToday, setLoadingToday] = useState(false);
   const [loadingHistory, setLoadingHistory] = useState(false);
