@@ -19,6 +19,9 @@ import { PengabsenAuthProvider, usePengabsenAuth } from '@/contexts/PengabsenAut
 import WaliAppLogin from '@/pages/WaliAppLogin';
 import WaliApp from '@/pages/WaliApp';
 import { WaliAuthProvider, useWaliAuth } from '@/contexts/WaliAuthContext';
+import PembimbingAppLogin from '@/pages/PembimbingAppLogin';
+import PembimbingApp from '@/pages/PembimbingApp';
+import { PembimbingAuthProvider, usePembimbingAuth } from '@/contexts/PembimbingAuthContext';
 import '@/App.css';
 
 const ProtectedRoute = ({ children }) => {
