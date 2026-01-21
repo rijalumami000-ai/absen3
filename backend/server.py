@@ -854,6 +854,29 @@ async def get_wali(_: dict = Depends(get_current_admin)):
     
     for wali in wali_list:
         if isinstance(wali['created_at'], str):
+
+class WaliFcmTokenRequest(BaseModel):
+    token: str
+
+
+@api_router.post("/wali/fcm-token")
+async def register_wali_fcm_token(payload: WaliFcmTokenRequest, current_wali: dict = Depends(get_current_wali)):
+    token = payload.token.strip()
+    if not token:
+        raise HTTPException(status_code=400, detail="Token tidak boleh kosong")
+
+    wali_id = current_wali["id"]
+    wali = await db.wali_santri.find_one({"id": wali_id}, {"_id": 0})
+    if not wali:
+        raise HTTPException(status_code=404, detail="Wali tidak ditemukan")
+
+    tokens: list[str] = wali.get("fcm_tokens", []) or []
+    if token not in tokens:
+        tokens.append(token)
+        await db.wali_santri.update_one({"id": wali_id}, {"$set": {"fcm_tokens": tokens}})
+
+    return {"status": "ok"}
+
             wali['created_at'] = datetime.fromisoformat(wali['created_at'])
         if isinstance(wali['updated_at'], str):
             wali['updated_at'] = datetime.fromisoformat(wali['updated_at'])
