@@ -90,6 +90,10 @@ const WaliApp = () => {
       haid: 'Haid',
       istihadhoh: 'Istihadhoh',
     };
+    const cls = map[status] || 'bg-gray-100 text-gray-700';
+    return <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${cls}`}>{labelMap[status] || status}</span>;
+  };
+
   const months = [
     'Jan',
     'Feb',
@@ -110,9 +114,6 @@ const WaliApp = () => {
     return new Date(year, monthIndex + 1, 0).getDate();
   };
 
-    const cls = map[status] || 'bg-gray-100 text-gray-700';
-    return <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${cls}`}>{labelMap[status] || status}</span>;
-  };
 
   const waktuLabels = [
     { key: 'subuh', label: 'Subuh' },
