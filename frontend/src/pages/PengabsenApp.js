@@ -275,6 +275,8 @@ const PengabsenApp = () => {
             </div>
           )}
         </section>
+          </>
+        )}
 
         {activeTab === 'history' && (
           <section className="bg-white rounded-lg shadow p-4">
