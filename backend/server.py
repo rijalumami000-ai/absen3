@@ -377,6 +377,7 @@ async def sync_wali_santri():
                 },
                 "email_wali": {"$first": "$email_wali"},
                 "nama_anak": {"$push": "$nama"},
+                "anak_ids": {"$push": "$id"},
                 "jumlah_anak": {"$sum": 1},
                 "first_created": {"$min": "$created_at"}
             }
@@ -389,6 +390,7 @@ async def sync_wali_santri():
         nama_wali = group["_id"]["nama_wali"]
         nomor_hp = group["_id"]["nomor_hp_wali"]
         email = group.get("email_wali")
+        anak_ids = group.get("anak_ids", [])
         
         # Check if wali exists
         wali_id = f"wali_{nomor_hp}"
@@ -405,6 +407,7 @@ async def sync_wali_santri():
                         "email": email,
                         "jumlah_anak": group["jumlah_anak"],
                         "nama_anak": group["nama_anak"],
+                        "anak_ids": anak_ids,
                         "updated_at": datetime.now(timezone.utc).isoformat()
                     }
                 }
@@ -428,6 +431,7 @@ async def sync_wali_santri():
                 "email": email,
                 "jumlah_anak": group["jumlah_anak"],
                 "nama_anak": group["nama_anak"],
+                "anak_ids": anak_ids,
                 "created_at": group["first_created"],
                 "updated_at": datetime.now(timezone.utc).isoformat()
             }
