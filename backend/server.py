@@ -1627,6 +1627,232 @@ async def delete_pembimbing(pembimbing_id: str, _: dict = Depends(get_current_ad
         raise HTTPException(status_code=404, detail="Pembimbing tidak ditemukan")
     return {"message": "Pembimbing berhasil dihapus"}
 
+
+# ==================== PEMBIMBING PWA ENDPOINTS ====================
+
+async def get_current_pembimbing(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
+    try:
+        token = credentials.credentials
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        pembimbing_id: str = payload.get("sub")
+        if pembimbing_id is None:
+            raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+
+        pembimbing = await db.pembimbing.find_one({"id": pembimbing_id}, {"_id": 0})
+        if pembimbing is None:
+            raise HTTPException(status_code=401, detail="Pembimbing tidak ditemukan")
+
+        return pembimbing
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+
+
+@api_router.post("/pembimbing/login", response_model=PembimbingTokenResponse)
+async def login_pembimbing(request: PembimbingLoginRequest):
+    """Login pembimbing using username and kode_akses"""
+    pembimbing = await db.pembimbing.find_one({"username": request.username}, {"_id": 0})
+
+    if not pembimbing:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Username atau kode akses salah"
+        )
+    
+    # Verify kode_akses
+    stored_kode = pembimbing.get("kode_akses", "")
+    if request.kode_akses != stored_kode:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Username atau kode akses salah"
+        )
+
+    access_token = create_access_token(data={"sub": pembimbing['id'], "role": "pembimbing"})
+
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": PembimbingMeResponse(**{k: v for k, v in pembimbing.items() if k not in ['password_hash', 'kode_akses']})
+    }
+
+
+@api_router.get("/pembimbing/me", response_model=PembimbingMeResponse)
+async def get_pembimbing_me(current_pembimbing: dict = Depends(get_current_pembimbing)):
+    return PembimbingMeResponse(**{k: v for k, v in current_pembimbing.items() if k not in ['password_hash', 'kode_akses']})
+
+
+@api_router.get("/pembimbing/santri-absensi-hari-ini")
+async def get_pembimbing_santri_absensi_hari_ini(
+    waktu_sholat: Optional[Literal["subuh", "dzuhur", "ashar", "maghrib", "isya"]] = None,
+    current_pembimbing: dict = Depends(get_current_pembimbing)
+):
+    """Get today's attendance for santri in pembimbing's asrama"""
+    today = datetime.now(timezone.utc).astimezone().date().isoformat()
+    
+    asrama_ids = current_pembimbing.get('asrama_ids', [])
+    if not asrama_ids:
+        return {"tanggal": today, "waktu_sholat": waktu_sholat, "data": []}
+    
+    # Get all santri in pembimbing's asrama
+    santri_list = await db.santri.find({"asrama_id": {"$in": asrama_ids}}, {"_id": 0}).to_list(10000)
+    santri_by_id = {s['id']: s for s in santri_list}
+    
+    # Get attendance for today
+    absensi_query = {"tanggal": today, "santri_id": {"$in": list(santri_by_id.keys())}}
+    if waktu_sholat:
+        absensi_query["waktu_sholat"] = waktu_sholat
+    
+    absensi_list = await db.absensi.find(absensi_query, {"_id": 0}).to_list(10000)
+    
+    # Build status map: santri_id -> {waktu_sholat: status}
+    status_by_santri = {sid: {} for sid in santri_by_id.keys()}
+    for a in absensi_list:
+        sid = a['santri_id']
+        ws = a['waktu_sholat']
+        if sid in status_by_santri:
+            status_by_santri[sid][ws] = a['status']
+    
+    # Get asrama names
+    asrama_map = {a['id']: a['nama'] for a in await db.asrama.find({}, {"_id": 0}).to_list(1000)}
+    
+    # Get pengabsen names
+    pengabsen_map = {
+        p["id"]: p.get("nama", "-")
+        for p in await db.pengabsen.find({}, {"_id": 0, "id": 1, "nama": 1}).to_list(1000)
+    }
+    
+    # Build pengabsen per santri (last entry)
+    pengabsen_by_santri = {}
+    for a in absensi_list:
+        sid = a.get("santri_id")
+        pid = a.get("pengabsen_id")
+        if sid in santri_by_id and pid:
+            pengabsen_by_santri[sid] = pengabsen_map.get(pid, "-")
+    
+    result = []
+    for sid, santri in santri_by_id.items():
+        result.append({
+            "santri_id": sid,
+            "nama": santri['nama'],
+            "nis": santri['nis'],
+            "asrama_id": santri['asrama_id'],
+            "nama_asrama": asrama_map.get(santri['asrama_id'], "-"),
+            "status": status_by_santri.get(sid, {}),
+            "pengabsen_nama": pengabsen_by_santri.get(sid)
+        })
+    
+    # Sort by asrama then name
+    result.sort(key=lambda x: (x['nama_asrama'], x['nama']))
+    
+    return {"tanggal": today, "waktu_sholat": waktu_sholat, "data": result}
+
+
+@api_router.get("/pembimbing/absensi-riwayat")
+async def get_pembimbing_absensi_riwayat(
+    tanggal: str,
+    waktu_sholat: Optional[Literal["subuh", "dzuhur", "ashar", "maghrib", "isya"]] = None,
+    asrama_id: Optional[str] = None,
+    current_pembimbing: dict = Depends(get_current_pembimbing)
+):
+    """Get historical attendance for a specific date"""
+    asrama_ids = current_pembimbing.get('asrama_ids', [])
+    if not asrama_ids:
+        return {"tanggal": tanggal, "waktu_sholat": waktu_sholat, "data": []}
+    
+    # Filter by specific asrama if provided
+    if asrama_id and asrama_id in asrama_ids:
+        filter_asrama_ids = [asrama_id]
+    else:
+        filter_asrama_ids = asrama_ids
+    
+    # Get santri
+    santri_list = await db.santri.find({"asrama_id": {"$in": filter_asrama_ids}}, {"_id": 0}).to_list(10000)
+    santri_by_id = {s['id']: s for s in santri_list}
+    
+    # Get attendance
+    absensi_query = {"tanggal": tanggal, "santri_id": {"$in": list(santri_by_id.keys())}}
+    if waktu_sholat:
+        absensi_query["waktu_sholat"] = waktu_sholat
+    
+    absensi_list = await db.absensi.find(absensi_query, {"_id": 0}).to_list(10000)
+    
+    # Build status map
+    status_by_santri = {sid: {} for sid in santri_by_id.keys()}
+    for a in absensi_list:
+        sid = a['santri_id']
+        ws = a['waktu_sholat']
+        if sid in status_by_santri:
+            status_by_santri[sid][ws] = a['status']
+    
+    asrama_map = {a['id']: a['nama'] for a in await db.asrama.find({}, {"_id": 0}).to_list(1000)}
+    
+    pengabsen_map = {
+        p["id"]: p.get("nama", "-")
+        for p in await db.pengabsen.find({}, {"_id": 0, "id": 1, "nama": 1}).to_list(1000)
+    }
+    
+    pengabsen_by_santri = {}
+    for a in absensi_list:
+        sid = a.get("santri_id")
+        pid = a.get("pengabsen_id")
+        if sid in santri_by_id and pid:
+            pengabsen_by_santri[sid] = pengabsen_map.get(pid, "-")
+    
+    result = []
+    for sid, santri in santri_by_id.items():
+        result.append({
+            "santri_id": sid,
+            "nama": santri['nama'],
+            "nis": santri['nis'],
+            "asrama_id": santri['asrama_id'],
+            "nama_asrama": asrama_map.get(santri['asrama_id'], "-"),
+            "status": status_by_santri.get(sid, {}),
+            "pengabsen_nama": pengabsen_by_santri.get(sid)
+        })
+    
+    result.sort(key=lambda x: (x['nama_asrama'], x['nama']))
+    
+    return {"tanggal": tanggal, "waktu_sholat": waktu_sholat, "data": result}
+
+
+@api_router.get("/pembimbing/statistik")
+async def get_pembimbing_statistik(
+    tanggal: str,
+    current_pembimbing: dict = Depends(get_current_pembimbing)
+):
+    """Get attendance statistics for a specific date"""
+    asrama_ids = current_pembimbing.get('asrama_ids', [])
+    if not asrama_ids:
+        return {"tanggal": tanggal, "total_santri": 0, "stats": {}}
+    
+    # Get santri count
+    santri_list = await db.santri.find({"asrama_id": {"$in": asrama_ids}}, {"_id": 0, "id": 1}).to_list(10000)
+    santri_ids = [s['id'] for s in santri_list]
+    total_santri = len(santri_ids)
+    
+    # Get attendance stats
+    absensi_list = await db.absensi.find(
+        {"tanggal": tanggal, "santri_id": {"$in": santri_ids}},
+        {"_id": 0}
+    ).to_list(10000)
+    
+    # Calculate stats per waktu sholat
+    waktu_list = ["subuh", "dzuhur", "ashar", "maghrib", "isya"]
+    stats = {}
+    for waktu in waktu_list:
+        waktu_absensi = [a for a in absensi_list if a['waktu_sholat'] == waktu]
+        stats[waktu] = {
+            "hadir": len([a for a in waktu_absensi if a['status'] == 'hadir']),
+            "alfa": len([a for a in waktu_absensi if a['status'] == 'alfa']),
+            "sakit": len([a for a in waktu_absensi if a['status'] == 'sakit']),
+            "izin": len([a for a in waktu_absensi if a['status'] == 'izin']),
+            "haid": len([a for a in waktu_absensi if a['status'] == 'haid']),
+            "istihadhoh": len([a for a in waktu_absensi if a['status'] == 'istihadhoh']),
+            "belum": total_santri - len(waktu_absensi)
+        }
+    
+    return {"tanggal": tanggal, "total_santri": total_santri, "stats": stats}
+
+
 # ==================== ABSENSI ENDPOINTS (REVISED) ====================
 
 @api_router.get("/absensi", response_model=List[AbsensiResponse])
