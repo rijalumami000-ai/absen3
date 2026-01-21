@@ -1227,6 +1227,78 @@ async def get_santri_absensi_hari_ini(
 
 
 @api_router.delete("/pengabsen/{pengabsen_id}")
+
+
+@api_router.get("/pengabsen/riwayat")
+async def get_pengabsen_riwayat(
+    tanggal_start: str,
+    tanggal_end: Optional[str] = None,
+    asrama_id: Optional[str] = None,
+    current_pengabsen: dict = Depends(get_current_pengabsen),
+):
+    """Riwayat absensi yang dicatat oleh pengabsen tertentu (ringkasan per tanggal/waktu/asrama)."""
+    if not tanggal_end:
+      tanggal_end = tanggal_start
+
+    # Ambil semua absensi milik pengabsen dalam rentang tanggal
+    query = {
+        "pengabsen_id": current_pengabsen["id"],
+        "tanggal": {"$gte": tanggal_start, "$lte": tanggal_end},
+    }
+    absensi_list = await db.absensi.find(query, {"_id": 0}).to_list(10000)
+
+    if not absensi_list:
+        return {"items": []}
+
+    santri_ids = list({a["santri_id"] for a in absensi_list})
+    santri_docs = await db.santri.find({"id": {"$in": santri_ids}}, {"_id": 0}).to_list(10000)
+    santri_by_id = {s["id"]: s for s in santri_docs}
+
+    asrama_docs = await db.asrama.find({}, {"_id": 0}).to_list(1000)
+    asrama_map = {a["id"]: a["nama"] for a in asrama_docs}
+
+    # Grouping: (tanggal, asrama_id, waktu_sholat) -> counts per status
+    groups: dict = {}
+    for a in absensi_list:
+        sid = a.get("santri_id")
+        santri = santri_by_id.get(sid)
+        if not santri:
+            continue
+
+        asrama_santri = santri.get("asrama_id")
+        # Batasi hanya asrama yang dikelola pengabsen
+        if asrama_santri not in current_pengabsen.get("asrama_ids", []):
+            continue
+
+        # Filter asrama jika diminta
+        if asrama_id and asrama_santri != asrama_id:
+            continue
+
+        key = (a["tanggal"], asrama_santri, a["waktu_sholat"])
+        if key not in groups:
+            groups[key] = {
+                "tanggal": a["tanggal"],
+                "asrama_id": asrama_santri,
+                "nama_asrama": asrama_map.get(asrama_santri, "-"),
+                "waktu_sholat": a["waktu_sholat"],
+                "hadir": 0,
+                "alfa": 0,
+                "sakit": 0,
+                "izin": 0,
+                "haid": 0,
+                "istihadhoh": 0,
+            }
+
+        status_val = a.get("status")
+        if status_val in ["hadir", "alfa", "sakit", "izin", "haid", "istihadhoh"]:
+            groups[key][status_val] += 1
+
+    items = list(groups.values())
+    # Urutkan berdasarkan tanggal lalu waktu sholat
+    items.sort(key=lambda x: (x["tanggal"], x["waktu_sholat"]))
+
+    return {"items": items}
+
 async def delete_pengabsen(pengabsen_id: str, _: dict = Depends(get_current_admin)):
     result = await db.pengabsen.delete_one({"id": pengabsen_id})
     if result.deleted_count == 0:

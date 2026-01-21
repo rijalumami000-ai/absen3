@@ -27,6 +27,7 @@ const STATUS_OPTIONS = [
 
 const PengabsenApp = () => {
   const { user, loading, logout } = usePengabsenAuth();
+  const [activeTab, setActiveTab] = useState('today'); // 'today' | 'history'
   const [waktu, setWaktu] = useState('maghrib');
   const [data, setData] = useState([]);
   const [loadingData, setLoadingData] = useState(false);
@@ -34,6 +35,10 @@ const PengabsenApp = () => {
   const [lastScan, setLastScan] = useState(null);
   const [lastScanAt, setLastScanAt] = useState(0);
   const [showScanSuccess, setShowScanSuccess] = useState(false);
+  const [historyItems, setHistoryItems] = useState([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
+  const [historyStart, setHistoryStart] = useState(() => new Date().toISOString().split('T')[0]);
+  const [historyEnd, setHistoryEnd] = useState(() => new Date().toISOString().split('T')[0]);
   const { toast } = useToast();
   const navigate = useNavigate();
 
