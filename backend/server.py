@@ -423,7 +423,7 @@ async def sync_wali_santri():
                 "id": wali_id,
                 "nama": nama_wali,
                 "username": username,
-                "password_hash": hash_password("password123"),  # default password
+                "password_hash": hash_password("12345"),  # default password
                 "nomor_hp": nomor_hp,
                 "email": email,
                 "jumlah_anak": group["jumlah_anak"],
