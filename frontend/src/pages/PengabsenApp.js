@@ -356,7 +356,7 @@ const PengabsenApp = () => {
                       </span>
                     </div>
                     <div className="text-gray-600 mb-1">Asrama: {item.nama_asrama}</div>
-                    <div className="flex flex-wrap gap-1 mt-1">
+                    <div className="flex flex-wrap gap-1 mt-1 mb-2">
                       <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">
                         Hadir: {item.hadir}
                       </span>
@@ -376,8 +376,48 @@ const PengabsenApp = () => {
                         Istihadhoh: {item.istihadhoh}
                       </span>
                     </div>
+                    <Button
+                      variant="outline"
+                      size="xs"
+                      className="self-start mt-1"
+                      onClick={() => loadHistoryDetail(item)}
+                    >
+                      {loadingHistoryDetail && historyDetail?.tanggal === item.tanggal &&
+                      historyDetail?.waktu_sholat === item.waktu_sholat ? (
+                        'Memuat...'
+                      ) : (
+                        'Lihat nama santri'
+                      )}
+                    </Button>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {historyDetail && (
+              <div className="mt-4 border-t pt-3 text-xs">
+                <h3 className="font-semibold text-gray-800 mb-2">
+                  Detail {historyDetail.tanggal} -{' '}
+                  {historyDetail.waktu_sholat.charAt(0).toUpperCase() +
+                    historyDetail.waktu_sholat.slice(1)}
+                </h3>
+                {historyDetail.data.length === 0 ? (
+                  <p className="text-gray-500">Tidak ada data santri.</p>
+                ) : (
+                  <div className="max-h-48 overflow-y-auto space-y-1">
+                    {historyDetail.data.map((s) => (
+                      <div key={s.santri_id} className="p-2 bg-white rounded border flex justify-between">
+                        <div>
+                          <div className="font-medium text-gray-800">{s.nama}</div>
+                          <div className="text-gray-500">NIS: {s.nis}</div>
+                        </div>
+                        <div className="text-[11px] text-gray-500 flex items-center">
+                          Status: <span className="ml-1 font-semibold capitalize">{s.status}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </section>
