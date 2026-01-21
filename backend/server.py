@@ -531,16 +531,24 @@ async def fetch_prayer_times(date: str) -> Optional[dict]:
         return None
 
 
-# ==================== AUTHENTIKASI PENGABSEN (PWA) ====================
+# ==================== AUTHENTIKASI PENGABSEN (PWA - Kode Akses) ====================
 
 @api_router.post("/pengabsen/login", response_model=PengabsenTokenResponse)
 async def login_pengabsen(request: PengabsenLoginRequest):
     pengabsen = await db.pengabsen.find_one({"username": request.username}, {"_id": 0})
 
-    if not pengabsen or not verify_password(request.password, pengabsen['password_hash']):
+    if not pengabsen:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Username atau password salah"
+            detail="Username atau kode akses salah"
+        )
+    
+    # Verify kode_akses
+    stored_kode = pengabsen.get("kode_akses", "")
+    if request.kode_akses != stored_kode:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Username atau kode akses salah"
         )
 
     access_token = create_access_token(data={"sub": pengabsen['id'], "role": "pengabsen"})
@@ -548,13 +556,13 @@ async def login_pengabsen(request: PengabsenLoginRequest):
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "user": PengabsenMeResponse(**{k: v for k, v in pengabsen.items() if k != 'password_hash'})
+        "user": PengabsenMeResponse(**{k: v for k, v in pengabsen.items() if k not in ['password_hash', 'kode_akses']})
     }
 
 
 @api_router.get("/pengabsen/me", response_model=PengabsenMeResponse)
 async def get_pengabsen_me(current_pengabsen: dict = Depends(get_current_pengabsen)):
-    return PengabsenMeResponse(**{k: v for k, v in current_pengabsen.items() if k != 'password_hash'})
+    return PengabsenMeResponse(**{k: v for k, v in current_pengabsen.items() if k not in ['password_hash', 'kode_akses']})
 
 
 # ==================== AUTHENTICATION ENDPOINTS ====================
