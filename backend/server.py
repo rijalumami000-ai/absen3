@@ -1226,6 +1226,57 @@ async def get_santri_absensi_hari_ini(
     return {"tanggal": today, "waktu_sholat": waktu_sholat, "data": result}
 
 
+
+@api_router.get("/pengabsen/riwayat-detail")
+async def get_pengabsen_riwayat_detail(
+    tanggal: str,
+    waktu_sholat: Literal["subuh", "dzuhur", "ashar", "maghrib", "isya"],
+    asrama_id: Optional[str] = None,
+    current_pengabsen: dict = Depends(get_current_pengabsen),
+):
+    """Detail santri untuk satu kombinasi tanggal/waktu_sholat/asrama yang dicatat oleh pengabsen saat ini."""
+    query = {
+        "pengabsen_id": current_pengabsen["id"],
+        "tanggal": tanggal,
+        "waktu_sholat": waktu_sholat,
+    }
+    absensi_list = await db.absensi.find(query, {"_id": 0}).to_list(10000)
+
+    if not absensi_list:
+        return {"tanggal": tanggal, "waktu_sholat": waktu_sholat, "data": []}
+
+    santri_ids = list({a["santri_id"] for a in absensi_list})
+    santri_docs = await db.santri.find({"id": {"$in": santri_ids}}, {"_id": 0}).to_list(10000)
+    santri_by_id = {s["id"]: s for s in santri_docs}
+
+    items = []
+    for a in absensi_list:
+        sid = a.get("santri_id")
+        santri = santri_by_id.get(sid)
+        if not santri:
+            continue
+
+        # Pastikan hanya asrama yang dikelola pengabsen
+        asrama_santri = santri.get("asrama_id")
+        if asrama_santri not in current_pengabsen.get("asrama_ids", []):
+            continue
+
+        if asrama_id and asrama_santri != asrama_id:
+            continue
+
+        items.append(
+            {
+                "santri_id": sid,
+                "nama": santri["nama"],
+                "nis": santri["nis"],
+                "asrama_id": asrama_santri,
+                "status": a.get("status"),
+            }
+        )
+
+    return {"tanggal": tanggal, "waktu_sholat": waktu_sholat, "data": items}
+
+
 @api_router.delete("/pengabsen/{pengabsen_id}")
 
 

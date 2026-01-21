@@ -101,6 +101,11 @@ export const pengabsenAppAPI = {
       params,
       headers: getPengabsenAuthHeader(),
     }),
+  riwayatDetail: (params) =>
+    axios.get(`${API}/pengabsen/riwayat-detail`, {
+      params,
+      headers: getPengabsenAuthHeader(),
+    }),
 };
 
 // API khusus PWA Wali Santri
