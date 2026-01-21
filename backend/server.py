@@ -861,6 +861,23 @@ async def get_wali(_: dict = Depends(get_current_admin)):
     return wali_list
 
 
+async def get_current_wali(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
+    try:
+        token = credentials.credentials
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        wali_id: str = payload.get("sub")
+        if wali_id is None:
+            raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+
+        wali = await db.wali_santri.find_one({"id": wali_id}, {"_id": 0})
+        if wali is None:
+            raise HTTPException(status_code=401, detail="Wali tidak ditemukan")
+
+        return wali
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+
+
 class WaliFcmTokenRequest(BaseModel):
     token: str
 
@@ -913,23 +930,6 @@ async def update_wali(wali_id: str, data: WaliSantriUpdate, _: dict = Depends(ge
         wali['updated_at'] = datetime.fromisoformat(wali['updated_at'])
     
     return WaliSantriResponse(**{k: v for k, v in wali.items() if k != 'password_hash'})
-
-
-async def get_current_wali(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
-    try:
-        token = credentials.credentials
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        wali_id: str = payload.get("sub")
-        if wali_id is None:
-            raise HTTPException(status_code=401, detail="Invalid authentication credentials")
-
-        wali = await db.wali_santri.find_one({"id": wali_id}, {"_id": 0})
-        if wali is None:
-            raise HTTPException(status_code=401, detail="Wali tidak ditemukan")
-
-        return wali
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
 
 
 @api_router.post("/wali/login", response_model=WaliTokenResponse)
