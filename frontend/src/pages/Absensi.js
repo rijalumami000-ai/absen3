@@ -268,6 +268,11 @@ const Absensi = () => {
                               >
                                 <div className="font-medium">{santri.nama}</div>
                                 <div className="text-gray-600">NIS: {santri.nis}</div>
+                                {santri.pengabsen_nama && (
+                                  <div className="text-gray-500 text-[11px] mt-0.5">
+                                    Dicatat oleh: <span className="font-semibold">{santri.pengabsen_nama}</span>
+                                  </div>
+                                )}
                               </div>
                             ))}
                           </div>
