@@ -98,6 +98,9 @@ const PengabsenApp = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-gray-500">Memuat...</div>
       </div>
+    );
+  }
+
   const loadHistory = async () => {
     try {
       setLoadingHistory(true);
