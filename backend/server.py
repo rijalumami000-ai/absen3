@@ -318,6 +318,23 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
+async def send_wali_push_notification(wali: dict, title: str, body: str):
+    """Send FCM push notification to all tokens of a wali (if configured)."""
+    try:
+        tokens: list[str] = wali.get("fcm_tokens", []) or []
+        if not tokens:
+            return
+
+        message = messaging.MulticastMessage(
+            tokens=tokens,
+            notification=messaging.Notification(title=title, body=body),
+        )
+        response = messaging.send_multicast(message)
+        logging.info(f"Sent FCM to wali {wali.get('id')} count={len(tokens)} success={response.success_count}")
+    except Exception as e:
+        logging.error(f"Failed to send FCM notification: {e}")
+
+
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:
