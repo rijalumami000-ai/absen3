@@ -1,0 +1,170 @@
+{
+  "identity": {
+    "persona": "E1: The Anti-AI Designer",
+    "mission": "Create a modern, culturally respectful, and highly functional interface for a Pesantren management system. Fusion of traditional Islamic aesthetics with Swiss-style precision.",
+    "principles": [
+      "Fusion over Imitation: Mix Islamic geometry with modern SaaS layouts.",
+      "Emotion First: Trust, Serenity, and Professionalism.",
+      "Content is King: Data clarity for admin, ease of use for parents/staff.",
+      "Negative Space: Generous breathing room.",
+      "Contrast: High contrast for readability, subtle textures for depth."
+    ]
+  },
+  "typography": {
+    "headings": {
+      "fontFamily": "Playfair Display, serif",
+      "weights": ["600", "700"],
+      "usage": "Page titles, Section headers, Hero text",
+      "letterSpacing": "-0.02em"
+    },
+    "body": {
+      "fontFamily": "Plus Jakarta Sans, sans-serif",
+      "weights": ["400", "500", "600"],
+      "usage": "Paragraphs, UI labels, Data tables, Buttons",
+      "letterSpacing": "0em"
+    },
+    "mono": {
+      "fontFamily": "JetBrains Mono, monospace",
+      "usage": "Code snippets, ID numbers, Technical data"
+    },
+    "installation": "Import via Google Fonts in index.html: <link href='https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono&display=swap' rel='stylesheet'>"
+  },
+  "colors": {
+    "palette_name": "Modern Pesantren (Archetype 1: Organic & Earthy)",
+    "primary": {
+      "DEFAULT": "#047857",
+      "foreground": "#FFFFFF",
+      "50": "#ECFDF5",
+      "100": "#D1FAE5",
+      "200": "#A7F3D0",
+      "300": "#6EE7B7",
+      "400": "#34D399",
+      "500": "#10B981",
+      "600": "#059669",
+      "700": "#047857",
+      "800": "#065F46",
+      "900": "#064E3B"
+    },
+    "secondary": {
+      "DEFAULT": "#D97706",
+      "foreground": "#FFFFFF",
+      "50": "#FFFBEB",
+      "100": "#FEF3C7",
+      "200": "#FDE68A",
+      "300": "#FCD34D",
+      "400": "#FBBF24",
+      "500": "#F59E0B",
+      "600": "#D97706",
+      "700": "#B45309",
+      "800": "#92400E",
+      "900": "#78350F"
+    },
+    "background": {
+      "DEFAULT": "#FAFAF9",
+      "paper": "#FFFFFF",
+      "subtle": "#F5F5F4"
+    },
+    "text": {
+      "primary": "#1C1917",
+      "secondary": "#57534E",
+      "muted": "#A8A29E"
+    },
+    "status": {
+      "success": "#10B981",
+      "warning": "#F59E0B",
+      "error": "#EF4444",
+      "info": "#3B82F6"
+    }
+  },
+  "visual_enhancers": {
+    "radius": {
+      "default": "0.75rem",
+      "sm": "0.5rem",
+      "lg": "1rem",
+      "full": "9999px"
+    },
+    "shadows": {
+      "card": "0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)",
+      "hover": "0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04)",
+      "dropdown": "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+    },
+    "textures": {
+      "noise": "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E\")",
+      "pattern": "Use subtle geometric Islamic patterns in SVG format for hero sections or card backgrounds (opacity 0.03)."
+    },
+    "glassmorphism": {
+      "default": "bg-white/80 backdrop-blur-md border border-white/20 shadow-sm",
+      "dark": "bg-black/60 backdrop-blur-xl border border-white/10 shadow-lg"
+    }
+  },
+  "layout_strategies": {
+    "admin_dashboard": {
+      "type": "Bento Grid Mode B (High Density)",
+      "structure": "Sidebar (Fixed Left) + Topbar (Sticky) + Main Content (Scrollable)",
+      "grid": "grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6",
+      "spacing": "p-6 md:p-8"
+    },
+    "mobile_pwa": {
+      "type": "Mobile First Stack",
+      "structure": "Header (Sticky) + Content (Scrollable) + Bottom Nav (Fixed)",
+      "container": "max-w-md mx-auto bg-white min-h-screen shadow-2xl overflow-hidden",
+      "spacing": "p-4 md:p-6"
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 rounded-lg font-medium transition-all active:scale-95 shadow-sm",
+      "secondary": "bg-secondary text-secondary-foreground hover:bg-secondary/80 h-10 px-4 py-2 rounded-lg font-medium transition-all active:scale-95",
+      "outline": "border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 rounded-lg transition-all",
+      "ghost": "hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 rounded-lg transition-all"
+    },
+    "cards": {
+      "default": "bg-card text-card-foreground rounded-xl border border-border/50 shadow-card hover:shadow-hover transition-shadow duration-300",
+      "interactive": "cursor-pointer hover:border-primary/50 hover:shadow-md transition-all duration-200"
+    },
+    "inputs": {
+      "default": "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+    },
+    "navigation": {
+      "sidebar": "w-64 bg-white border-r border-border h-screen fixed left-0 top-0 z-40 hidden md:flex flex-col",
+      "bottom_nav": "fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-border h-16 flex items-center justify-around z-50 md:hidden"
+    }
+  },
+  "assets": {
+    "icons": {
+      "library": "lucide-react",
+      "style": "Stroke width 1.5px or 2px",
+      "usage": "Use consistent sizing (w-5 h-5 for UI, w-6 h-6 for nav)"
+    },
+    "images": {
+      "login_bg": "https://images.pexels.com/photos/18435276/pexels-photo-18435276.jpeg",
+      "student_hero": "https://images.pexels.com/photos/35548842/pexels-photo-35548842.jpeg",
+      "pattern_bg": "https://images.pexels.com/photos/34238805/pexels-photo-34238805.jpeg",
+      "mosque_interior": "https://images.pexels.com/photos/33251467/pexels-photo-33251467.jpeg"
+    }
+  },
+  "accessibility": {
+    "contrast": "Ensure text meets WCAG AA (4.5:1). Use darker shades of primary/secondary for text on light backgrounds.",
+    "focus": "Visible focus rings on all interactive elements.",
+    "touch_targets": "Minimum 44x44px for mobile touch targets."
+  },
+  "instructions_to_main_agent": [
+    "1. Install fonts: Add the Google Fonts link to public/index.html.",
+    "2. Configure Tailwind: Update tailwind.config.js with the new color palette, font families, and border radius.",
+    "3. Global CSS: Update index.css to set the base styles (font-family, background color).",
+    "4. Layout Implementation: Create separate layout components for 'AdminLayout' (Sidebar) and 'MobileLayout' (BottomNav).",
+    "5. Component Customization: Update Shadcn components in components/ui to match the 'visual_enhancers' (radius, shadows).",
+    "6. Page Polish: Apply the 'Bento Grid' to the Admin Dashboard and 'Card Stack' to Mobile Dashboards.",
+    "7. Use 'lucide-react' for all icons.",
+    "8. Ensure all interactive elements have 'data-testid'.",
+    "9. DO NOT use gradients for main backgrounds; use solid colors or subtle patterns.",
+    "10. Keep the UI 'Clean' and 'Holy' - avoid clutter."
+  ],
+  "universal_guidelines": [
+    "Avoid 'AI Slop': No generic centered layouts or default blue colors.",
+    "Micro-interactions: Add hover states, active states, and simple transitions.",
+    "Spacing: Use generous padding (p-6, p-8) to create breathing room.",
+    "Mobile First: Ensure all PWA views are perfectly optimized for touch.",
+    "Dark Mode: Support it, but prioritize the 'Light/Holy' theme as default."
+  ]
+}
