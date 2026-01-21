@@ -53,12 +53,22 @@ Build a comprehensive prayer attendance application for a school (Pesantren). Th
 
 ### Phase 5 - Pembimbing PWA ✅ COMPLETED (Jan 21, 2026)
 - [x] Login with username and kode_akses (9-digit access code)
-- [x] Dashboard with today's attendance statistics
+- [x] Dashboard with today's attendance statistics (all 7 status columns)
 - [x] Santri list grouped by asrama
 - [x] Filter by waktu sholat (subuh, dzuhur, ashar, maghrib, isya)
-- [x] History tab with month/day picker
+- [x] History tab with period filters (day/week/biweek/month/year)
 - [x] Admin can view and regenerate kode_akses
 - [x] Read-only access (cannot modify attendance)
+
+### Phase 6 - UI/UX Redesign ✅ COMPLETED (Jan 21, 2026)
+- [x] Modern design system with Emerald (primary) + Amber (secondary) colors
+- [x] Google Fonts: Playfair Display (headings), Plus Jakarta Sans (body)
+- [x] Admin: Split-screen login, sidebar navigation with active states
+- [x] PWA Login pages: Unique colors per role (green/amber/violet)
+- [x] Card-based layouts with subtle shadows
+- [x] Responsive mobile-first design
+- [x] Smooth animations and transitions
+- [x] Consistent notification banners with icons
 
 ## Tech Stack
 - **Backend**: FastAPI, Python 3.11, Motor (async MongoDB), firebase-admin
@@ -66,19 +76,27 @@ Build a comprehensive prayer attendance application for a school (Pesantren). Th
 - **Database**: MongoDB
 - **External APIs**: Al-Adhan (prayer times), Firebase Cloud Messaging
 
+## Design System
+- **Primary Color**: Emerald (#047857) - for main actions and Pengabsen
+- **Secondary Color**: Amber (#D97706) - for Wali Santri  
+- **Accent Color**: Violet (#7C3AED) - for Pembimbing
+- **Background**: Warm stone (#FAFAF9)
+- **Fonts**: Playfair Display (serif headings), Plus Jakarta Sans (body)
+
 ## API Endpoints Summary
 
 ### Authentication
 - `POST /api/auth/login` - Admin login
-- `POST /api/pengabsen/login` - Pengabsen login
-- `POST /api/wali/login` - Wali login
+- `POST /api/pengabsen/login` - Pengabsen login (username + kode_akses)
+- `POST /api/wali/login` - Wali login (username + password)
 - `POST /api/pembimbing/login` - Pembimbing login (username + kode_akses)
 
 ### Admin Resources
 - `/api/asrama` - CRUD for dormitories
 - `/api/santri` - CRUD for students
 - `/api/wali` - Read/Update for guardians
-- `/api/pengabsen` - CRUD for attendants
+- `/api/pengabsen` - CRUD for attendants (includes kode_akses)
+- `/api/pengabsen/{id}/regenerate-kode-akses` - Regenerate access code
 - `/api/pembimbing` - CRUD for supervisors (includes kode_akses)
 - `/api/pembimbing/{id}/regenerate-kode-akses` - Regenerate access code
 - `/api/absensi` - Attendance records
