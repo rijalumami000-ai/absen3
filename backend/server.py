@@ -1207,6 +1207,17 @@ async def update_pengabsen(pengabsen_id: str, data: PengabsenUpdate, _: dict = D
     
     if 'password' in update_data:
         update_data['password_hash'] = hash_password(update_data.pop('password'))
+    
+    if update_data:
+        await db.pengabsen.update_one({"id": pengabsen_id}, {"$set": update_data})
+        pengabsen.update(update_data)
+    
+    if isinstance(pengabsen.get('created_at'), str):
+        pengabsen['created_at'] = datetime.fromisoformat(pengabsen['created_at'])
+    
+    return PengabsenResponse(**{k: v for k, v in pengabsen.items() if k != 'password_hash'})
+
+
 @api_router.post("/pengabsen/absensi")
 async def upsert_absensi_pengabsen(
     santri_id: str,
