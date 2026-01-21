@@ -118,6 +118,8 @@ export const waliAppAPI = {
       params,
       headers: getWaliAuthHeader(),
     }),
+  registerFcmToken: (token) =>
+    axios.post(`${API}/wali/fcm-token`, { token }, { headers: getWaliAuthHeader() }),
 };
 
 // Absensi API
