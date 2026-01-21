@@ -224,8 +224,7 @@ const WaliApp = () => {
                 type="button"
                 onClick={() => {
                   setSelectedDay(day);
-                  const newDate = new Date(currentYear, selectedMonth, day);
-                  const iso = newDate.toISOString().slice(0, 10);
+                  const iso = formatDateYMD(currentYear, selectedMonth, day);
                   setHistoryDate(iso);
                 }}
                 className={`text-[10px] h-7 rounded border flex items-center justify-center transition-colors ${
