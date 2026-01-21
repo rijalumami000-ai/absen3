@@ -1535,7 +1535,7 @@ async def delete_pengabsen(pengabsen_id: str, _: dict = Depends(get_current_admi
         raise HTTPException(status_code=404, detail="Pengabsen tidak ditemukan")
     return {"message": "Pengabsen berhasil dihapus"}
 
-# ==================== PEMBIMBING ENDPOINTS (REVISED - Add Contact) ====================
+# ==================== PEMBIMBING ENDPOINTS (REVISED - Kode Akses) ====================
 
 @api_router.get("/pembimbing", response_model=List[PembimbingResponse])
 async def get_pembimbing(_: dict = Depends(get_current_admin)):
@@ -1543,7 +1543,7 @@ async def get_pembimbing(_: dict = Depends(get_current_admin)):
 
     normalized: List[PembimbingResponse] = []
     for pembimbing in raw_list:
-        # Backward compatibility untuk data lama yang belum punya email_atau_hp / asrama_ids
+        # Backward compatibility untuk data lama
         if 'email_atau_hp' not in pembimbing:
             pembimbing['email_atau_hp'] = ''
         if 'asrama_ids' not in pembimbing:
@@ -1551,10 +1551,15 @@ async def get_pembimbing(_: dict = Depends(get_current_admin)):
                 pembimbing['asrama_ids'] = [pembimbing['asrama_id']]
             else:
                 pembimbing['asrama_ids'] = []
+        # Migrate from password_hash to kode_akses if needed
+        if 'kode_akses' not in pembimbing:
+            pembimbing['kode_akses'] = generate_kode_akses()
+            await db.pembimbing.update_one({"id": pembimbing['id']}, {"$set": {"kode_akses": pembimbing['kode_akses']}})
 
         if isinstance(pembimbing.get('created_at'), str):
             pembimbing['created_at'] = datetime.fromisoformat(pembimbing['created_at'])
 
+        # Filter out password_hash if exists (old data)
         data = {k: v for k, v in pembimbing.items() if k != 'password_hash'}
         normalized.append(PembimbingResponse(**data))
 
@@ -1567,8 +1572,7 @@ async def create_pembimbing(data: PembimbingCreate, _: dict = Depends(get_curren
         raise HTTPException(status_code=400, detail="Username sudah digunakan")
     
     pembimbing_dict = data.model_dump()
-    password = pembimbing_dict.pop('password')
-    pembimbing_dict['password_hash'] = hash_password(password)
+    pembimbing_dict['kode_akses'] = generate_kode_akses()  # Auto-generate kode akses
     
     pembimbing_obj = Pembimbing(**pembimbing_dict)
     doc = pembimbing_obj.model_dump()
@@ -1586,12 +1590,30 @@ async def update_pembimbing(pembimbing_id: str, data: PembimbingUpdate, _: dict 
     
     update_data = {k: v for k, v in data.model_dump().items() if v is not None}
     
-    if 'password' in update_data:
-        update_data['password_hash'] = hash_password(update_data.pop('password'))
-    
     if update_data:
         await db.pembimbing.update_one({"id": pembimbing_id}, {"$set": update_data})
         pembimbing.update(update_data)
+    
+    # Ensure kode_akses exists
+    if 'kode_akses' not in pembimbing:
+        pembimbing['kode_akses'] = generate_kode_akses()
+        await db.pembimbing.update_one({"id": pembimbing_id}, {"$set": {"kode_akses": pembimbing['kode_akses']}})
+    
+    if isinstance(pembimbing['created_at'], str):
+        pembimbing['created_at'] = datetime.fromisoformat(pembimbing['created_at'])
+    
+    return PembimbingResponse(**{k: v for k, v in pembimbing.items() if k != 'password_hash'})
+
+@api_router.post("/pembimbing/{pembimbing_id}/regenerate-kode-akses", response_model=PembimbingResponse)
+async def regenerate_kode_akses(pembimbing_id: str, _: dict = Depends(get_current_admin)):
+    """Regenerate kode akses untuk pembimbing"""
+    pembimbing = await db.pembimbing.find_one({"id": pembimbing_id}, {"_id": 0})
+    if not pembimbing:
+        raise HTTPException(status_code=404, detail="Pembimbing tidak ditemukan")
+    
+    new_kode = generate_kode_akses()
+    await db.pembimbing.update_one({"id": pembimbing_id}, {"$set": {"kode_akses": new_kode}})
+    pembimbing['kode_akses'] = new_kode
     
     if isinstance(pembimbing['created_at'], str):
         pembimbing['created_at'] = datetime.fromisoformat(pembimbing['created_at'])
