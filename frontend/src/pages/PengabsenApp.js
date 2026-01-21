@@ -179,11 +179,15 @@ const PengabsenApp = () => {
       </header>
 
       <main className="flex-1 p-4 space-y-4 max-w-4xl mx-auto w-full">
-        <section className="bg-white rounded-lg shadow p-4">
-          <h2 className="text-sm font-semibold text-gray-700 mb-2">Pilih Waktu Sholat</h2>
-          <div className="flex flex-wrap gap-2">
-            {WAKTU_OPTIONS.map((opt) => (
-              <button
+        {renderTabs()}
+
+        {activeTab === 'today' && (
+          <>
+            <section className="bg-white rounded-lg shadow p-4">
+              <h2 className="text-sm font-semibold text-gray-700 mb-2">Pilih Waktu Sholat</h2>
+              <div className="flex flex-wrap gap-2">
+                {WAKTU_OPTIONS.map((opt) => (
+                  <button
                 key={opt.value}
                 type="button"
                 onClick={() => setWaktu(opt.value)}
