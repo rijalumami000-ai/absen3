@@ -401,6 +401,13 @@ async def get_current_admin(credentials: HTTPAuthorizationCredentials = Depends(
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid authentication credentials")
 
+
+def generate_kode_akses() -> str:
+    """Generate random 9-digit access code for Pembimbing"""
+    import random
+    return ''.join([str(random.randint(0, 9)) for _ in range(9)])
+
+
 def generate_qr_code(data: dict) -> str:
     import json
     qr = qrcode.QRCode(version=1, box_size=10, border=5)
