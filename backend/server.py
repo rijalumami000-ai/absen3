@@ -265,16 +265,12 @@ class PembimbingTokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: PembimbingMeResponse
-class PengabsenLoginRequest(BaseModel):
-    username: str
-    password: str
-
 class PengabsenMeResponse(BaseModel):
     id: str
     nama: str
     username: str
-    email_atau_hp: str
-    asrama_ids: List[str]
+    email_atau_hp: Optional[str] = ''
+    asrama_ids: List[str] = []
     created_at: datetime
 
 class PengabsenTokenResponse(BaseModel):
