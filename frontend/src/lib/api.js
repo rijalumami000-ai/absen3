@@ -58,12 +58,13 @@ export const pengabsenAPI = {
   delete: (id) => axios.delete(`${API}/pengabsen/${id}`, { headers: getAuthHeader() }),
 };
 
-// Pembimbing API
+// Pembimbing API (Admin)
 export const pembimbingAPI = {
   getAll: () => axios.get(`${API}/pembimbing`, { headers: getAuthHeader() }),
   create: (data) => axios.post(`${API}/pembimbing`, data, { headers: getAuthHeader() }),
   update: (id, data) => axios.put(`${API}/pembimbing/${id}`, data, { headers: getAuthHeader() }),
   delete: (id) => axios.delete(`${API}/pembimbing/${id}`, { headers: getAuthHeader() }),
+  regenerateKodeAkses: (id) => axios.post(`${API}/pembimbing/${id}/regenerate-kode-akses`, {}, { headers: getAuthHeader() }),
 };
 
 const getPengabsenAuthHeader = () => {
@@ -73,6 +74,13 @@ const getPengabsenAuthHeader = () => {
 
 const getWaliAuthHeader = () => {
   const token = localStorage.getItem('wali_token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
+const getPembimbingAuthHeader = () => {
+  const token = localStorage.getItem('pembimbing_token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
