@@ -113,6 +113,12 @@ const PengabsenApp = () => {
         title: 'Error',
         description: 'Gagal memuat riwayat absensi',
         variant: 'destructive',
+      });
+    } finally {
+      setLoadingHistory(false);
+    }
+  };
+
   const loadHistoryDetail = async (item) => {
     try {
       setLoadingHistoryDetail(true);
@@ -130,12 +136,6 @@ const PengabsenApp = () => {
       });
     } finally {
       setLoadingHistoryDetail(false);
-    }
-  };
-
-      });
-    } finally {
-      setLoadingHistory(false);
     }
   };
 
