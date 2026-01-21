@@ -21,7 +21,7 @@ BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://prayertrack-4.previe
 ADMIN_USERNAME = "admin"
 ADMIN_PASSWORD = "admin123"
 PEMBIMBING_USERNAME = "Wafa"
-PEMBIMBING_KODE_AKSES = "137088972"
+PEMBIMBING_KODE_AKSES = "258064095"
 
 
 @pytest.fixture(scope="module")
