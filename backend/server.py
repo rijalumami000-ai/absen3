@@ -184,24 +184,22 @@ class Pengabsen(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     nama: str
-    email_atau_hp: str  # Changed from nip
+    email_atau_hp: str
     username: str
-    password_hash: str
-    asrama_ids: List[str] = []  # Changed to array
+    kode_akses: str  # Changed from password_hash to kode_akses
+    asrama_ids: List[str] = []
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class PengabsenCreate(BaseModel):
     nama: str
     email_atau_hp: str
     username: str
-    password: str
     asrama_ids: List[str]
 
 class PengabsenUpdate(BaseModel):
     nama: Optional[str] = None
     email_atau_hp: Optional[str] = None
     username: Optional[str] = None
-    password: Optional[str] = None
     asrama_ids: Optional[List[str]] = None
 
 class PengabsenResponse(BaseModel):
@@ -209,8 +207,13 @@ class PengabsenResponse(BaseModel):
     nama: str
     email_atau_hp: str
     username: str
+    kode_akses: str  # Include kode_akses for Admin to see
     asrama_ids: List[str]
     created_at: datetime
+
+class PengabsenLoginRequest(BaseModel):
+    username: str
+    kode_akses: str
 
 # REVISED: Pembimbing Models - tambah kontak
 class Pembimbing(BaseModel):
