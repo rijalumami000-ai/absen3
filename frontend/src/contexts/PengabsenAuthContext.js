@@ -28,9 +28,9 @@ export const PengabsenAuthProvider = ({ children }) => {
     init();
   }, [token]);
 
-  const login = async (username, password) => {
+  const login = async (username, kodeAkses) => {
     try {
-      const resp = await pengabsenAppAPI.login(username, password);
+      const resp = await pengabsenAppAPI.login(username, kodeAkses);
       const { access_token, user: userData } = resp.data;
       localStorage.setItem('pengabsen_token', access_token);
       setToken(access_token);
