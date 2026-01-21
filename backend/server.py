@@ -1244,6 +1244,57 @@ async def upsert_absensi_pengabsen(
         doc["id"] = str(uuid.uuid4())
         await db.absensi.insert_one(doc)
 
+    # Kirim notifikasi ke wali terkait
+    try:
+        # Cari wali yang memiliki santri ini
+        wali_list = await db.wali_santri.find({"anak_ids": santri_id}, {"_id": 0}).to_list(100)
+        if wali_list:
+            # Ambil template notifikasi dari settings (fallback ke default jika belum di-set)
+            settings_doc = await db.settings.find_one({"id": "wali_notifikasi"}, {"_id": 0}) or {}
+            templates = {
+                "hadir": settings_doc.get(
+                    "hadir",
+                    "{nama} hadir pada waktu sholat {waktu} hari ini, alhamdulillah (hadir)",
+                ),
+                "alfa": settings_doc.get(
+                    "alfa",
+                    "{nama} tidak mengikuti/membolos sholat {waktu} pada hari ini (alfa)",
+                ),
+                "sakit": settings_doc.get(
+                    "sakit",
+                    "{nama} tidak mengikuti sholat {waktu} pada hari ini karena sedang sakit (sakit)",
+                ),
+                "izin": settings_doc.get(
+                    "izin",
+                    "{nama} tidak mengikuti sholat {waktu} pada hari ini karena izin (izin)",
+                ),
+                "haid": settings_doc.get(
+                    "haid",
+                    "{nama} tidak mengikuti sholat {waktu} pada hari ini karena sedang haid (haid)",
+                ),
+                "istihadhoh": settings_doc.get(
+                    "istihadhoh",
+                    "{nama} tidak mengikuti sholat {waktu} pada hari ini karena sedang istihadhoh (istihadhoh)",
+                ),
+            }
+
+            waktu_label_map = {
+                "subuh": "subuh",
+                "dzuhur": "dzuhur",
+                "ashar": "ashar",
+                "maghrib": "maghrib",
+                "isya": "isya",
+            }
+
+            template = templates.get(status_absen)
+            if template:
+                body = template.format(nama=santri["nama"], waktu=waktu_label_map.get(waktu_sholat, waktu_sholat))
+                title = f"Absensi Sholat {waktu_label_map.get(waktu_sholat, waktu_sholat).capitalize()}"
+                for wali in wali_list:
+                    await send_wali_push_notification(wali, title=title, body=body)
+    except Exception as e:
+        logging.error(f"Failed to send wali notification: {e}")
+
     return {"message": "Absensi tersimpan", "tanggal": today}
 
 
