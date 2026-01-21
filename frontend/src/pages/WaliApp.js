@@ -263,6 +263,11 @@ const WaliApp = () => {
                       </div>
                     ))}
                   </div>
+                  {anak.pengabsen_nama && (
+                    <div className="mt-2 text-[11px] text-gray-500 text-right">
+                      Dicatat oleh: <span className="font-semibold">{anak.pengabsen_nama}</span>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
