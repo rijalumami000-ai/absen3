@@ -34,6 +34,68 @@ const WaliApp = () => {
     }
   }, [loading, user, navigate]);
 
+  // FCM Token Registration
+  const registerFcmToken = useCallback(async () => {
+    try {
+      // Check if notifications are supported
+      if (!('Notification' in window)) {
+        console.log('Browser tidak mendukung notifikasi');
+        setNotificationStatus('unsupported');
+        return;
+      }
+
+      // Check current permission
+      if (Notification.permission === 'denied') {
+        setNotificationStatus('denied');
+        return;
+      }
+
+      // Register service worker first
+      if ('serviceWorker' in navigator) {
+        try {
+          await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+        } catch (swError) {
+          console.warn('Service worker registration failed:', swError);
+        }
+      }
+
+      // Request permission and get token
+      const fcmToken = await requestNotificationPermission();
+      if (fcmToken) {
+        // Send token to backend
+        await waliAppAPI.registerFcmToken(fcmToken);
+        setNotificationStatus('granted');
+        console.log('FCM token registered successfully');
+      } else {
+        setNotificationStatus('denied');
+      }
+    } catch (error) {
+      console.error('Error registering FCM token:', error);
+      setNotificationStatus('error');
+    }
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      // Register FCM token when user is logged in
+      registerFcmToken();
+      
+      // Listen for foreground messages
+      onMessageListener()
+        .then((payload) => {
+          if (payload) {
+            toast({
+              title: payload.notification?.title || 'Notifikasi',
+              description: payload.notification?.body || 'Anda memiliki notifikasi baru',
+            });
+            // Refresh data when notification received
+            loadToday();
+          }
+        })
+        .catch((err) => console.log('Message listener error:', err));
+    }
+  }, [user, registerFcmToken, toast]);
+
   const loadToday = async () => {
     try {
       setLoadingToday(true);
