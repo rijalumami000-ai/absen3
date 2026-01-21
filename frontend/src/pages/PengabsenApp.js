@@ -98,6 +98,22 @@ const PengabsenApp = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-gray-500">Memuat...</div>
       </div>
+  const loadHistory = async () => {
+    try {
+      setLoadingHistory(true);
+      const resp = await pengabsenAppAPI.riwayat({ tanggal_start: historyStart, tanggal_end: historyEnd });
+      setHistoryItems(resp.data.items || []);
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Gagal memuat riwayat absensi',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoadingHistory(false);
+    }
+  };
+
     );
   }
 
