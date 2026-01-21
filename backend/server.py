@@ -1174,7 +1174,7 @@ Pondok Pesantren"""
     }
 
 
-# ==================== PENGABSEN ENDPOINTS (REVISED - Multi Asrama) ====================
+# ==================== PENGABSEN ENDPOINTS (REVISED - Kode Akses) ====================
 
 @api_router.get("/pengabsen", response_model=List[PengabsenResponse])
 async def get_pengabsen(_: dict = Depends(get_current_admin)):
@@ -1182,7 +1182,7 @@ async def get_pengabsen(_: dict = Depends(get_current_admin)):
 
     normalized: List[PengabsenResponse] = []
     for pengabsen in raw_list:
-        # Backward compatibility untuk data lama yang masih pakai field nip/asrama_id tunggal
+        # Backward compatibility untuk data lama
         if 'email_atau_hp' not in pengabsen:
             pengabsen['email_atau_hp'] = pengabsen.get('nip', '')
         if 'asrama_ids' not in pengabsen:
@@ -1190,11 +1190,14 @@ async def get_pengabsen(_: dict = Depends(get_current_admin)):
                 pengabsen['asrama_ids'] = [pengabsen['asrama_id']]
             else:
                 pengabsen['asrama_ids'] = []
+        # Migrate from password_hash to kode_akses if needed
+        if 'kode_akses' not in pengabsen:
+            pengabsen['kode_akses'] = generate_kode_akses()
+            await db.pengabsen.update_one({"id": pengabsen['id']}, {"$set": {"kode_akses": pengabsen['kode_akses']}})
 
         if isinstance(pengabsen.get('created_at'), str):
             pengabsen['created_at'] = datetime.fromisoformat(pengabsen['created_at'])
 
-        # Pastikan password_hash tidak ikut ter-serialize
         data = {k: v for k, v in pengabsen.items() if k != 'password_hash'}
         normalized.append(PengabsenResponse(**data))
 
@@ -1202,20 +1205,17 @@ async def get_pengabsen(_: dict = Depends(get_current_admin)):
 
 @api_router.post("/pengabsen", response_model=PengabsenResponse)
 async def create_pengabsen(data: PengabsenCreate, _: dict = Depends(get_current_admin)):
-    # Check if username already exists
     existing = await db.pengabsen.find_one({"username": data.username})
     if existing:
         raise HTTPException(status_code=400, detail="Username sudah digunakan")
     
-    # Verify all asrama exist
     for asrama_id in data.asrama_ids:
         asrama = await db.asrama.find_one({"id": asrama_id})
         if not asrama:
             raise HTTPException(status_code=404, detail=f"Asrama {asrama_id} tidak ditemukan")
     
     pengabsen_dict = data.model_dump()
-    password = pengabsen_dict.pop('password')
-    pengabsen_dict['password_hash'] = hash_password(password)
+    pengabsen_dict['kode_akses'] = generate_kode_akses()  # Auto-generate kode akses
     
     pengabsen_obj = Pengabsen(**pengabsen_dict)
     doc = pengabsen_obj.model_dump()
