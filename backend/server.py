@@ -1777,6 +1777,52 @@ async def sync_waktu_sholat(tanggal: str, _: dict = Depends(get_current_admin)):
     
     return WaktuSholatResponse(**waktu_obj.model_dump())
 
+
+# ==================== SETTINGS ENDPOINTS ====================
+
+class WaliNotifikasiSettings(BaseModel):
+    hadir: str = "{nama} hadir pada waktu sholat {waktu} hari ini, alhamdulillah (hadir)"
+    alfa: str = "{nama} tidak mengikuti/membolos sholat {waktu} pada hari ini (alfa)"
+    sakit: str = "{nama} tidak mengikuti sholat {waktu} pada hari ini karena sedang sakit (sakit)"
+    izin: str = "{nama} tidak mengikuti sholat {waktu} pada hari ini karena izin (izin)"
+    haid: str = "{nama} tidak mengikuti sholat {waktu} pada hari ini karena sedang haid (haid)"
+    istihadhoh: str = "{nama} tidak mengikuti sholat {waktu} pada hari ini karena sedang istihadhoh (istihadhoh)"
+
+
+@api_router.get("/settings/wali-notifikasi")
+async def get_wali_notifikasi_settings(_: dict = Depends(get_current_admin)):
+    """Get notification template settings for Wali Santri"""
+    settings = await db.settings.find_one({"id": "wali_notifikasi"}, {"_id": 0})
+    if not settings:
+        # Return defaults
+        return WaliNotifikasiSettings().model_dump()
+    
+    return {
+        "hadir": settings.get("hadir", WaliNotifikasiSettings().hadir),
+        "alfa": settings.get("alfa", WaliNotifikasiSettings().alfa),
+        "sakit": settings.get("sakit", WaliNotifikasiSettings().sakit),
+        "izin": settings.get("izin", WaliNotifikasiSettings().izin),
+        "haid": settings.get("haid", WaliNotifikasiSettings().haid),
+        "istihadhoh": settings.get("istihadhoh", WaliNotifikasiSettings().istihadhoh),
+    }
+
+
+@api_router.put("/settings/wali-notifikasi")
+async def update_wali_notifikasi_settings(data: WaliNotifikasiSettings, _: dict = Depends(get_current_admin)):
+    """Update notification template settings for Wali Santri"""
+    settings_data = data.model_dump()
+    settings_data["id"] = "wali_notifikasi"
+    settings_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.settings.update_one(
+        {"id": "wali_notifikasi"},
+        {"$set": settings_data},
+        upsert=True
+    )
+    
+    return {"message": "Pengaturan notifikasi berhasil disimpan"}
+
+
 # ==================== INITIALIZATION ====================
 
 @api_router.get("/")
