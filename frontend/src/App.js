@@ -162,6 +162,24 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/pembimbing-app/login"
+        element={
+          <PembimbingAuthProvider>
+            <PembimbingAppLogin />
+          </PembimbingAuthProvider>
+        }
+      />
+      <Route
+        path="/pembimbing-app"
+        element={
+          <PembimbingAuthProvider>
+            <PembimbingProtectedRoute>
+              <PembimbingApp />
+            </PembimbingProtectedRoute>
+          </PembimbingAuthProvider>
+        }
+      />
+      <Route
         path="/dashboard"
         element={
           <ProtectedRoute>
