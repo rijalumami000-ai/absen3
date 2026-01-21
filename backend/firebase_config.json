@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "absensi-pesantren-139ac",
+  "private_key_id": "a38325d4f48fe11db3018f3f1125cb4b1422dd96",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDhZJoouvQCmDdt\nttYG1tXv9GWF1avFvQgyoPNoLTwzHbMSvyXbOBenO+LqUUlcagSZ7bMt7JOpcF80\nbQVMOhkmkazwa9FTLr7c3xVyoHEfF9V+uFPN9oZOwOsO+JwnK/nkbzvCJCf8rTgN\nqlC4W1B1jWXfx68P59Ul0jivQ4nXyIKzyXmaiHWwcw7cxotBGvTOD+lxb9awnuBQ\nf8hSfJ6QAz0MGYUXoQG6I9rJsePzWJgsqAvO3YYa6+hqP2bRm9elx+5mpTwAk1Aq\ncO6xyVxKwMiyqsKyR8+WBD6jKLOFt/Bk/7Xc9NSiY7IyWHthMyM7ozcOZL0xkK2m\nM1DAx2iNAgMBAAECggEAImOeVsURilzNpjZ9iM0aFrKwE7+yZejt2YWvpa8zLmxj\nYGKcRMqV50zulghBfHFrks3O5xyfufw8dmwE4SjDIhybaZJVvY6WDe6Wn+blY5RY\nHW3D0ZrByr3KD350mtBtoAItuLUaCcYnFYStLLe3+ruQddiKeA+L+KmOvwT7wNmc\ndGsw1RWpbjAbVzCZlJ7PCQMonnFRE8M34XVZxVDXsQ6fuY0a8NhZkdXV5SFcGcTP\ndx1ecjppeaRLgodSMDOF2fIoga9a7oGdSvJIfVHOdUbJNFeURoP4l+i13uJ0EFlG\nIJeDYDXiYuyJrgyslRlV4vtBJ+J6AGh5bJp2a0oQmQKBgQDxSB3C0hts7vRDV1PW\nkXqu2VmyQYLbtJr2PJrCr9cr4CA2mNx7gWLjVJASXQ0y7Y6UwMagN8V9VAF51RAv\nrb951tiTpTa28s1azNM3DG4vUSmBzVinxr01P85jbGlf6cb+oRtgvprAoUbFi+2I\nAOjZ5Rbqi5kMAv+rqSru6F6TlQKBgQDvJF2dhQKCuIied5RqpwbS/RkMZbx22dRD\n+W3aHTz5B4BV2z6Cf+doP0d7uM8VFZ0GWS0auVv6ANo1kmEDELE+vBxlWjb3jJQS\nZY6gbcKqEfoWiXDjcdfAYLzfqOXlr5uMv/b/Q2Dd14zadSnV0XCh0rAp5MBq2Zgi\nw2Y5uH9DGQKBgQDWJ9VKi2SOTpV9g/BE/YEv2nkTj7QPQAFe1zHh5WMNbXQKIalo\n8dGMxwzNT8wcTOAFxglGQdpHQB3DPkqMlyHhicFXYwfqYB3HHw/Fx4Gw+8/khxfO\nasabkdOlSZ9J41yduu9q8iK3IS6IvocI9Q24AO9TJK6mC69UdOVHgfYX9QKBgEtU\nRTjtQRE0V7SzLkk6O+gSWeWR1oAJtdeDppriQuae+koROeuZpqcr57SNTo3xtPje\n9lpIsTRbOGFPrsdsZqjAUKGMfWwVGD+DRh469OrlpsWanbjHj5LF5jj91w029+Sq\nQ3+9FbJLx864wWjdBIG1AFDyAbqmuEmbC4R7HXthAoGAVJOh8mbK9D9oadTUpZIk\njhqaXbrKmFK+BL9k4LpAZi8bSCqFpj0/Klq9kNhxW8JHaS3MJFrFEz1RUTbrVD6R\nHU0R1+aGfBuzMWnklGFzq4++yEHSPry0sSDOcv7sTzGFT6IMPvI+mgdMRwertTj3\nEqQEq5Nmcu8z+8yTyCME+7w=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-fbsvc@absensi-pesantren-139ac.iam.gserviceaccount.com",
+  "client_id": "111763912175610050991",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40absensi-pesantren-139ac.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
