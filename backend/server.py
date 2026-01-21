@@ -860,6 +860,7 @@ async def get_wali(_: dict = Depends(get_current_admin)):
     
     return wali_list
 
+
 class WaliFcmTokenRequest(BaseModel):
     token: str
 
