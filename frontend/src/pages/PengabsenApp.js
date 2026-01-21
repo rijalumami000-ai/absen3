@@ -220,6 +220,91 @@ const PengabsenApp = () => {
           ) : data.length === 0 ? (
             <div className="py-6 text-center text-gray-500 text-sm">
               Belum ada santri untuk asrama yang Anda kelola.
+        )}
+
+        {activeTab === 'history' && (
+          <section className="bg-white rounded-lg shadow p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h2 className="text-sm font-semibold text-gray-700">Riwayat Absensi Saya</h2>
+                <p className="text-xs text-gray-500 mt-1">
+                  Ringkasan absensi berdasarkan tanggal dan asrama yang Anda kelola.
+                </p>
+              </div>
+              <div className="flex flex-col items-end gap-2 text-xs">
+                <div className="flex gap-2">
+                  <div>
+                    <span className="block mb-1 text-[11px] text-gray-500">Tanggal Mulai</span>
+                    <input
+                      type="date"
+                      value={historyStart}
+                      onChange={(e) => setHistoryStart(e.target.value)}
+                      className="border rounded px-2 py-1 text-xs"
+                    />
+                  </div>
+                  <div>
+                    <span className="block mb-1 text-[11px] text-gray-500">Tanggal Akhir</span>
+                    <input
+                      type="date"
+                      value={historyEnd}
+                      onChange={(e) => setHistoryEnd(e.target.value)}
+                      className="border rounded px-2 py-1 text-xs"
+                    />
+                  </div>
+                </div>
+                <Button variant="outline" size="xs" onClick={loadHistory} disabled={loadingHistory}>
+                  {loadingHistory ? 'Memuat...' : 'Terapkan Filter'}
+                </Button>
+              </div>
+            </div>
+
+            {loadingHistory ? (
+              <div className="py-6 text-center text-gray-500 text-sm">Memuat riwayat...</div>
+            ) : historyItems.length === 0 ? (
+              <div className="py-6 text-center text-gray-500 text-sm">
+                Belum ada data absensi untuk rentang tanggal ini.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {historyItems.map((item, idx) => (
+                  <div
+                    key={idx}
+                    className="border rounded-lg p-3 bg-slate-50 text-xs flex flex-col gap-1"
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-semibold text-gray-800">{item.tanggal}</span>
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-semibold">
+                        {item.waktu_sholat.charAt(0).toUpperCase() + item.waktu_sholat.slice(1)}
+                      </span>
+                    </div>
+                    <div className="text-gray-600 mb-1">Asrama: {item.nama_asrama}</div>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">
+                        Hadir: {item.hadir}
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full bg-red-100 text-red-700">
+                        Alfa: {item.alfa}
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full bg-sky-100 text-sky-700">
+                        Sakit: {item.sakit}
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
+                        Izin: {item.izin}
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">
+                        Haid: {item.haid}
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full bg-pink-100 text-pink-700">
+                        Istihadhoh: {item.istihadhoh}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
+
             </div>
           ) : (
             <div className="max-h-[60vh] overflow-y-auto space-y-4">
