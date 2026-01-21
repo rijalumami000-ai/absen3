@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePembimbingAuth } from '@/contexts/PembimbingAuthContext';
 import { pembimbingAppAPI } from '@/lib/api';
@@ -7,12 +7,13 @@ import { useToast } from '@/hooks/use-toast';
 
 const PembimbingApp = () => {
   const { user, loading, logout } = usePembimbingAuth();
-  const [activeTab, setActiveTab] = useState('today'); // 'today' or 'history'
+  const [activeTab, setActiveTab] = useState('today');
   const [selectedWaktu, setSelectedWaktu] = useState(null);
   const [todayData, setTodayData] = useState(null);
   const [statistik, setStatistik] = useState(null);
   const [historyData, setHistoryData] = useState(null);
   const [loadingData, setLoadingData] = useState(false);
+  const [periodType, setPeriodType] = useState('day'); // 'day', 'week', 'biweek1', 'biweek2', 'month', 'year'
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -27,6 +28,7 @@ const PembimbingApp = () => {
 
   const [selectedMonth, setSelectedMonth] = useState(now.getMonth());
   const [selectedDay, setSelectedDay] = useState(now.getDate());
+  const [selectedWeek, setSelectedWeek] = useState(1);
   const [historyDate, setHistoryDate] = useState(() =>
     formatDateYMD(currentYear, now.getMonth(), now.getDate())
   );
@@ -38,14 +40,14 @@ const PembimbingApp = () => {
     }
   }, [loading, user, navigate]);
 
-  // Load today's data
   const loadTodayData = async () => {
     try {
       setLoadingData(true);
       const params = selectedWaktu ? { waktu_sholat: selectedWaktu } : {};
+      const todayStr = formatDateYMD(currentYear, now.getMonth(), now.getDate());
       const [absensiRes, statRes] = await Promise.all([
         pembimbingAppAPI.absensiHariIni(params),
-        pembimbingAppAPI.statistik({ tanggal: formatDateYMD(currentYear, now.getMonth(), now.getDate()) }),
+        pembimbingAppAPI.statistik({ tanggal: todayStr }),
       ]);
       setTodayData(absensiRes.data);
       setStatistik(statRes.data);
@@ -56,14 +58,69 @@ const PembimbingApp = () => {
     }
   };
 
-  // Load history data
+  // Calculate date range based on period type
+  const dateRange = useMemo(() => {
+    const dates = [];
+    const year = currentYear;
+    const month = selectedMonth;
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    if (periodType === 'day') {
+      dates.push(formatDateYMD(year, month, selectedDay));
+    } else if (periodType === 'week') {
+      // Get week dates (7 days starting from selected week)
+      const weekStart = (selectedWeek - 1) * 7 + 1;
+      for (let i = 0; i < 7; i++) {
+        const day = weekStart + i;
+        if (day <= daysInMonth) {
+          dates.push(formatDateYMD(year, month, day));
+        }
+      }
+    } else if (periodType === 'biweek1') {
+      // First 2 weeks (day 1-14)
+      for (let i = 1; i <= 14 && i <= daysInMonth; i++) {
+        dates.push(formatDateYMD(year, month, i));
+      }
+    } else if (periodType === 'biweek2') {
+      // Second 2 weeks (day 15-end)
+      for (let i = 15; i <= daysInMonth; i++) {
+        dates.push(formatDateYMD(year, month, i));
+      }
+    } else if (periodType === 'month') {
+      // Whole month
+      for (let i = 1; i <= daysInMonth; i++) {
+        dates.push(formatDateYMD(year, month, i));
+      }
+    } else if (periodType === 'year') {
+      // Whole year - just get first day of each month for summary
+      for (let m = 0; m < 12; m++) {
+        dates.push(formatDateYMD(year, m, 1));
+      }
+    }
+    return dates;
+  }, [periodType, selectedMonth, selectedDay, selectedWeek, currentYear]);
+
   const loadHistoryData = async () => {
     try {
       setLoadingData(true);
-      const params = { tanggal: historyDate };
-      if (historyWaktu) params.waktu_sholat = historyWaktu;
-      const res = await pembimbingAppAPI.absensiRiwayat(params);
-      setHistoryData(res.data);
+      
+      if (periodType === 'day') {
+        const params = { tanggal: historyDate };
+        if (historyWaktu) params.waktu_sholat = historyWaktu;
+        const res = await pembimbingAppAPI.absensiRiwayat(params);
+        setHistoryData({ type: 'single', data: res.data });
+      } else {
+        // For multiple dates, fetch summary
+        const allData = await Promise.all(
+          dateRange.map(async (date) => {
+            const params = { tanggal: date };
+            if (historyWaktu) params.waktu_sholat = historyWaktu;
+            const res = await pembimbingAppAPI.absensiRiwayat(params);
+            return { date, data: res.data };
+          })
+        );
+        setHistoryData({ type: 'multiple', data: allData });
+      }
     } catch (error) {
       toast({ title: 'Error', description: 'Gagal memuat riwayat', variant: 'destructive' });
     } finally {
@@ -83,7 +140,7 @@ const PembimbingApp = () => {
       loadHistoryData();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, activeTab, historyDate, historyWaktu]);
+  }, [user, activeTab, historyDate, historyWaktu, periodType, dateRange]);
 
   if (loading || !user) {
     return (
@@ -102,6 +159,7 @@ const PembimbingApp = () => {
   ];
 
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+  const fullMonths = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
   const getDaysInMonth = (year, monthIndex) => {
     return new Date(year, monthIndex + 1, 0).getDate();
@@ -150,6 +208,8 @@ const PembimbingApp = () => {
                 <th className="px-2 py-1 text-center text-red-600">Alfa</th>
                 <th className="px-2 py-1 text-center text-sky-600">Sakit</th>
                 <th className="px-2 py-1 text-center text-amber-600">Izin</th>
+                <th className="px-2 py-1 text-center text-pink-600">Haid</th>
+                <th className="px-2 py-1 text-center text-violet-600">Istihadhoh</th>
                 <th className="px-2 py-1 text-center text-gray-500">Belum</th>
               </tr>
             </thead>
@@ -163,6 +223,8 @@ const PembimbingApp = () => {
                     <td className="px-2 py-1 text-center">{stat.alfa || 0}</td>
                     <td className="px-2 py-1 text-center">{stat.sakit || 0}</td>
                     <td className="px-2 py-1 text-center">{stat.izin || 0}</td>
+                    <td className="px-2 py-1 text-center">{stat.haid || 0}</td>
+                    <td className="px-2 py-1 text-center">{stat.istihadhoh || 0}</td>
                     <td className="px-2 py-1 text-center text-gray-400">{stat.belum || 0}</td>
                   </tr>
                 );
@@ -179,7 +241,6 @@ const PembimbingApp = () => {
       return <div className="py-4 text-sm text-gray-500">Tidak ada data santri.</div>;
     }
 
-    // Group by asrama
     const grouped = {};
     data.data.forEach((s) => {
       const key = s.nama_asrama || 'Lainnya';
@@ -217,6 +278,90 @@ const PembimbingApp = () => {
             </div>
           </div>
         ))}
+      </div>
+    );
+  };
+
+  const renderMultipleDaySummary = () => {
+    if (!historyData || historyData.type !== 'multiple') return null;
+
+    // Calculate summary stats
+    const summary = {
+      hadir: 0, alfa: 0, sakit: 0, izin: 0, haid: 0, istihadhoh: 0, total: 0
+    };
+
+    historyData.data.forEach(({ data }) => {
+      if (data && data.data) {
+        data.data.forEach((santri) => {
+          Object.values(santri.status || {}).forEach((status) => {
+            if (status) {
+              summary[status] = (summary[status] || 0) + 1;
+              summary.total++;
+            }
+          });
+        });
+      }
+    });
+
+    return (
+      <div className="bg-white rounded-lg shadow p-4 mb-4">
+        <h3 className="text-sm font-semibold text-gray-700 mb-3">
+          Ringkasan Periode ({dateRange.length} hari)
+        </h3>
+        <div className="grid grid-cols-4 gap-2 text-xs">
+          <div className="bg-emerald-50 p-2 rounded text-center">
+            <div className="font-bold text-emerald-700">{summary.hadir}</div>
+            <div className="text-emerald-600">Hadir</div>
+          </div>
+          <div className="bg-red-50 p-2 rounded text-center">
+            <div className="font-bold text-red-700">{summary.alfa}</div>
+            <div className="text-red-600">Alfa</div>
+          </div>
+          <div className="bg-sky-50 p-2 rounded text-center">
+            <div className="font-bold text-sky-700">{summary.sakit}</div>
+            <div className="text-sky-600">Sakit</div>
+          </div>
+          <div className="bg-amber-50 p-2 rounded text-center">
+            <div className="font-bold text-amber-700">{summary.izin}</div>
+            <div className="text-amber-600">Izin</div>
+          </div>
+          <div className="bg-pink-50 p-2 rounded text-center">
+            <div className="font-bold text-pink-700">{summary.haid}</div>
+            <div className="text-pink-600">Haid</div>
+          </div>
+          <div className="bg-violet-50 p-2 rounded text-center">
+            <div className="font-bold text-violet-700">{summary.istihadhoh}</div>
+            <div className="text-violet-600">Istihadhoh</div>
+          </div>
+        </div>
+        
+        {/* Per-day breakdown */}
+        <div className="mt-4">
+          <h4 className="text-xs font-semibold text-gray-600 mb-2">Detail per Tanggal:</h4>
+          <div className="max-h-60 overflow-y-auto space-y-1">
+            {historyData.data.map(({ date, data }) => {
+              const dayStats = { hadir: 0, alfa: 0, sakit: 0, izin: 0, haid: 0, istihadhoh: 0 };
+              if (data && data.data) {
+                data.data.forEach((santri) => {
+                  Object.values(santri.status || {}).forEach((status) => {
+                    if (status) dayStats[status]++;
+                  });
+                });
+              }
+              return (
+                <div key={date} className="flex items-center justify-between text-[10px] bg-gray-50 px-2 py-1 rounded">
+                  <span className="font-medium">{date}</span>
+                  <div className="flex gap-2">
+                    <span className="text-emerald-600">H:{dayStats.hadir}</span>
+                    <span className="text-red-600">A:{dayStats.alfa}</span>
+                    <span className="text-sky-600">S:{dayStats.sakit}</span>
+                    <span className="text-amber-600">I:{dayStats.izin}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
     );
   };
@@ -260,10 +405,8 @@ const PembimbingApp = () => {
       <main className="flex-1 p-4 space-y-4 max-w-4xl mx-auto w-full">
         {activeTab === 'today' && (
           <>
-            {/* Statistik */}
             {renderStatistik()}
 
-            {/* Filter Waktu Sholat */}
             <div className="bg-white rounded-lg shadow p-4">
               <h3 className="text-sm font-semibold text-gray-700 mb-2">Filter Waktu Sholat</h3>
               <div className="flex flex-wrap gap-2">
@@ -293,7 +436,6 @@ const PembimbingApp = () => {
               </div>
             </div>
 
-            {/* Daftar Santri */}
             <div className="bg-white rounded-lg shadow p-4">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-semibold text-gray-700">
@@ -314,7 +456,34 @@ const PembimbingApp = () => {
 
         {activeTab === 'history' && (
           <>
-            {/* Filter Waktu Sholat untuk Riwayat */}
+            {/* Period Type Selection */}
+            <div className="bg-white rounded-lg shadow p-4">
+              <h3 className="text-sm font-semibold text-gray-700 mb-2">Pilih Jenis Periode</h3>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { key: 'day', label: 'Per Hari' },
+                  { key: 'week', label: 'Per Minggu' },
+                  { key: 'biweek1', label: '2 Minggu I' },
+                  { key: 'biweek2', label: '2 Minggu II' },
+                  { key: 'month', label: 'Per Bulan' },
+                  { key: 'year', label: 'Per Tahun' },
+                ].map((p) => (
+                  <button
+                    key={p.key}
+                    onClick={() => setPeriodType(p.key)}
+                    className={`px-3 py-1 text-xs rounded-full border transition-colors ${
+                      periodType === p.key
+                        ? 'bg-blue-500 text-white border-blue-500'
+                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                    }`}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Filter Waktu Sholat */}
             <div className="bg-white rounded-lg shadow p-4">
               <h3 className="text-sm font-semibold text-gray-700 mb-2">Filter Waktu Sholat</h3>
               <div className="flex flex-wrap gap-2">
@@ -344,14 +513,13 @@ const PembimbingApp = () => {
               </div>
             </div>
 
-            {/* Pilih Tanggal */}
+            {/* Date Selection */}
             <div className="bg-white rounded-lg shadow p-4">
-              <h3 className="text-sm font-semibold text-gray-700 mb-2">Pilih Tanggal</h3>
-              <p className="text-xs text-gray-500 mb-3">
-                Pilih bulan lalu tanggal untuk melihat riwayat absensi.
-              </p>
+              <h3 className="text-sm font-semibold text-gray-700 mb-2">
+                {periodType === 'year' ? 'Pilih Tahun' : 'Pilih Bulan'}
+              </h3>
 
-              {/* Grid bulan */}
+              {/* Month Grid */}
               <div className="grid grid-cols-4 gap-2 mb-3">
                 {months.map((m, idx) => (
                   <button
@@ -359,8 +527,10 @@ const PembimbingApp = () => {
                     type="button"
                     onClick={() => {
                       setSelectedMonth(idx);
-                      const iso = formatDateYMD(currentYear, idx, selectedDay);
-                      setHistoryDate(iso);
+                      if (periodType === 'day') {
+                        const iso = formatDateYMD(currentYear, idx, selectedDay);
+                        setHistoryDate(iso);
+                      }
                     }}
                     className={`text-xs px-2 py-1 rounded border transition-colors ${
                       selectedMonth === idx
@@ -373,49 +543,90 @@ const PembimbingApp = () => {
                 ))}
               </div>
 
-              {/* Grid tanggal */}
-              <div className="grid grid-cols-7 gap-1 mb-3">
-                {Array.from({ length: getDaysInMonth(currentYear, selectedMonth) }, (_, i) => i + 1).map(
-                  (day) => (
-                    <button
-                      key={day}
-                      type="button"
-                      onClick={() => {
-                        setSelectedDay(day);
-                        const iso = formatDateYMD(currentYear, selectedMonth, day);
-                        setHistoryDate(iso);
-                      }}
-                      className={`text-[10px] h-7 rounded border flex items-center justify-center transition-colors ${
-                        selectedDay === day
-                          ? 'bg-blue-500 text-white border-blue-500'
-                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                      }`}
-                    >
-                      {day}
-                    </button>
-                  )
-                )}
-              </div>
+              {/* Day Grid - only for 'day' period */}
+              {periodType === 'day' && (
+                <>
+                  <h4 className="text-xs font-semibold text-gray-600 mb-2">Pilih Tanggal:</h4>
+                  <div className="grid grid-cols-7 gap-1 mb-3">
+                    {Array.from({ length: getDaysInMonth(currentYear, selectedMonth) }, (_, i) => i + 1).map(
+                      (day) => (
+                        <button
+                          key={day}
+                          type="button"
+                          onClick={() => {
+                            setSelectedDay(day);
+                            const iso = formatDateYMD(currentYear, selectedMonth, day);
+                            setHistoryDate(iso);
+                          }}
+                          className={`text-[10px] h-7 rounded border flex items-center justify-center transition-colors ${
+                            selectedDay === day
+                              ? 'bg-blue-500 text-white border-blue-500'
+                              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                          }`}
+                        >
+                          {day}
+                        </button>
+                      )
+                    )}
+                  </div>
+                </>
+              )}
 
-              <p className="text-xs text-gray-600">
-                Tanggal dipilih: <span className="font-semibold">{historyDate}</span>
+              {/* Week Selection - only for 'week' period */}
+              {periodType === 'week' && (
+                <>
+                  <h4 className="text-xs font-semibold text-gray-600 mb-2">Pilih Minggu:</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {[1, 2, 3, 4, 5].map((week) => (
+                      <button
+                        key={week}
+                        onClick={() => setSelectedWeek(week)}
+                        className={`px-3 py-1 text-xs rounded-full border transition-colors ${
+                          selectedWeek === week
+                            ? 'bg-blue-500 text-white border-blue-500'
+                            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                        }`}
+                      >
+                        Minggu {week}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              <p className="text-xs text-gray-600 mt-3">
+                Periode: <span className="font-semibold">
+                  {periodType === 'day' && historyDate}
+                  {periodType === 'week' && `Minggu ${selectedWeek}, ${fullMonths[selectedMonth]} ${currentYear}`}
+                  {periodType === 'biweek1' && `1-14 ${fullMonths[selectedMonth]} ${currentYear}`}
+                  {periodType === 'biweek2' && `15-${getDaysInMonth(currentYear, selectedMonth)} ${fullMonths[selectedMonth]} ${currentYear}`}
+                  {periodType === 'month' && `${fullMonths[selectedMonth]} ${currentYear}`}
+                  {periodType === 'year' && `Tahun ${currentYear}`}
+                </span>
               </p>
             </div>
 
-            {/* Daftar Santri Riwayat */}
-            <div className="bg-white rounded-lg shadow p-4">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold text-gray-700">Riwayat Absensi</h3>
-                <Button variant="outline" size="sm" onClick={loadHistoryData} disabled={loadingData}>
-                  {loadingData ? 'Memuat...' : 'Refresh'}
-                </Button>
+            {/* Summary for multiple days */}
+            {periodType !== 'day' && renderMultipleDaySummary()}
+
+            {/* Santri List - only for single day */}
+            {periodType === 'day' && (
+              <div className="bg-white rounded-lg shadow p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold text-gray-700">Riwayat Absensi</h3>
+                  <Button variant="outline" size="sm" onClick={loadHistoryData} disabled={loadingData}>
+                    {loadingData ? 'Memuat...' : 'Refresh'}
+                  </Button>
+                </div>
+                {loadingData ? (
+                  <div className="py-4 text-sm text-gray-500">Memuat data...</div>
+                ) : historyData?.type === 'single' ? (
+                  renderSantriList(historyData.data)
+                ) : (
+                  <div className="py-4 text-sm text-gray-500">Pilih tanggal untuk melihat detail.</div>
+                )}
               </div>
-              {loadingData ? (
-                <div className="py-4 text-sm text-gray-500">Memuat data...</div>
-              ) : (
-                renderSantriList(historyData)
-              )}
-            </div>
+            )}
           </>
         )}
       </main>
