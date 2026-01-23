@@ -17,7 +17,9 @@ import {
   Settings,
   ChevronRight,
   BookOpen,
-  GraduationCap
+  GraduationCap,
+  ClipboardCheck,
+  Eye
 } from 'lucide-react';
 
 const Layout = ({ children }) => {
@@ -37,6 +39,8 @@ const Layout = ({ children }) => {
     { path: '/waktu-sholat', icon: Clock, label: 'Waktu Sholat' },
     { path: '/kelas', icon: GraduationCap, label: 'Kelas' },
     { path: '/madrasah-diniyah', icon: BookOpen, label: 'Madrasah Diniyah' },
+    { path: '/pengabsen-kelas', icon: ClipboardCheck, label: 'Pengabsen Kelas' },
+    { path: '/monitoring-kelas', icon: Eye, label: 'Monitoring Kelas' },
     { path: '/settings', icon: Settings, label: 'Pengaturan' },
   ];
 
