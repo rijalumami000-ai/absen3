@@ -74,18 +74,19 @@ const Layout = ({ children }) => {
             {menuItems.map((item) => {
               const isActive = location.pathname === item.path;
               return (
-                <li key={item.path}>
+                <li key={item.path} className="animate-fade-in" style={{ animationDelay: `${index * 30}ms` }}>
                   <Link
                     to={item.path}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 group ${
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 group relative overflow-hidden hover-lift ${
                       isActive
-                        ? 'bg-primary-700 text-white shadow-md'
+                        ? 'bg-primary-700 text-white shadow-lg'
                         : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                     }`}
                   >
-                    <item.icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-muted-foreground group-hover:text-foreground'}`} />
-                    <span>{item.label}</span>
-                    {isActive && <ChevronRight className="w-4 h-4 ml-auto" />}
+                    {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary-500 rounded-r-full animate-scale-in" />}
+                    <item.icon className={`w-5 h-5 transition-transform duration-200 ${isActive ? 'text-white scale-110' : 'text-muted-foreground group-hover:text-foreground group-hover:scale-110'}`} />
+                    <span className="flex-1">{item.label}</span>
+                    {isActive && <ChevronRight className="w-4 h-4 animate-slide-in-right" />}
                   </Link>
                 </li>
               );
