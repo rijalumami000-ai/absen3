@@ -605,6 +605,76 @@ const Santri = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Link to Madrasah Dialog */}
+      <Dialog open={linkMadrasahDialogOpen} onOpenChange={setLinkMadrasahDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Madrasah Diniyah</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {madrasahStatus?.is_linked ? (
+              <div className="text-center py-6">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <GraduationCap className="w-8 h-8 text-green-700" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Sudah Terdaftar</h3>
+                <p className="text-gray-600 mb-1">
+                  <strong>{selectedSantri?.nama}</strong> sudah terdaftar di Madrasah Diniyah
+                </p>
+                {madrasahStatus.kelas_nama && (
+                  <p className="text-sm text-gray-500">
+                    Kelas: <strong>{madrasahStatus.kelas_nama}</strong>
+                  </p>
+                )}
+              </div>
+            ) : (
+              <>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <p className="text-sm text-blue-800">
+                    Daftarkan <strong>{selectedSantri?.nama}</strong> ke Madrasah Diniyah?
+                  </p>
+                </div>
+                
+                <div>
+                  <Label>Pilih Kelas (Opsional)</Label>
+                  <select 
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    id="kelas-select"
+                  >
+                    <option value="">Belum Ada Kelas</option>
+                    {kelasList.map(kelas => (
+                      <option key={kelas.id} value={kelas.id}>
+                        {kelas.nama}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setLinkMadrasahDialogOpen(false)}
+                    className="flex-1"
+                  >
+                    Batal
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      const kelasId = document.getElementById('kelas-select').value;
+                      handleLinkToMadrasah(kelasId || null);
+                    }}
+                    className="flex-1 bg-green-600 hover:bg-green-700"
+                  >
+                    <GraduationCap className="w-4 h-4 mr-2" />
+                    Daftarkan
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
