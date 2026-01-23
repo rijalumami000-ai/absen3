@@ -523,10 +523,9 @@ const MadrasahDiniyah = () => {
                 onValueChange={(value) => setFormData({ ...formData, kelas_id: value })}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Pilih kelas" />
+                  <SelectValue placeholder="Belum Ada Kelas" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Belum Ada Kelas</SelectItem>
                   {kelasList.map(kelas => (
                     <SelectItem key={kelas.id} value={kelas.id}>
                       {kelas.nama}
