@@ -325,6 +325,212 @@ class WaktuSholatResponse(BaseModel):
     isya: str
     lokasi: str
 
+# ==================== MADRASAH DINIYAH MODELS ====================
+
+# Kelas Models
+class Kelas(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    nama: str
+    jadwal: List[str] = []  # ["senin", "selasa", "rabu", "jumat", "sabtu", "minggu"]
+    jam_mulai: str = "20:00"
+    jam_selesai: str = "20:30"
+    kapasitas: int
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class KelasCreate(BaseModel):
+    nama: str
+    jadwal: List[str]
+    jam_mulai: str = "20:00"
+    jam_selesai: str = "20:30"
+    kapasitas: int
+
+class KelasUpdate(BaseModel):
+    nama: Optional[str] = None
+    jadwal: Optional[List[str]] = None
+    jam_mulai: Optional[str] = None
+    jam_selesai: Optional[str] = None
+    kapasitas: Optional[int] = None
+
+class KelasResponse(BaseModel):
+    id: str
+    nama: str
+    jadwal: List[str]
+    jam_mulai: str
+    jam_selesai: str
+    kapasitas: int
+    jumlah_siswa: int = 0
+    created_at: datetime
+
+# Siswa Madrasah Models
+class SiswaMadrasah(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    nama: str
+    nis: Optional[str] = None
+    gender: Literal["putra", "putri"]
+    kelas_id: Optional[str] = None
+    santri_id: Optional[str] = None  # Link ke menu Santri (optional)
+    qr_code: Optional[str] = None  # Only if santri_id is None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class SiswaMadrasahCreate(BaseModel):
+    nama: str
+    nis: Optional[str] = None
+    gender: Literal["putra", "putri"]
+    kelas_id: Optional[str] = None
+    santri_id: Optional[str] = None
+
+class SiswaMadrasahUpdate(BaseModel):
+    nama: Optional[str] = None
+    nis: Optional[str] = None
+    gender: Optional[Literal["putra", "putri"]] = None
+    kelas_id: Optional[str] = None
+    santri_id: Optional[str] = None
+
+class SiswaMadrasahResponse(BaseModel):
+    id: str
+    nama: str
+    nis: Optional[str]
+    gender: str
+    kelas_id: Optional[str]
+    kelas_nama: Optional[str] = None
+    santri_id: Optional[str]
+    has_qr: bool = False
+    created_at: datetime
+    updated_at: datetime
+
+# Absensi Kelas Models
+class AbsensiKelas(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    siswa_id: str
+    kelas_id: str
+    tanggal: str  # YYYY-MM-DD
+    status: Literal["hadir", "alfa", "izin", "sakit"]
+    waktu_absen: Optional[datetime] = None
+    pengabsen_kelas_id: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class AbsensiKelasCreate(BaseModel):
+    siswa_id: str
+    kelas_id: str
+    tanggal: str
+    status: Literal["hadir", "alfa", "izin", "sakit"]
+
+class AbsensiKelasUpdate(BaseModel):
+    status: Literal["hadir", "alfa", "izin", "sakit"]
+
+class AbsensiKelasResponse(BaseModel):
+    id: str
+    siswa_id: str
+    siswa_nama: str
+    kelas_id: str
+    kelas_nama: str
+    tanggal: str
+    status: str
+    waktu_absen: Optional[datetime]
+    created_at: datetime
+
+# Pengabsen Kelas Models
+class PengabsenKelas(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    nama: str
+    email_atau_hp: str
+    username: str
+    kode_akses: str
+    kelas_ids: List[str] = []
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class PengabsenKelasCreate(BaseModel):
+    nama: str
+    email_atau_hp: str
+    username: str
+    kelas_ids: List[str]
+
+class PengabsenKelasUpdate(BaseModel):
+    nama: Optional[str] = None
+    email_atau_hp: Optional[str] = None
+    username: Optional[str] = None
+    kelas_ids: Optional[List[str]] = None
+
+class PengabsenKelasResponse(BaseModel):
+    id: str
+    nama: str
+    email_atau_hp: str
+    username: str
+    kode_akses: str
+    kelas_ids: List[str]
+    created_at: datetime
+
+class PengabsenKelasLoginRequest(BaseModel):
+    username: str
+    kode_akses: str
+
+class PengabsenKelasMeResponse(BaseModel):
+    id: str
+    nama: str
+    username: str
+    email_atau_hp: str
+    kelas_ids: List[str]
+    created_at: datetime
+
+class PengabsenKelasTokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: PengabsenKelasMeResponse
+
+# Pembimbing Kelas (Monitoring) Models
+class PembimbingKelas(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    nama: str
+    username: str
+    kode_akses: str
+    email_atau_hp: str
+    kelas_ids: List[str] = []
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class PembimbingKelasCreate(BaseModel):
+    nama: str
+    username: str
+    email_atau_hp: str
+    kelas_ids: List[str] = []
+
+class PembimbingKelasUpdate(BaseModel):
+    nama: Optional[str] = None
+    username: Optional[str] = None
+    email_atau_hp: Optional[str] = None
+    kelas_ids: Optional[List[str]] = None
+
+class PembimbingKelasResponse(BaseModel):
+    id: str
+    nama: str
+    username: str
+    kode_akses: str
+    email_atau_hp: str
+    kelas_ids: List[str]
+    created_at: datetime
+
+class PembimbingKelasLoginRequest(BaseModel):
+    username: str
+    kode_akses: str
+
+class PembimbingKelasMeResponse(BaseModel):
+    id: str
+    nama: str
+    username: str
+    email_atau_hp: str
+    kelas_ids: List[str]
+    created_at: datetime
+
+class PembimbingKelasTokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: PembimbingKelasMeResponse
+
 # ==================== UTILITY FUNCTIONS ====================
 
 def hash_password(password: str) -> str:
