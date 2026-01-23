@@ -151,17 +151,19 @@ const Absensi = () => {
   if (loading) return <div className="flex justify-center p-8">Memuat data...</div>;
 
   return (
-    <div data-testid="absensi-page">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-800 flex items-center">
-          <ClipboardList className="mr-3" size={32} />
-          Riwayat Absensi
+    <div data-testid="absensi-page" className="animate-fade-in">
+      <div className="mb-6 animate-slide-in-left">
+        <h1 className="text-3xl font-bold text-gray-800 flex items-center font-display">
+          <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center mr-3 shadow-lg">
+            <ClipboardList className="text-white" size={24} />
+          </div>
+          Riwayat Absensi Sholat
         </h1>
-        <p className="text-gray-600 mt-1">Data absensi sholat santri per waktu</p>
+        <p className="text-gray-600 mt-2 ml-15">Data absensi sholat santri per waktu</p>
       </div>
 
       {/* Filters */}
-      <Card className="mb-6">
+      <Card className="mb-6 shadow-card animate-scale-in">
         <CardContent className="p-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
