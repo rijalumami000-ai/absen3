@@ -15,6 +15,8 @@ import WaktuSholat from '@/pages/WaktuSholat';
 import Settings from '@/pages/Settings';
 import Kelas from '@/pages/Kelas';
 import MadrasahDiniyah from '@/pages/MadrasahDiniyah';
+import PengabsenKelas from '@/pages/PengabsenKelas';
+import PembimbingKelas from '@/pages/PembimbingKelas';
 import PengabsenAppLogin from '@/pages/PengabsenAppLogin';
 import PengabsenApp from '@/pages/PengabsenApp';
 import { PengabsenAuthProvider, usePengabsenAuth } from '@/contexts/PengabsenAuthContext';
@@ -258,6 +260,22 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <MadrasahDiniyah />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/pengabsen-kelas"
+        element={
+          <ProtectedRoute>
+            <PengabsenKelas />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/monitoring-kelas"
+        element={
+          <ProtectedRoute>
+            <PembimbingKelas />
           </ProtectedRoute>
         }
       />
