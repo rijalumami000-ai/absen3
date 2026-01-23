@@ -985,6 +985,16 @@ async def update_santri(santri_id: str, data: SantriUpdate, _: dict = Depends(ge
     if any(k in update_data for k in ['nama_wali', 'nomor_hp_wali', 'email_wali']):
         await sync_wali_santri()
     
+    # Sync siswa_madrasah if linked
+    if any(k in update_data for k in ['nama', 'nis', 'gender']):
+        await db.siswa_madrasah.update_many(
+            {"santri_id": santri_id},
+            {"$set": {
+                k: v for k, v in update_data.items() 
+                if k in ['nama', 'nis', 'gender']
+            }}
+        )
+    
     if isinstance(santri['created_at'], str):
         santri['created_at'] = datetime.fromisoformat(santri['created_at'])
     if isinstance(santri['updated_at'], str):
