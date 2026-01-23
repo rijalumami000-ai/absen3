@@ -1483,6 +1483,11 @@ async def get_pengabsen_riwayat_detail(
 
 
 @api_router.delete("/pengabsen/{pengabsen_id}")
+async def delete_pengabsen(pengabsen_id: str, _: dict = Depends(get_current_admin)):
+    result = await db.pengabsen.delete_one({"id": pengabsen_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Pengabsen tidak ditemukan")
+    return {"message": "Pengabsen berhasil dihapus"}
 
 
 @api_router.get("/pengabsen/riwayat")
