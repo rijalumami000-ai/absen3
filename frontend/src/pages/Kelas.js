@@ -135,23 +135,23 @@ const Kelas = () => {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center animate-slide-in-left">
         <div>
           <h1 className="text-3xl font-display font-bold text-foreground">Kelas Madrasah Diniyah</h1>
           <p className="text-muted-foreground mt-1">Kelola data kelas dan siswa</p>
         </div>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
-            <Button onClick={resetForm}>
+            <Button onClick={resetForm} className="btn-ripple active-scale shadow-card hover:shadow-card-hover transition-smooth">
               <Plus className="w-4 h-4 mr-2" />
               Tambah Kelas
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-md animate-scale-in">
             <DialogHeader>
-              <DialogTitle>Tambah Kelas Baru</DialogTitle>
+              <DialogTitle className="font-display">Tambah Kelas Baru</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div>
