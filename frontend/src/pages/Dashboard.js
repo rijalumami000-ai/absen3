@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { absensiAPI, santriAPI } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, CheckCircle, XCircle, Activity } from 'lucide-react';
+import { Users, CheckCircle, XCircle, Activity, Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const Dashboard = () => {
@@ -75,9 +75,9 @@ const Dashboard = () => {
   ];
 
   return (
-    <div data-testid="dashboard-page">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
+    <div data-testid="dashboard-page" className="animate-fade-in">
+      <div className="mb-8 animate-slide-in-left">
+        <h1 className="text-3xl font-bold text-gray-800 font-display">Dashboard</h1>
         <p className="text-gray-600 mt-2">Selamat datang di Admin Panel Absensi Santri Dan Siswa</p>
       </div>
 
@@ -85,14 +85,19 @@ const Dashboard = () => {
         {statCards.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <Card key={index} data-testid={`stat-card-${index}`}>
+            <Card 
+              key={index} 
+              data-testid={`stat-card-${index}`}
+              className="card-hover transition-smooth animate-scale-in shadow-card hover:shadow-card-hover"
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600">{stat.title}</p>
                     <p className="text-3xl font-bold text-gray-800 mt-2">{stat.value}</p>
                   </div>
-                  <div className={`${stat.bgColor} ${stat.color} p-3 rounded-lg`}>
+                  <div className={`${stat.bgColor} ${stat.color} p-3 rounded-lg transition-transform hover:scale-110 transition-smooth`}>
                     <Icon size={24} />
                   </div>
                 </div>

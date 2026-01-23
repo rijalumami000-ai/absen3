@@ -71,7 +71,7 @@ const Layout = ({ children }) => {
         {/* Navigation */}
         <nav className="flex-1 p-4 overflow-y-auto">
           <ul className="space-y-1">
-            {menuItems.map((item) => {
+            {menuItems.map((item, index) => {
               const isActive = location.pathname === item.path;
               return (
                 <li key={item.path} className="animate-fade-in" style={{ animationDelay: `${index * 30}ms` }}>
