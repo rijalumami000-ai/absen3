@@ -429,7 +429,7 @@ def generate_username(nama: str, nomor_hp: str) -> str:
     return f"{nama_clean}{hp_suffix}"
 
 async def sync_wali_santri():
-    """Sinkronisasi data wali dari santri"""
+    """Sinkronisasi data wali dari santri - termasuk menghapus wali tanpa anak"""
     # Aggregate santri by wali
     pipeline = [
         {
@@ -449,14 +449,20 @@ async def sync_wali_santri():
     
     wali_groups = await db.santri.aggregate(pipeline).to_list(1000)
     
+    # Collect valid wali IDs from current santri
+    valid_wali_ids = set()
+    
     for group in wali_groups:
         nama_wali = group["_id"]["nama_wali"]
         nomor_hp = group["_id"]["nomor_hp_wali"]
         email = group.get("email_wali")
         anak_ids = group.get("anak_ids", [])
         
-        # Check if wali exists
+        # Generate wali_id
         wali_id = f"wali_{nomor_hp}"
+        valid_wali_ids.add(wali_id)
+        
+        # Check if wali exists
         existing_wali = await db.wali_santri.find_one({"id": wali_id}, {"_id": 0})
         
         if existing_wali:
@@ -499,6 +505,18 @@ async def sync_wali_santri():
                 "updated_at": datetime.now(timezone.utc).isoformat()
             }
             await db.wali_santri.insert_one(wali_doc)
+    
+    # Delete wali yang tidak punya santri lagi
+    if valid_wali_ids:
+        # Delete all wali whose ID is NOT in the valid set
+        delete_result = await db.wali_santri.delete_many({"id": {"$nin": list(valid_wali_ids)}})
+        if delete_result.deleted_count > 0:
+            logging.info(f"Deleted {delete_result.deleted_count} wali without santri")
+    else:
+        # No santri at all, delete all wali
+        delete_result = await db.wali_santri.delete_many({})
+        if delete_result.deleted_count > 0:
+            logging.info(f"Deleted all {delete_result.deleted_count} wali (no santri left)")
 
 async def fetch_prayer_times(date: str) -> Optional[dict]:
     try:
