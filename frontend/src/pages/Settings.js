@@ -80,15 +80,15 @@ const Settings = () => {
   }
 
   return (
-    <div className="space-y-6" data-testid="settings-page">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-800">Pengaturan</h1>
+    <div className="space-y-6 animate-fade-in" data-testid="settings-page">
+      <div className="animate-slide-in-left">
+        <h1 className="text-2xl font-bold text-gray-800 font-display">Pengaturan</h1>
         <p className="text-gray-500 mt-1">Kelola pengaturan aplikasi</p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Template Notifikasi Wali Santri</CardTitle>
+      <Card className="shadow-card card-hover transition-smooth animate-scale-in">
+        <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50">
+          <CardTitle className="text-lg font-display">Template Notifikasi Wali Santri</CardTitle>
           <CardDescription>
             Atur pesan notifikasi yang dikirim ke Wali Santri ketika status absensi anak mereka diperbarui.
             <br />
