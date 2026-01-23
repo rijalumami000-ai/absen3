@@ -1002,6 +1002,59 @@ async def update_santri(santri_id: str, data: SantriUpdate, _: dict = Depends(ge
     
     return SantriResponse(**{k: v for k, v in santri.items() if k != 'qr_code'})
 
+
+
+@api_router.post("/santri/{santri_id}/link-to-madrasah")
+async def link_santri_to_madrasah(santri_id: str, kelas_id: str = None, _: dict = Depends(get_current_admin)):
+    """Link santri to Madrasah Diniyah"""
+    santri = await db.santri.find_one({"id": santri_id}, {"_id": 0})
+    if not santri:
+        raise HTTPException(status_code=404, detail="Santri tidak ditemukan")
+    
+    # Check if already linked
+    existing = await db.siswa_madrasah.find_one({"santri_id": santri_id}, {"_id": 0})
+    if existing:
+        raise HTTPException(status_code=400, detail="Santri sudah terdaftar di Madrasah Diniyah")
+    
+    # Create siswa_madrasah
+    siswa_data = {
+        "nama": santri["nama"],
+        "nis": santri.get("nis"),
+        "gender": santri["gender"],
+        "kelas_id": kelas_id,
+        "santri_id": santri_id
+    }
+    
+    from .server import SiswaMadrasahCreate
+    siswa = SiswaMadrasah(**siswa_data)
+    
+    doc = siswa.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    doc['updated_at'] = doc['updated_at'].isoformat()
+    await db.siswa_madrasah.insert_one(doc)
+    
+    return {"message": "Santri berhasil didaftarkan ke Madrasah Diniyah", "siswa_id": siswa.id}
+
+@api_router.get("/santri/{santri_id}/madrasah-status")
+async def get_santri_madrasah_status(santri_id: str, _: dict = Depends(get_current_admin)):
+    """Check if santri is linked to Madrasah Diniyah"""
+    siswa = await db.siswa_madrasah.find_one({"santri_id": santri_id}, {"_id": 0})
+    
+    if siswa:
+        kelas_nama = None
+        if siswa.get("kelas_id"):
+            kelas = await db.kelas.find_one({"id": siswa["kelas_id"]}, {"_id": 0})
+            kelas_nama = kelas["nama"] if kelas else None
+        
+        return {
+            "is_linked": True,
+            "siswa_id": siswa["id"],
+            "kelas_id": siswa.get("kelas_id"),
+            "kelas_nama": kelas_nama
+        }
+    
+    return {"is_linked": False}
+
 @api_router.delete("/santri/{santri_id}")
 async def delete_santri(santri_id: str, _: dict = Depends(get_current_admin)):
     result = await db.santri.delete_one({"id": santri_id})
