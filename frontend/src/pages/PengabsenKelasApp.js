@@ -83,17 +83,71 @@ const PengabsenKelasApp = () => {
   };
 
   const handleScanQR = async () => {
-    // Simulate QR scan for demo - in production use a QR scanner library
-    const qrData = prompt('Scan QR Code (untuk demo, masukkan ID siswa/santri):');
-    
-    if (!qrData) return;
+    if (isScanning) {
+      // Stop scanning
+      if (html5QrCode.current) {
+        try {
+          await html5QrCode.current.stop();
+          html5QrCode.current.clear();
+        } catch (err) {
+          console.error('Error stopping scanner:', err);
+        }
+      }
+      setIsScanning(false);
+      return;
+    }
 
+    // Start scanning
+    setIsScanning(true);
+    
+    try {
+      html5QrCode.current = new Html5Qrcode("qr-reader");
+      
+      const config = {
+        fps: 10,
+        qrbox: { width: 250, height: 250 }
+      };
+      
+      await html5QrCode.current.start(
+        { facingMode: "environment" },
+        config,
+        async (decodedText) => {
+          // QR Code detected
+          console.log('QR Code detected:', decodedText);
+          
+          // Stop scanner
+          await html5QrCode.current.stop();
+          setIsScanning(false);
+          
+          // Process the QR code
+          await processQRCode(decodedText);
+        },
+        (errorMessage) => {
+          // Ignore errors during scanning
+        }
+      );
+    } catch (err) {
+      console.error('Error starting scanner:', err);
+      toast.error('Gagal memulai kamera. Pastikan izin kamera sudah diberikan.');
+      setIsScanning(false);
+    }
+  };
+
+  const processQRCode = async (qrData) => {
     setScanning(true);
     try {
+      let parsedData;
+      try {
+        parsedData = JSON.parse(qrData);
+      } catch {
+        // If not JSON, assume it's just an ID
+        parsedData = { id: qrData, type: 'santri' };
+      }
+
       const token = localStorage.getItem('pengabsen_kelas_token');
       const response = await axios.post(
         `${API_URL}/api/absensi-kelas/scan`,
-        { id: qrData, type: 'santri' }, // Simplified for demo
+        parsedData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
@@ -215,7 +269,7 @@ const PengabsenKelasApp = () => {
               }`}
             >
               <Calendar className="w-4 h-4 inline mr-2" />
-              Grid Bulanan
+              Riwayat
             </button>
           </div>
         </div>
