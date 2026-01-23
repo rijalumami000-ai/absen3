@@ -456,6 +456,78 @@ const WaliApp = () => {
             </div>
           )}
         </section>
+        </>
+      ) : (
+        <>
+        {/* KONTEN ABSENSI KELAS */}
+        <section className="bg-card border border-border rounded-2xl overflow-hidden">
+          <div className="bg-gradient-to-r from-primary-700 to-primary-600 text-white p-4">
+            <h2 className="font-display text-lg font-bold">Absensi Madrasah Diniyah</h2>
+            <p className="text-sm text-primary-100">Kehadiran kelas anak Anda</p>
+          </div>
+
+          <div className="p-4 space-y-4">
+            {/* Date Selector */}
+            <div>
+              <label className="text-sm font-medium mb-2 block">Pilih Tanggal</label>
+              <input
+                type="date"
+                value={historyDate}
+                onChange={(e) => setHistoryDate(e.target.value)}
+                className="w-full px-3 py-2 border border-border rounded-lg"
+              />
+            </div>
+
+            {loadingKelasAbsensi ? (
+              <div className="py-8 text-center text-muted-foreground">
+                Memuat data...
+              </div>
+            ) : kelasAbsensi.length === 0 ? (
+              <div className="py-8 text-center text-muted-foreground">
+                Tidak ada data absensi kelas untuk tanggal ini
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {kelasAbsensi.map((anak) => (
+                  <div key={anak.siswa_id} className="border border-border rounded-xl p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div>
+                        <h3 className="font-semibold text-foreground">{anak.siswa_nama}</h3>
+                        <p className="text-sm text-muted-foreground">{anak.kelas_nama || 'Belum ada kelas'}</p>
+                      </div>
+                      {anak.status && (
+                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                          anak.status === 'hadir' ? 'bg-green-100 text-green-700' :
+                          anak.status === 'alfa' ? 'bg-red-100 text-red-700' :
+                          anak.status === 'izin' ? 'bg-blue-100 text-blue-700' :
+                          anak.status === 'sakit' ? 'bg-orange-100 text-orange-700' :
+                          'bg-gray-100 text-gray-700'
+                        }`}>
+                          {anak.status === 'hadir' ? 'Hadir' :
+                           anak.status === 'alfa' ? 'Alfa' :
+                           anak.status === 'izin' ? 'Izin' :
+                           anak.status === 'sakit' ? 'Sakit' : '-'}
+                        </span>
+                      )}
+                      {!anak.status && (
+                        <span className="px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-500">
+                          Belum Absen
+                        </span>
+                      )}
+                    </div>
+                    {anak.waktu_absen && (
+                      <p className="text-xs text-muted-foreground">
+                        Waktu: {new Date(anak.waktu_absen).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+        </>
+      )}
       </main>
     </div>
   );
