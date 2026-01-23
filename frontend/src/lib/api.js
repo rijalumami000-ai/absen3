@@ -8,6 +8,21 @@ const getAuthHeader = () => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
+// Default axios instance for general use
+const api = axios.create({
+  baseURL: API,
+});
+
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export default api;
+
 // Asrama API
 export const asramaAPI = {
   getAll: (gender) => axios.get(`${API}/asrama${gender ? `?gender=${gender}` : ''}`, { headers: getAuthHeader() }),
