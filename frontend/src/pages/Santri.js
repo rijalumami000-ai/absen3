@@ -12,9 +12,12 @@ import { Plus, Edit, Trash2, QrCode, Download, Upload, FileDown, FileSpreadsheet
 const Santri = () => {
   const [santriList, setSantriList] = useState([]);
   const [asramaList, setAsramaList] = useState([]);
+  const [kelasList, setKelasList] = useState([]);
+  const [madrasahStatus, setMadrasahStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [qrDialogOpen, setQrDialogOpen] = useState(false);
+  const [linkMadrasahDialogOpen, setLinkMadrasahDialogOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [selectedSantri, setSelectedSantri] = useState(null);
   const [filterGender, setFilterGender] = useState('');
