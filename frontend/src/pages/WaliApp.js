@@ -243,7 +243,35 @@ const WaliApp = () => {
         </Button>
       </header>
 
-      <main className="flex-1 p-4 space-y-4 max-w-4xl mx-auto w-full">
+      {/* Tab Navigation */}
+      <div className="bg-card border-b border-border">
+        <div className="max-w-4xl mx-auto px-4 flex gap-2">
+          <button
+            onClick={() => setActiveTab('sholat')}
+            className={`px-4 py-3 font-medium text-sm transition-colors border-b-2 ${ 
+              activeTab === 'sholat'
+                ? 'border-primary-700 text-primary-700'
+                : 'border-transparent text-muted-foreground'
+            }`}
+          >
+            Absensi Sholat
+          </button>
+          <button
+            onClick={() => setActiveTab('kelas')}
+            className={`px-4 py-3 font-medium text-sm transition-colors border-b-2 ${
+              activeTab === 'kelas'
+                ? 'border-primary-700 text-primary-700'
+                : 'border-transparent text-muted-foreground'
+            }`}
+          >
+            Absensi Kelas
+          </button>
+        </div>
+      </div>
+
+      <main className="flex-1 p-4 space-y-4 max-w-4xl mx-auto w-full">{activeTab === 'sholat' ? (
+        <>
+        {/* KONTEN ABSENSI SHOLAT (existing) */}
         {/* Notification Status Banner */}
         {notificationStatus === 'denied' && (
           <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center gap-3">
