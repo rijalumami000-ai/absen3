@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit, Trash2, QrCode, Download, Upload, FileDown, FileSpreadsheet } from 'lucide-react';
+import { Plus, Edit, Trash2, QrCode, Download, Upload, FileDown, FileSpreadsheet, GraduationCap } from 'lucide-react';
 
 const Santri = () => {
   const [santriList, setSantriList] = useState([]);
@@ -519,7 +519,16 @@ const Santri = () => {
             {santriList.map((santri) => (
               <tr key={santri.id} data-testid={`santri-row-${santri.id}`}>
                 <td className="px-6 py-4 text-sm text-gray-900">{santri.nis}</td>
-                <td className="px-6 py-4 text-sm font-medium text-gray-900">{santri.nama}</td>
+                <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                  <div className="flex items-center gap-2">
+                    {santri.nama}
+                    {santri.is_in_madrasah && (
+                      <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs font-medium">
+                        Madrasah Diniyah
+                      </span>
+                    )}
+                  </div>
+                </td>
                 <td className="px-6 py-4 text-sm text-gray-600">
                   <span className={`px-2 py-1 rounded-full text-xs ${santri.gender === 'putra' ? 'bg-blue-100 text-blue-700' : 'bg-pink-100 text-pink-700'}`}>
                     {santri.gender}
@@ -530,16 +539,25 @@ const Santri = () => {
                 <td className="px-6 py-4 text-sm text-gray-600">{santri.nomor_hp_wali}</td>
                 <td className="px-6 py-4 text-sm">
                   <div className="flex space-x-2">
-                    <Button size="sm" variant="outline" onClick={() => showQRCode(santri)} data-testid={`qr-santri-${santri.id}`}>
+                    <Button size="sm" variant="outline" onClick={() => showQRCode(santri)} data-testid={`qr-santri-${santri.id}`} title="Lihat QR Code">
                       <QrCode size={16} />
                     </Button>
-                    <Button size="sm" variant="outline" onClick={() => downloadQRCode(santri)} data-testid={`download-qr-${santri.id}`}>
+                    <Button size="sm" variant="outline" onClick={() => downloadQRCode(santri)} data-testid={`download-qr-${santri.id}`} title="Download QR">
                       <Download size={16} />
                     </Button>
-                    <Button size="sm" variant="outline" onClick={() => handleEdit(santri)} data-testid={`edit-santri-${santri.id}`}>
+                    <Button size="sm" variant="outline" onClick={() => handleEdit(santri)} data-testid={`edit-santri-${santri.id}`} title="Edit">
                       <Edit size={16} />
                     </Button>
-                    <Button size="sm" variant="destructive" onClick={() => handleDelete(santri.id)} data-testid={`delete-santri-${santri.id}`}>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={() => handleOpenLinkMadrasah(santri)} 
+                      className="bg-green-50 hover:bg-green-100 text-green-700 border-green-200"
+                      title="Madrasah Diniyah"
+                    >
+                      <GraduationCap size={16} />
+                    </Button>
+                    <Button size="sm" variant="destructive" onClick={() => handleDelete(santri.id)} data-testid={`delete-santri-${santri.id}`} title="Hapus">
                       <Trash2 size={16} />
                     </Button>
                   </div>
