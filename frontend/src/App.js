@@ -372,11 +372,25 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="*" element={<NotFoundRedirect />} />
     </Routes>
   );
 }
+
+// Component to handle 404 - don't redirect PWA routes
+const NotFoundRedirect = () => {
+  const location = window.location.pathname;
+  
+  // If it's a PWA route, don't redirect (let the PWA provider handle it)
+  if (location.includes('-app')) {
+    return <div className="min-h-screen flex items-center justify-center">
+      <div className="text-gray-500">Loading...</div>
+    </div>;
+  }
+  
+  return <Navigate to="/login" replace />;
+};
 
 function App() {
   return (
