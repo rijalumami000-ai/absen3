@@ -179,19 +179,24 @@ const PengabsenKelasApp = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-b from-primary-50 to-background animate-fade-in">
       {/* Header */}
-      <header className="bg-primary-700 text-white px-4 py-4 shadow-lg">
+      <header className="bg-gradient-to-r from-primary-700 to-primary-600 text-white px-4 py-4 shadow-lg animate-slide-in-left">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-display font-bold">Pengabsen Kelas</h1>
-            <p className="text-sm text-primary-100">{user?.nama}</p>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+              <QrCode className="w-5 h-5" />
+            </div>
+            <div>
+              <h1 className="text-xl font-display font-bold">Pengabsen Kelas</h1>
+              <p className="text-sm text-primary-100">{user?.nama}</p>
+            </div>
           </div>
           <Button
             variant="outline"
             size="sm"
             onClick={handleLogout}
-            className="bg-white/10 text-white border-white/20 hover:bg-white/20"
+            className="bg-white/10 text-white border-white/20 hover:bg-white/20 active-scale transition-smooth"
           >
             <LogOut className="w-4 h-4 mr-2" />
             Keluar
@@ -200,12 +205,12 @@ const PengabsenKelasApp = () => {
       </header>
 
       {/* Tab Navigation */}
-      <div className="border-b border-border bg-card">
+      <div className="border-b border-border bg-card shadow-sm">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex gap-4">
             <button
               onClick={() => setView('scan')}
-              className={`px-4 py-3 font-medium transition-colors border-b-2 ${
+              className={`px-4 py-3 font-medium transition-smooth border-b-2 ${
                 view === 'scan'
                   ? 'border-primary-700 text-primary-700'
                   : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -216,7 +221,7 @@ const PengabsenKelasApp = () => {
             </button>
             <button
               onClick={() => setView('grid')}
-              className={`px-4 py-3 font-medium transition-colors border-b-2 ${
+              className={`px-4 py-3 font-medium transition-smooth border-b-2 ${
                 view === 'grid'
                   ? 'border-primary-700 text-primary-700'
                   : 'border-transparent text-muted-foreground hover:text-foreground'

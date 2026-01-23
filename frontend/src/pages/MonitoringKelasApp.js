@@ -136,19 +136,24 @@ const MonitoringKelasApp = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-b from-green-50 to-background animate-fade-in">
       {/* Header */}
-      <header className="bg-green-700 text-white px-4 py-4 shadow-lg">
+      <header className="bg-gradient-to-r from-green-700 to-emerald-600 text-white px-4 py-4 shadow-lg animate-slide-in-left">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-display font-bold">Monitoring Kelas</h1>
-            <p className="text-sm text-green-100">{user?.nama}</p>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+              <BarChart className="w-5 h-5" />
+            </div>
+            <div>
+              <h1 className="text-xl font-display font-bold">Monitoring Kelas</h1>
+              <p className="text-sm text-green-100">{user?.nama}</p>
+            </div>
           </div>
           <Button
             variant="outline"
             size="sm"
             onClick={handleLogout}
-            className="bg-white/10 text-white border-white/20 hover:bg-white/20"
+            className="bg-white/10 text-white border-white/20 hover:bg-white/20 active-scale transition-smooth"
           >
             <LogOut className="w-4 h-4 mr-2" />
             Keluar
@@ -157,12 +162,12 @@ const MonitoringKelasApp = () => {
       </header>
 
       {/* Tab Navigation */}
-      <div className="border-b border-border bg-card">
+      <div className="border-b border-border bg-card shadow-sm">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex gap-4">
             <button
               onClick={() => setView('dashboard')}
-              className={`px-4 py-3 font-medium transition-colors border-b-2 ${
+              className={`px-4 py-3 font-medium transition-smooth border-b-2 ${
                 view === 'dashboard'
                   ? 'border-green-700 text-green-700'
                   : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -173,7 +178,7 @@ const MonitoringKelasApp = () => {
             </button>
             <button
               onClick={() => setView('history')}
-              className={`px-4 py-3 font-medium transition-colors border-b-2 ${
+              className={`px-4 py-3 font-medium transition-smooth border-b-2 ${
                 view === 'history'
                   ? 'border-green-700 text-green-700'
                   : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -198,7 +203,7 @@ const MonitoringKelasApp = () => {
             <div className="space-y-6">
               {/* Summary Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-card rounded-xl border border-border p-6">
+                <div className="bg-card rounded-xl border border-border p-6 shadow-card hover-lift transition-smooth animate-scale-in">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center">
                       <Users className="w-6 h-6 text-primary-700" />
