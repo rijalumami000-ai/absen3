@@ -63,16 +63,18 @@ const WaktuSholat = () => {
   ];
 
   return (
-    <div data-testid="waktu-sholat-page">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-800 flex items-center">
-          <Clock className="mr-3" size={32} />
+    <div data-testid="waktu-sholat-page" className="animate-fade-in">
+      <div className="mb-6 animate-slide-in-left">
+        <h1 className="text-3xl font-bold text-gray-800 flex items-center font-display">
+          <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center mr-3 shadow-lg">
+            <Clock className="text-white" size={24} />
+          </div>
           Waktu Sholat
         </h1>
-        <p className="text-gray-600 mt-1">Jadwal waktu sholat untuk Lampung Selatan</p>
+        <p className="text-gray-600 mt-2 ml-15">Jadwal waktu sholat untuk Lampung Selatan</p>
       </div>
 
-      <Card className="mb-6">
+      <Card className="mb-6 card-hover shadow-card hover:shadow-card-hover transition-smooth animate-scale-in">
         <CardContent className="p-6">
           <div className="flex flex-col md:flex-row md:items-end gap-4">
             <div className="flex-1">
