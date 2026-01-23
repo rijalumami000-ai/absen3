@@ -169,13 +169,13 @@ const Pengabsen = () => {
   }
 
   return (
-    <div className="space-y-6" data-testid="pengabsen-admin-page">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 animate-fade-in" data-testid="pengabsen-admin-page">
+      <div className="flex items-center justify-between animate-slide-in-left">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Kelola Pengabsen</h1>
+          <h1 className="text-2xl font-bold text-gray-800 font-display">Kelola Pengabsen Sholat</h1>
           <p className="text-gray-500 mt-1">Daftar pengabsen yang bertugas mencatat absensi santri</p>
         </div>
-        <Button onClick={openAddDialog} data-testid="add-pengabsen-btn">
+        <Button onClick={openAddDialog} data-testid="add-pengabsen-btn" className="btn-ripple active-scale shadow-card hover:shadow-card-hover transition-smooth">
           <Plus className="w-4 h-4 mr-2" />
           Tambah Pengabsen
         </Button>

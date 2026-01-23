@@ -331,18 +331,18 @@ const Santri = () => {
   if (loading) return <div className="flex justify-center p-8">Memuat data...</div>;
 
   return (
-    <div data-testid="santri-page">
-      <div className="flex justify-between items-center mb-6">
+    <div data-testid="santri-page" className="animate-fade-in">
+      <div className="flex justify-between items-center mb-6 animate-slide-in-left">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Kelola Santri</h1>
+          <h1 className="text-3xl font-bold text-gray-800 font-display">Kelola Santri</h1>
           <p className="text-gray-600 mt-1">Manajemen data santri dan QR code</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={downloadTemplate} data-testid="download-template-button">
+        <div className="flex gap-2 animate-slide-in-right">
+          <Button variant="outline" onClick={downloadTemplate} data-testid="download-template-button" className="hover-lift transition-smooth active-scale">
             <FileSpreadsheet className="mr-2" size={20} />
             Template
           </Button>
-          <Button variant="outline" onClick={() => fileInputRef.current?.click()} disabled={importing} data-testid="import-button">
+          <Button variant="outline" onClick={() => fileInputRef.current?.click()} disabled={importing} data-testid="import-button" className="hover-lift transition-smooth active-scale">
             <Upload className="mr-2" size={20} />
             {importing ? 'Importing...' : 'Import'}
           </Button>
@@ -353,20 +353,20 @@ const Santri = () => {
             onChange={handleImport}
             style={{ display: 'none' }}
           />
-          <Button variant="outline" onClick={handleExport} data-testid="export-button">
+          <Button variant="outline" onClick={handleExport} data-testid="export-button" className="hover-lift transition-smooth active-scale">
             <FileDown className="mr-2" size={20} />
             Export
           </Button>
           <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>
             <DialogTrigger asChild>
-              <Button data-testid="add-santri-button">
+              <Button data-testid="add-santri-button" className="btn-ripple active-scale shadow-card hover:shadow-card-hover transition-smooth">
                 <Plus className="mr-2" size={20} />
                 Tambah Santri
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto animate-scale-in">
               <DialogHeader>
-                <DialogTitle>{editMode ? 'Edit Santri' : 'Tambah Santri'}</DialogTitle>
+                <DialogTitle className="font-display">{editMode ? 'Edit Santri' : 'Tambah Santri'}</DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
