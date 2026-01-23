@@ -138,6 +138,33 @@ const WaliApp = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [historyDate]);
 
+  // Load absensi kelas
+  useEffect(() => {
+    if (user && activeTab === 'kelas') {
+      loadKelasAbsensi();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, activeTab, historyDate]);
+
+  const loadKelasAbsensi = async () => {
+    setLoadingKelasAbsensi(true);
+    try {
+      const token = localStorage.getItem('wali_token');
+      const response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/wali-app/absensi-kelas?tanggal=${historyDate}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setKelasAbsensi(data);
+      }
+    } catch (error) {
+      console.error('Error loading kelas absensi:', error);
+    } finally {
+      setLoadingKelasAbsensi(false);
+    }
+  };
+
   if (loading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
