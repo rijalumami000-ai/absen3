@@ -59,7 +59,8 @@ const PengabsenKelasApp = () => {
       );
       setKelasList(accessibleKelas);
       
-      if (accessibleKelas.length > 0) {
+      // Auto-select first kelas if not selected yet
+      if (accessibleKelas.length > 0 && !selectedKelas) {
         setSelectedKelas(accessibleKelas[0].id);
       }
     } catch (error) {
