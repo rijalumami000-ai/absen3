@@ -2411,6 +2411,782 @@ async def initialize_admin():
     
     return {"message": "Admin default berhasil dibuat", "username": "admin", "password": "admin123"}
 
+
+# ==================== KELAS ENDPOINTS ====================
+
+@api_router.get("/kelas", response_model=List[KelasResponse])
+async def get_kelas_list(_: dict = Depends(get_current_admin)):
+    kelas_list = await db.kelas.find({}, {"_id": 0}).to_list(1000)
+    
+    # Count students for each kelas
+    result = []
+    for kelas in kelas_list:
+        jumlah_siswa = await db.siswa_madrasah.count_documents({"kelas_id": kelas["id"]})
+        kelas_response = KelasResponse(**kelas, jumlah_siswa=jumlah_siswa)
+        result.append(kelas_response)
+    
+    return result
+
+@api_router.post("/kelas", response_model=KelasResponse)
+async def create_kelas(data: KelasCreate, _: dict = Depends(get_current_admin)):
+    kelas = Kelas(**data.model_dump())
+    doc = kelas.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    await db.kelas.insert_one(doc)
+    
+    return KelasResponse(**kelas.model_dump(), jumlah_siswa=0)
+
+@api_router.get("/kelas/{kelas_id}", response_model=KelasResponse)
+async def get_kelas_detail(kelas_id: str, _: dict = Depends(get_current_admin)):
+    kelas = await db.kelas.find_one({"id": kelas_id}, {"_id": 0})
+    if not kelas:
+        raise HTTPException(status_code=404, detail="Kelas tidak ditemukan")
+    
+    jumlah_siswa = await db.siswa_madrasah.count_documents({"kelas_id": kelas_id})
+    return KelasResponse(**kelas, jumlah_siswa=jumlah_siswa)
+
+@api_router.put("/kelas/{kelas_id}", response_model=KelasResponse)
+async def update_kelas(kelas_id: str, data: KelasUpdate, _: dict = Depends(get_current_admin)):
+    kelas = await db.kelas.find_one({"id": kelas_id}, {"_id": 0})
+    if not kelas:
+        raise HTTPException(status_code=404, detail="Kelas tidak ditemukan")
+    
+    update_data = {k: v for k, v in data.model_dump().items() if v is not None}
+    if update_data:
+        await db.kelas.update_one({"id": kelas_id}, {"$set": update_data})
+    
+    updated_kelas = await db.kelas.find_one({"id": kelas_id}, {"_id": 0})
+    jumlah_siswa = await db.siswa_madrasah.count_documents({"kelas_id": kelas_id})
+    return KelasResponse(**updated_kelas, jumlah_siswa=jumlah_siswa)
+
+@api_router.delete("/kelas/{kelas_id}")
+async def delete_kelas(kelas_id: str, _: dict = Depends(get_current_admin)):
+    # Set siswa yang ada di kelas ini menjadi kelas_id = None
+    await db.siswa_madrasah.update_many(
+        {"kelas_id": kelas_id},
+        {"$set": {"kelas_id": None}}
+    )
+    
+    result = await db.kelas.delete_one({"id": kelas_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Kelas tidak ditemukan")
+    
+    return {"message": "Kelas berhasil dihapus"}
+
+@api_router.get("/kelas/{kelas_id}/siswa", response_model=List[SiswaMadrasahResponse])
+async def get_kelas_siswa(kelas_id: str, _: dict = Depends(get_current_admin)):
+    kelas = await db.kelas.find_one({"id": kelas_id}, {"_id": 0})
+    if not kelas:
+        raise HTTPException(status_code=404, detail="Kelas tidak ditemukan")
+    
+    siswa_list = await db.siswa_madrasah.find({"kelas_id": kelas_id}, {"_id": 0}).to_list(1000)
+    
+    result = []
+    for siswa in siswa_list:
+        has_qr = False
+        if siswa.get("santri_id"):
+            # Linked to santri, has QR
+            has_qr = True
+        elif siswa.get("qr_code"):
+            # Standalone with QR
+            has_qr = True
+        
+        result.append(SiswaMadrasahResponse(
+            **siswa,
+            kelas_nama=kelas["nama"],
+            has_qr=has_qr
+        ))
+    
+    return result
+
+# ==================== SISWA MADRASAH ENDPOINTS ====================
+
+@api_router.get("/siswa-madrasah", response_model=List[SiswaMadrasahResponse])
+async def get_siswa_madrasah_list(_: dict = Depends(get_current_admin)):
+    siswa_list = await db.siswa_madrasah.find({}, {"_id": 0}).to_list(1000)
+    
+    # Get kelas names
+    kelas_map = {}
+    kelas_list = await db.kelas.find({}, {"_id": 0}).to_list(1000)
+    for kelas in kelas_list:
+        kelas_map[kelas["id"]] = kelas["nama"]
+    
+    result = []
+    for siswa in siswa_list:
+        kelas_nama = kelas_map.get(siswa.get("kelas_id")) if siswa.get("kelas_id") else None
+        has_qr = False
+        if siswa.get("santri_id"):
+            has_qr = True
+        elif siswa.get("qr_code"):
+            has_qr = True
+        
+        result.append(SiswaMadrasahResponse(
+            **siswa,
+            kelas_nama=kelas_nama,
+            has_qr=has_qr
+        ))
+    
+    return result
+
+@api_router.post("/siswa-madrasah", response_model=SiswaMadrasahResponse)
+async def create_siswa_madrasah(data: SiswaMadrasahCreate, _: dict = Depends(get_current_admin)):
+    # Validate kelas_id if provided
+    if data.kelas_id:
+        kelas = await db.kelas.find_one({"id": data.kelas_id}, {"_id": 0})
+        if not kelas:
+            raise HTTPException(status_code=404, detail="Kelas tidak ditemukan")
+    
+    # Validate santri_id if provided
+    if data.santri_id:
+        santri = await db.santri.find_one({"id": data.santri_id}, {"_id": 0})
+        if not santri:
+            raise HTTPException(status_code=404, detail="Santri tidak ditemukan")
+    
+    siswa = SiswaMadrasah(**data.model_dump())
+    
+    # Generate QR code only if no santri_id
+    if not siswa.santri_id:
+        qr_data = {
+            "id": siswa.id,
+            "nama": siswa.nama,
+            "type": "siswa_madrasah"
+        }
+        siswa.qr_code = generate_qr_code(qr_data)
+    
+    doc = siswa.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    doc['updated_at'] = doc['updated_at'].isoformat()
+    await db.siswa_madrasah.insert_one(doc)
+    
+    kelas_nama = None
+    if siswa.kelas_id:
+        kelas = await db.kelas.find_one({"id": siswa.kelas_id}, {"_id": 0})
+        kelas_nama = kelas["nama"] if kelas else None
+    
+    has_qr = bool(siswa.santri_id or siswa.qr_code)
+    
+    return SiswaMadrasahResponse(**siswa.model_dump(), kelas_nama=kelas_nama, has_qr=has_qr)
+
+@api_router.get("/siswa-madrasah/{siswa_id}/qr-code")
+async def get_siswa_madrasah_qr_code(siswa_id: str, _: dict = Depends(get_current_admin)):
+    siswa = await db.siswa_madrasah.find_one({"id": siswa_id}, {"_id": 0})
+    if not siswa:
+        raise HTTPException(status_code=404, detail="Siswa tidak ditemukan")
+    
+    # If linked to santri, get QR from santri
+    if siswa.get("santri_id"):
+        santri = await db.santri.find_one({"id": siswa["santri_id"]}, {"_id": 0})
+        if not santri or not santri.get("qr_code"):
+            raise HTTPException(status_code=404, detail="QR Code tidak ditemukan")
+        img_data = base64.b64decode(santri['qr_code'])
+    elif siswa.get("qr_code"):
+        img_data = base64.b64decode(siswa['qr_code'])
+    else:
+        raise HTTPException(status_code=404, detail="QR Code tidak ditemukan")
+    
+    return Response(content=img_data, media_type="image/png")
+
+@api_router.put("/siswa-madrasah/{siswa_id}", response_model=SiswaMadrasahResponse)
+async def update_siswa_madrasah(siswa_id: str, data: SiswaMadrasahUpdate, _: dict = Depends(get_current_admin)):
+    siswa = await db.siswa_madrasah.find_one({"id": siswa_id}, {"_id": 0})
+    if not siswa:
+        raise HTTPException(status_code=404, detail="Siswa tidak ditemukan")
+    
+    update_data = {k: v for k, v in data.model_dump().items() if v is not None}
+    
+    # Validate kelas_id if changed
+    if "kelas_id" in update_data and update_data["kelas_id"]:
+        kelas = await db.kelas.find_one({"id": update_data["kelas_id"]}, {"_id": 0})
+        if not kelas:
+            raise HTTPException(status_code=404, detail="Kelas tidak ditemukan")
+    
+    # If santri_id is added/changed, remove qr_code
+    if "santri_id" in update_data and update_data["santri_id"]:
+        santri = await db.santri.find_one({"id": update_data["santri_id"]}, {"_id": 0})
+        if not santri:
+            raise HTTPException(status_code=404, detail="Santri tidak ditemukan")
+        update_data["qr_code"] = None
+    
+    if update_data:
+        update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+        await db.siswa_madrasah.update_one({"id": siswa_id}, {"$set": update_data})
+    
+    updated_siswa = await db.siswa_madrasah.find_one({"id": siswa_id}, {"_id": 0})
+    
+    kelas_nama = None
+    if updated_siswa.get("kelas_id"):
+        kelas = await db.kelas.find_one({"id": updated_siswa["kelas_id"]}, {"_id": 0})
+        kelas_nama = kelas["nama"] if kelas else None
+    
+    has_qr = bool(updated_siswa.get("santri_id") or updated_siswa.get("qr_code"))
+    
+    return SiswaMadrasahResponse(**updated_siswa, kelas_nama=kelas_nama, has_qr=has_qr)
+
+@api_router.delete("/siswa-madrasah/{siswa_id}")
+async def delete_siswa_madrasah(siswa_id: str, _: dict = Depends(get_current_admin)):
+    result = await db.siswa_madrasah.delete_one({"id": siswa_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Siswa tidak ditemukan")
+    
+    # Also delete all absensi kelas for this siswa
+    await db.absensi_kelas.delete_many({"siswa_id": siswa_id})
+    
+    return {"message": "Siswa berhasil dihapus"}
+
+@api_router.post("/siswa-madrasah/{siswa_id}/link-to-santri")
+async def link_siswa_to_santri(siswa_id: str, santri_id: str, _: dict = Depends(get_current_admin)):
+    siswa = await db.siswa_madrasah.find_one({"id": siswa_id}, {"_id": 0})
+    if not siswa:
+        raise HTTPException(status_code=404, detail="Siswa tidak ditemukan")
+    
+    santri = await db.santri.find_one({"id": santri_id}, {"_id": 0})
+    if not santri:
+        raise HTTPException(status_code=404, detail="Santri tidak ditemukan")
+    
+    # Link and remove standalone QR
+    await db.siswa_madrasah.update_one(
+        {"id": siswa_id},
+        {"$set": {"santri_id": santri_id, "qr_code": None, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return {"message": "Siswa berhasil di-link ke Santri"}
+
+# ==================== ABSENSI KELAS ENDPOINTS ====================
+
+@api_router.post("/absensi-kelas/scan")
+async def scan_qr_absensi_kelas(
+    qr_data: dict,
+    current_pengabsen: dict = Depends(get_current_pengabsen_kelas)
+):
+    """Scan QR code for kelas attendance - auto mark as Hadir"""
+    tanggal = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    
+    # Determine siswa_id from QR code
+    siswa_id = None
+    if qr_data.get("type") == "siswa_madrasah":
+        siswa_id = qr_data.get("id")
+    else:
+        # QR is from santri, find siswa_madrasah linked to this santri
+        santri_id = qr_data.get("id")
+        siswa = await db.siswa_madrasah.find_one({"santri_id": santri_id}, {"_id": 0})
+        if siswa:
+            siswa_id = siswa["id"]
+    
+    if not siswa_id:
+        raise HTTPException(status_code=404, detail="Siswa tidak ditemukan")
+    
+    # Get siswa info
+    siswa = await db.siswa_madrasah.find_one({"id": siswa_id}, {"_id": 0})
+    if not siswa:
+        raise HTTPException(status_code=404, detail="Siswa tidak ditemukan")
+    
+    if not siswa.get("kelas_id"):
+        raise HTTPException(status_code=400, detail="Siswa belum memiliki kelas")
+    
+    # Verify pengabsen has access to this kelas
+    if siswa["kelas_id"] not in current_pengabsen.get("kelas_ids", []):
+        raise HTTPException(status_code=403, detail="Anda tidak memiliki akses ke kelas ini")
+    
+    # Check if already marked today
+    existing = await db.absensi_kelas.find_one({
+        "siswa_id": siswa_id,
+        "tanggal": tanggal
+    }, {"_id": 0})
+    
+    if existing:
+        return {"message": "Siswa sudah diabsen hari ini", "status": existing["status"]}
+    
+    # Create new absensi
+    absensi = AbsensiKelas(
+        siswa_id=siswa_id,
+        kelas_id=siswa["kelas_id"],
+        tanggal=tanggal,
+        status="hadir",
+        waktu_absen=datetime.now(timezone.utc),
+        pengabsen_kelas_id=current_pengabsen["id"]
+    )
+    
+    doc = absensi.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    if doc.get('waktu_absen'):
+        doc['waktu_absen'] = doc['waktu_absen'].isoformat()
+    
+    await db.absensi_kelas.insert_one(doc)
+    
+    return {"message": "Absensi berhasil dicatat", "siswa_nama": siswa["nama"], "status": "hadir"}
+
+@api_router.get("/absensi-kelas/riwayat")
+async def get_absensi_kelas_riwayat(
+    tanggal_start: str,
+    tanggal_end: Optional[str] = None,
+    kelas_id: Optional[str] = None,
+    current_pengabsen: dict = Depends(get_current_pengabsen_kelas)
+):
+    """Get attendance history for Pengabsen Kelas"""
+    if not tanggal_end:
+        tanggal_end = tanggal_start
+    
+    query = {
+        "tanggal": {"$gte": tanggal_start, "$lte": tanggal_end}
+    }
+    
+    if kelas_id:
+        query["kelas_id"] = kelas_id
+    else:
+        # Filter by pengabsen's kelas
+        query["kelas_id"] = {"$in": current_pengabsen.get("kelas_ids", [])}
+    
+    absensi_list = await db.absensi_kelas.find(query, {"_id": 0}).to_list(10000)
+    
+    # Enrich with siswa and kelas names
+    siswa_map = {}
+    siswa_list = await db.siswa_madrasah.find({}, {"_id": 0}).to_list(10000)
+    for siswa in siswa_list:
+        siswa_map[siswa["id"]] = siswa["nama"]
+    
+    kelas_map = {}
+    kelas_list = await db.kelas.find({}, {"_id": 0}).to_list(1000)
+    for kelas in kelas_list:
+        kelas_map[kelas["id"]] = kelas["nama"]
+    
+    result = []
+    for absensi in absensi_list:
+        result.append(AbsensiKelasResponse(
+            **absensi,
+            siswa_nama=siswa_map.get(absensi["siswa_id"], "Unknown"),
+            kelas_nama=kelas_map.get(absensi["kelas_id"], "Unknown")
+        ))
+    
+    return result
+
+@api_router.get("/absensi-kelas/grid")
+async def get_absensi_kelas_grid(
+    bulan: str,  # YYYY-MM
+    kelas_id: str,
+    current_pengabsen: dict = Depends(get_current_pengabsen_kelas)
+):
+    """Get monthly grid for manual input - for Pengabsen Kelas"""
+    # Verify access
+    if kelas_id not in current_pengabsen.get("kelas_ids", []):
+        raise HTTPException(status_code=403, detail="Anda tidak memiliki akses ke kelas ini")
+    
+    # Get all siswa in this kelas
+    siswa_list = await db.siswa_madrasah.find({"kelas_id": kelas_id}, {"_id": 0}).to_list(1000)
+    
+    # Get all absensi for this month
+    tanggal_start = f"{bulan}-01"
+    tanggal_end = f"{bulan}-31"
+    
+    absensi_list = await db.absensi_kelas.find({
+        "kelas_id": kelas_id,
+        "tanggal": {"$gte": tanggal_start, "$lte": tanggal_end}
+    }, {"_id": 0}).to_list(10000)
+    
+    # Build grid
+    absensi_map = {}
+    for absensi in absensi_list:
+        key = f"{absensi['siswa_id']}_{absensi['tanggal']}"
+        absensi_map[key] = absensi
+    
+    result = []
+    for siswa in siswa_list:
+        siswa_data = {
+            "siswa_id": siswa["id"],
+            "siswa_nama": siswa["nama"],
+            "absensi": []
+        }
+        
+        # Generate all days in month
+        import calendar
+        year, month = map(int, bulan.split("-"))
+        days_in_month = calendar.monthrange(year, month)[1]
+        
+        for day in range(1, days_in_month + 1):
+            tanggal = f"{bulan}-{day:02d}"
+            key = f"{siswa['id']}_{tanggal}"
+            
+            if key in absensi_map:
+                siswa_data["absensi"].append({
+                    "tanggal": tanggal,
+                    "status": absensi_map[key]["status"],
+                    "absensi_id": absensi_map[key]["id"]
+                })
+            else:
+                siswa_data["absensi"].append({
+                    "tanggal": tanggal,
+                    "status": None,
+                    "absensi_id": None
+                })
+        
+        result.append(siswa_data)
+    
+    return result
+
+@api_router.put("/absensi-kelas/{absensi_id}", response_model=AbsensiKelasResponse)
+async def update_absensi_kelas(
+    absensi_id: str,
+    data: AbsensiKelasUpdate,
+    current_pengabsen: dict = Depends(get_current_pengabsen_kelas)
+):
+    """Update attendance status manually"""
+    absensi = await db.absensi_kelas.find_one({"id": absensi_id}, {"_id": 0})
+    if not absensi:
+        raise HTTPException(status_code=404, detail="Absensi tidak ditemukan")
+    
+    # Verify access
+    if absensi["kelas_id"] not in current_pengabsen.get("kelas_ids", []):
+        raise HTTPException(status_code=403, detail="Anda tidak memiliki akses ke kelas ini")
+    
+    await db.absensi_kelas.update_one(
+        {"id": absensi_id},
+        {"$set": {"status": data.status}}
+    )
+    
+    updated_absensi = await db.absensi_kelas.find_one({"id": absensi_id}, {"_id": 0})
+    
+    # Get names
+    siswa = await db.siswa_madrasah.find_one({"id": updated_absensi["siswa_id"]}, {"_id": 0})
+    kelas = await db.kelas.find_one({"id": updated_absensi["kelas_id"]}, {"_id": 0})
+    
+    return AbsensiKelasResponse(
+        **updated_absensi,
+        siswa_nama=siswa["nama"] if siswa else "Unknown",
+        kelas_nama=kelas["nama"] if kelas else "Unknown"
+    )
+
+@api_router.post("/absensi-kelas/manual")
+async def create_absensi_kelas_manual(
+    data: AbsensiKelasCreate,
+    current_pengabsen: dict = Depends(get_current_pengabsen_kelas)
+):
+    """Create attendance manually from grid"""
+    # Verify access
+    if data.kelas_id not in current_pengabsen.get("kelas_ids", []):
+        raise HTTPException(status_code=403, detail="Anda tidak memiliki akses ke kelas ini")
+    
+    # Check if already exists
+    existing = await db.absensi_kelas.find_one({
+        "siswa_id": data.siswa_id,
+        "tanggal": data.tanggal
+    }, {"_id": 0})
+    
+    if existing:
+        # Update instead
+        await db.absensi_kelas.update_one(
+            {"id": existing["id"]},
+            {"$set": {"status": data.status}}
+        )
+        return {"message": "Absensi berhasil diupdate", "absensi_id": existing["id"]}
+    
+    # Create new
+    absensi = AbsensiKelas(
+        siswa_id=data.siswa_id,
+        kelas_id=data.kelas_id,
+        tanggal=data.tanggal,
+        status=data.status,
+        pengabsen_kelas_id=current_pengabsen["id"]
+    )
+    
+    doc = absensi.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    if doc.get('waktu_absen'):
+        doc['waktu_absen'] = doc['waktu_absen'].isoformat()
+    
+    await db.absensi_kelas.insert_one(doc)
+    
+    return {"message": "Absensi berhasil dicatat", "absensi_id": absensi.id}
+
+# ==================== PENGABSEN KELAS ENDPOINTS ====================
+
+@api_router.get("/pengabsen-kelas", response_model=List[PengabsenKelasResponse])
+async def get_pengabsen_kelas_list(_: dict = Depends(get_current_admin)):
+    pengabsen_list = await db.pengabsen_kelas.find({}, {"_id": 0}).to_list(1000)
+    return [PengabsenKelasResponse(**p) for p in pengabsen_list]
+
+@api_router.post("/pengabsen-kelas", response_model=PengabsenKelasResponse)
+async def create_pengabsen_kelas(data: PengabsenKelasCreate, _: dict = Depends(get_current_admin)):
+    # Validate kelas_ids
+    for kelas_id in data.kelas_ids:
+        kelas = await db.kelas.find_one({"id": kelas_id}, {"_id": 0})
+        if not kelas:
+            raise HTTPException(status_code=404, detail=f"Kelas {kelas_id} tidak ditemukan")
+    
+    # Check username uniqueness
+    existing = await db.pengabsen_kelas.find_one({"username": data.username})
+    if existing:
+        raise HTTPException(status_code=400, detail="Username sudah digunakan")
+    
+    pengabsen = PengabsenKelas(
+        **data.model_dump(),
+        kode_akses=generate_kode_akses()
+    )
+    
+    doc = pengabsen.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    await db.pengabsen_kelas.insert_one(doc)
+    
+    return PengabsenKelasResponse(**pengabsen.model_dump())
+
+@api_router.put("/pengabsen-kelas/{pengabsen_id}", response_model=PengabsenKelasResponse)
+async def update_pengabsen_kelas(pengabsen_id: str, data: PengabsenKelasUpdate, _: dict = Depends(get_current_admin)):
+    pengabsen = await db.pengabsen_kelas.find_one({"id": pengabsen_id}, {"_id": 0})
+    if not pengabsen:
+        raise HTTPException(status_code=404, detail="Pengabsen kelas tidak ditemukan")
+    
+    update_data = {k: v for k, v in data.model_dump().items() if v is not None}
+    
+    if "username" in update_data:
+        existing = await db.pengabsen_kelas.find_one({"username": update_data["username"], "id": {"$ne": pengabsen_id}})
+        if existing:
+            raise HTTPException(status_code=400, detail="Username sudah digunakan")
+    
+    if "kelas_ids" in update_data:
+        for kelas_id in update_data["kelas_ids"]:
+            kelas = await db.kelas.find_one({"id": kelas_id}, {"_id": 0})
+            if not kelas:
+                raise HTTPException(status_code=404, detail=f"Kelas {kelas_id} tidak ditemukan")
+    
+    if update_data:
+        await db.pengabsen_kelas.update_one({"id": pengabsen_id}, {"$set": update_data})
+    
+    updated = await db.pengabsen_kelas.find_one({"id": pengabsen_id}, {"_id": 0})
+    return PengabsenKelasResponse(**updated)
+
+@api_router.post("/pengabsen-kelas/{pengabsen_id}/regenerate-kode-akses", response_model=PengabsenKelasResponse)
+async def regenerate_pengabsen_kelas_kode(pengabsen_id: str, _: dict = Depends(get_current_admin)):
+    pengabsen = await db.pengabsen_kelas.find_one({"id": pengabsen_id}, {"_id": 0})
+    if not pengabsen:
+        raise HTTPException(status_code=404, detail="Pengabsen kelas tidak ditemukan")
+    
+    new_kode = generate_kode_akses()
+    await db.pengabsen_kelas.update_one({"id": pengabsen_id}, {"$set": {"kode_akses": new_kode}})
+    
+    updated = await db.pengabsen_kelas.find_one({"id": pengabsen_id}, {"_id": 0})
+    return PengabsenKelasResponse(**updated)
+
+@api_router.delete("/pengabsen-kelas/{pengabsen_id}")
+async def delete_pengabsen_kelas(pengabsen_id: str, _: dict = Depends(get_current_admin)):
+    result = await db.pengabsen_kelas.delete_one({"id": pengabsen_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Pengabsen kelas tidak ditemukan")
+    return {"message": "Pengabsen kelas berhasil dihapus"}
+
+@api_router.post("/pengabsen-kelas/login", response_model=PengabsenKelasTokenResponse)
+async def login_pengabsen_kelas(data: PengabsenKelasLoginRequest):
+    pengabsen = await db.pengabsen_kelas.find_one({"username": data.username}, {"_id": 0})
+    if not pengabsen or pengabsen["kode_akses"] != data.kode_akses:
+        raise HTTPException(status_code=401, detail="Username atau kode akses salah")
+    
+    access_token = create_access_token(data={"sub": pengabsen["id"]})
+    
+    user_data = PengabsenKelasMeResponse(
+        id=pengabsen["id"],
+        nama=pengabsen["nama"],
+        username=pengabsen["username"],
+        email_atau_hp=pengabsen.get("email_atau_hp", ""),
+        kelas_ids=pengabsen.get("kelas_ids", []),
+        created_at=pengabsen["created_at"]
+    )
+    
+    return PengabsenKelasTokenResponse(access_token=access_token, user=user_data)
+
+@api_router.get("/pengabsen-kelas/me", response_model=PengabsenKelasMeResponse)
+async def get_pengabsen_kelas_me(current_pengabsen: dict = Depends(get_current_pengabsen_kelas)):
+    return PengabsenKelasMeResponse(**current_pengabsen)
+
+# ==================== PEMBIMBING KELAS ENDPOINTS ====================
+
+@api_router.get("/pembimbing-kelas", response_model=List[PembimbingKelasResponse])
+async def get_pembimbing_kelas_list(_: dict = Depends(get_current_admin)):
+    pembimbing_list = await db.pembimbing_kelas.find({}, {"_id": 0}).to_list(1000)
+    return [PembimbingKelasResponse(**p) for p in pembimbing_list]
+
+@api_router.post("/pembimbing-kelas", response_model=PembimbingKelasResponse)
+async def create_pembimbing_kelas(data: PembimbingKelasCreate, _: dict = Depends(get_current_admin)):
+    # Validate kelas_ids
+    for kelas_id in data.kelas_ids:
+        kelas = await db.kelas.find_one({"id": kelas_id}, {"_id": 0})
+        if not kelas:
+            raise HTTPException(status_code=404, detail=f"Kelas {kelas_id} tidak ditemukan")
+    
+    # Check username uniqueness
+    existing = await db.pembimbing_kelas.find_one({"username": data.username})
+    if existing:
+        raise HTTPException(status_code=400, detail="Username sudah digunakan")
+    
+    pembimbing = PembimbingKelas(
+        **data.model_dump(),
+        kode_akses=generate_kode_akses()
+    )
+    
+    doc = pembimbing.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    await db.pembimbing_kelas.insert_one(doc)
+    
+    return PembimbingKelasResponse(**pembimbing.model_dump())
+
+@api_router.put("/pembimbing-kelas/{pembimbing_id}", response_model=PembimbingKelasResponse)
+async def update_pembimbing_kelas(pembimbing_id: str, data: PembimbingKelasUpdate, _: dict = Depends(get_current_admin)):
+    pembimbing = await db.pembimbing_kelas.find_one({"id": pembimbing_id}, {"_id": 0})
+    if not pembimbing:
+        raise HTTPException(status_code=404, detail="Pembimbing kelas tidak ditemukan")
+    
+    update_data = {k: v for k, v in data.model_dump().items() if v is not None}
+    
+    if "username" in update_data:
+        existing = await db.pembimbing_kelas.find_one({"username": update_data["username"], "id": {"$ne": pembimbing_id}})
+        if existing:
+            raise HTTPException(status_code=400, detail="Username sudah digunakan")
+    
+    if "kelas_ids" in update_data:
+        for kelas_id in update_data["kelas_ids"]:
+            kelas = await db.kelas.find_one({"id": kelas_id}, {"_id": 0})
+            if not kelas:
+                raise HTTPException(status_code=404, detail=f"Kelas {kelas_id} tidak ditemukan")
+    
+    if update_data:
+        await db.pembimbing_kelas.update_one({"id": pembimbing_id}, {"$set": update_data})
+    
+    updated = await db.pembimbing_kelas.find_one({"id": pembimbing_id}, {"_id": 0})
+    return PembimbingKelasResponse(**updated)
+
+@api_router.post("/pembimbing-kelas/{pembimbing_id}/regenerate-kode-akses", response_model=PembimbingKelasResponse)
+async def regenerate_pembimbing_kelas_kode(pembimbing_id: str, _: dict = Depends(get_current_admin)):
+    pembimbing = await db.pembimbing_kelas.find_one({"id": pembimbing_id}, {"_id": 0})
+    if not pembimbing:
+        raise HTTPException(status_code=404, detail="Pembimbing kelas tidak ditemukan")
+    
+    new_kode = generate_kode_akses()
+    await db.pembimbing_kelas.update_one({"id": pembimbing_id}, {"$set": {"kode_akses": new_kode}})
+    
+    updated = await db.pembimbing_kelas.find_one({"id": pembimbing_id}, {"_id": 0})
+    return PembimbingKelasResponse(**updated)
+
+@api_router.delete("/pembimbing-kelas/{pembimbing_id}")
+async def delete_pembimbing_kelas(pembimbing_id: str, _: dict = Depends(get_current_admin)):
+    result = await db.pembimbing_kelas.delete_one({"id": pembimbing_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Pembimbing kelas tidak ditemukan")
+    return {"message": "Pembimbing kelas berhasil dihapus"}
+
+@api_router.post("/pembimbing-kelas/login", response_model=PembimbingKelasTokenResponse)
+async def login_pembimbing_kelas(data: PembimbingKelasLoginRequest):
+    pembimbing = await db.pembimbing_kelas.find_one({"username": data.username}, {"_id": 0})
+    if not pembimbing or pembimbing["kode_akses"] != data.kode_akses:
+        raise HTTPException(status_code=401, detail="Username atau kode akses salah")
+    
+    access_token = create_access_token(data={"sub": pembimbing["id"]})
+    
+    user_data = PembimbingKelasMeResponse(
+        id=pembimbing["id"],
+        nama=pembimbing["nama"],
+        username=pembimbing["username"],
+        email_atau_hp=pembimbing.get("email_atau_hp", ""),
+        kelas_ids=pembimbing.get("kelas_ids", []),
+        created_at=pembimbing["created_at"]
+    )
+    
+    return PembimbingKelasTokenResponse(access_token=access_token, user=user_data)
+
+@api_router.get("/pembimbing-kelas/me", response_model=PembimbingKelasMeResponse)
+async def get_pembimbing_kelas_me(current_pembimbing: dict = Depends(get_current_pembimbing_kelas)):
+    return PembimbingKelasMeResponse(**current_pembimbing)
+
+@api_router.get("/pembimbing-kelas/statistik")
+async def get_pembimbing_kelas_statistik(current_pembimbing: dict = Depends(get_current_pembimbing_kelas)):
+    """Get statistics for Pembimbing Kelas dashboard"""
+    kelas_ids = current_pembimbing.get("kelas_ids", [])
+    
+    # Get all kelas info
+    kelas_list = await db.kelas.find({"id": {"$in": kelas_ids}}, {"_id": 0}).to_list(1000)
+    
+    # Get total siswa across all kelas
+    total_siswa = await db.siswa_madrasah.count_documents({"kelas_id": {"$in": kelas_ids}})
+    
+    # Get today's attendance
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    absensi_today = await db.absensi_kelas.find({
+        "kelas_id": {"$in": kelas_ids},
+        "tanggal": today
+    }, {"_id": 0}).to_list(10000)
+    
+    # Count by status
+    hadir = sum(1 for a in absensi_today if a["status"] == "hadir")
+    alfa = sum(1 for a in absensi_today if a["status"] == "alfa")
+    izin = sum(1 for a in absensi_today if a["status"] == "izin")
+    sakit = sum(1 for a in absensi_today if a["status"] == "sakit")
+    
+    # Per kelas stats
+    kelas_stats = []
+    for kelas in kelas_list:
+        siswa_count = await db.siswa_madrasah.count_documents({"kelas_id": kelas["id"]})
+        absensi_count = sum(1 for a in absensi_today if a["kelas_id"] == kelas["id"])
+        
+        kelas_stats.append({
+            "kelas_id": kelas["id"],
+            "kelas_nama": kelas["nama"],
+            "total_siswa": siswa_count,
+            "sudah_absen": absensi_count,
+            "belum_absen": siswa_count - absensi_count
+        })
+    
+    return {
+        "total_kelas": len(kelas_list),
+        "total_siswa": total_siswa,
+        "hari_ini": {
+            "hadir": hadir,
+            "alfa": alfa,
+            "izin": izin,
+            "sakit": sakit,
+            "total_absen": len(absensi_today)
+        },
+        "per_kelas": kelas_stats
+    }
+
+@api_router.get("/pembimbing-kelas/absensi-riwayat")
+async def get_pembimbing_kelas_riwayat(
+    tanggal_start: str,
+    tanggal_end: Optional[str] = None,
+    kelas_id: Optional[str] = None,
+    current_pembimbing: dict = Depends(get_current_pembimbing_kelas)
+):
+    """Get attendance history for Pembimbing Kelas"""
+    if not tanggal_end:
+        tanggal_end = tanggal_start
+    
+    kelas_ids = current_pembimbing.get("kelas_ids", [])
+    
+    query = {
+        "tanggal": {"$gte": tanggal_start, "$lte": tanggal_end},
+        "kelas_id": {"$in": kelas_ids}
+    }
+    
+    if kelas_id:
+        query["kelas_id"] = kelas_id
+    
+    absensi_list = await db.absensi_kelas.find(query, {"_id": 0}).to_list(10000)
+    
+    # Enrich with siswa and kelas names
+    siswa_map = {}
+    siswa_list = await db.siswa_madrasah.find({}, {"_id": 0}).to_list(10000)
+    for siswa in siswa_list:
+        siswa_map[siswa["id"]] = siswa["nama"]
+    
+    kelas_map = {}
+    kelas_list = await db.kelas.find({}, {"_id": 0}).to_list(1000)
+    for kelas in kelas_list:
+        kelas_map[kelas["id"]] = kelas["nama"]
+    
+    result = []
+    for absensi in absensi_list:
+        result.append(AbsensiKelasResponse(
+            **absensi,
+            siswa_nama=siswa_map.get(absensi["siswa_id"], "Unknown"),
+            kelas_nama=kelas_map.get(absensi["kelas_id"], "Unknown")
+        ))
+    
+    return result
+
 # Include router
 app.include_router(api_router)
 
