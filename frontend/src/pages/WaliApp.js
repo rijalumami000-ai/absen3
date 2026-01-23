@@ -10,6 +10,9 @@ const WaliApp = () => {
   const { user, loading, logout } = useWaliAuth();
   const [todayData, setTodayData] = useState(null);
   const [notificationStatus, setNotificationStatus] = useState('unknown');
+  const [activeTab, setActiveTab] = useState('sholat'); // 'sholat' or 'kelas'
+  const [kelasAbsensi, setKelasAbsensi] = useState([]);
+  const [loadingKelasAbsensi, setLoadingKelasAbsensi] = useState(false);
   const now = new Date();
   const currentYear = now.getFullYear();
 
