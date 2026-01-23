@@ -158,7 +158,7 @@ const MadrasahDiniyah = () => {
     setSelectedSiswa(null);
   };
 
-  const downloadQRCode = async (siswaId, namaS iswa) => {
+  const downloadQRCode = async (siswaId, namaSiswa) => {
     try {
       const response = await api.get(`/siswa-madrasah/${siswaId}/qr-code`, {
         responseType: 'blob'
