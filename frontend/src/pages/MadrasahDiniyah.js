@@ -483,12 +483,21 @@ const MadrasahDiniyah = () => {
             <DialogTitle>Edit Siswa</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
+            {selectedSiswa?.santri_id && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                <p className="text-sm text-blue-800">
+                  ℹ️ Siswa ini ter-link dengan Santri. Nama, NIS, dan Gender tidak bisa diedit di sini.
+                  Silakan edit di menu <strong>Santri</strong>.
+                </p>
+              </div>
+            )}
             <div>
               <Label>Nama Siswa</Label>
               <Input
                 placeholder="Nama lengkap"
                 value={formData.nama}
                 onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
+                disabled={selectedSiswa?.santri_id}
               />
             </div>
             <div>
@@ -497,6 +506,7 @@ const MadrasahDiniyah = () => {
                 placeholder="Nomor Induk Siswa"
                 value={formData.nis}
                 onChange={(e) => setFormData({ ...formData, nis: e.target.value })}
+                disabled={selectedSiswa?.santri_id}
               />
             </div>
             <div>
@@ -504,6 +514,7 @@ const MadrasahDiniyah = () => {
               <Select
                 value={formData.gender}
                 onValueChange={(value) => setFormData({ ...formData, gender: value })}
+                disabled={selectedSiswa?.santri_id}
               >
                 <SelectTrigger>
                   <SelectValue />
