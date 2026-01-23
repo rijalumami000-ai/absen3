@@ -139,21 +139,21 @@ const PengabsenKelas = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center animate-slide-in-left">
         <div>
           <h1 className="text-3xl font-display font-bold text-foreground">Pengabsen Kelas</h1>
           <p className="text-muted-foreground mt-1">Kelola pengabsen untuk Madrasah Diniyah</p>
         </div>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
-            <Button onClick={resetForm}>
+            <Button onClick={resetForm} className="btn-ripple active-scale shadow-card hover:shadow-card-hover transition-smooth">
               <Plus className="w-4 h-4 mr-2" />
               Tambah Pengabsen Kelas
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-md animate-scale-in">
             <DialogHeader>
-              <DialogTitle>Tambah Pengabsen Kelas</DialogTitle>
+              <DialogTitle className="font-display">Tambah Pengabsen Kelas</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div>

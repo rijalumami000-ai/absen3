@@ -139,21 +139,21 @@ const PembimbingKelas = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center animate-slide-in-left">
         <div>
           <h1 className="text-3xl font-display font-bold text-foreground">Monitoring Kelas</h1>
           <p className="text-muted-foreground mt-1">Kelola akun monitoring untuk Madrasah Diniyah</p>
         </div>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
-            <Button onClick={resetForm}>
+            <Button onClick={resetForm} className="btn-ripple active-scale shadow-card hover:shadow-card-hover transition-smooth">
               <Plus className="w-4 h-4 mr-2" />
               Tambah Monitoring Kelas
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-md animate-scale-in">
             <DialogHeader>
-              <DialogTitle>Tambah Monitoring Kelas</DialogTitle>
+              <DialogTitle className="font-display">Tambah Monitoring Kelas</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div>
