@@ -394,11 +394,32 @@ const NotFoundRedirect = () => {
 
 function App() {
   return (
+    <BrowserRouter>
+      <AppContent />
+      <Toaster />
+    </BrowserRouter>
+  );
+}
+
+function AppContent() {
+  const location = window.location.pathname;
+  
+  // Check if current route is a PWA route
+  const isPWARoute = location.startsWith('/pengabsen-app') || 
+                     location.startsWith('/wali-app') || 
+                     location.startsWith('/pembimbing-app') ||
+                     location.startsWith('/pengabsen-kelas-app') ||
+                     location.startsWith('/monitoring-kelas-app');
+  
+  // If it's a PWA route, don't wrap with AuthProvider
+  if (isPWARoute) {
+    return <AppRoutes />;
+  }
+  
+  // For admin routes, wrap with AuthProvider
+  return (
     <AuthProvider>
-      <BrowserRouter>
-        <AppRoutes />
-        <Toaster />
-      </BrowserRouter>
+      <AppRoutes />
     </AuthProvider>
   );
 }
