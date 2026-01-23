@@ -305,18 +305,24 @@ const MonitoringKelasApp = () => {
                 </div>
                 <div>
                   <label className="text-sm font-medium mb-2 block">Filter Kelas</label>
-                  <Select value={selectedKelas} onValueChange={setSelectedKelas}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Semua Kelas" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {kelasList.map(kelas => (
-                        <SelectItem key={kelas.id} value={kelas.id}>
-                          {kelas.nama}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  {kelasList.length === 0 ? (
+                    <div className="px-3 py-2 border border-border rounded-lg bg-muted text-muted-foreground text-sm">
+                      Tidak ada kelas tersedia
+                    </div>
+                  ) : (
+                    <Select value={selectedKelas} onValueChange={setSelectedKelas}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih kelas" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {kelasList.map(kelas => (
+                          <SelectItem key={kelas.id} value={kelas.id}>
+                            {kelas.nama}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
                 </div>
               </div>
             </div>
