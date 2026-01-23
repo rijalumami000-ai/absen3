@@ -15,7 +15,9 @@ import {
   Menu,
   X,
   Settings,
-  ChevronRight
+  ChevronRight,
+  BookOpen,
+  GraduationCap
 } from 'lucide-react';
 
 const Layout = ({ children }) => {
@@ -33,6 +35,8 @@ const Layout = ({ children }) => {
     { path: '/pembimbing', icon: UserCog, label: 'Pembimbing' },
     { path: '/absensi', icon: ClipboardList, label: 'Riwayat Absensi' },
     { path: '/waktu-sholat', icon: Clock, label: 'Waktu Sholat' },
+    { path: '/kelas', icon: GraduationCap, label: 'Kelas' },
+    { path: '/madrasah-diniyah', icon: BookOpen, label: 'Madrasah Diniyah' },
     { path: '/settings', icon: Settings, label: 'Pengaturan' },
   ];
 
