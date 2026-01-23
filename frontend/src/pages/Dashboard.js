@@ -103,9 +103,14 @@ const Dashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
+        <Card className="card-hover animate-fade-in transition-smooth" style={{ animationDelay: '100ms' }}>
           <CardHeader>
-            <CardTitle>Statistik Kehadiran Hari Ini</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                <Users className="w-5 h-5 text-green-700" />
+              </div>
+              Statistik Kehadiran Hari Ini
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
