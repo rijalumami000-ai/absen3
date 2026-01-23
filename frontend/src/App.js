@@ -54,7 +54,6 @@ const ProtectedRoute = ({ children }) => {
 
 const PublicRoute = ({ children }) => {
   const { user, loading } = useAuth();
-  const location = window.location.pathname;
 
   if (loading) {
     return (
@@ -64,10 +63,7 @@ const PublicRoute = ({ children }) => {
     );
   }
 
-  // Don't redirect if user is accessing PWA routes
-  const isPWARoute = location.includes('-app');
-  
-  if (user && !isPWARoute) {
+  if (user) {
     return <Navigate to="/dashboard" replace />;
   }
 
