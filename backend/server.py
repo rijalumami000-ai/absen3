@@ -1395,6 +1395,58 @@ async def get_wali_me(current_wali: dict = Depends(get_current_wali)):
     )
 
 
+@api_router.get("/wali-app/absensi-kelas")
+async def get_wali_absensi_kelas(
+    tanggal: str,
+    current_wali: dict = Depends(get_current_wali)
+):
+    """Get absensi kelas for wali's children"""
+    anak_ids = current_wali.get("anak_ids", [])
+    
+    if not anak_ids:
+        return []
+    
+    # Get all siswa_madrasah linked to these santri
+    siswa_list = await db.siswa_madrasah.find(
+        {"santri_id": {"$in": anak_ids}},
+        {"_id": 0}
+    ).to_list(100)
+    
+    if not siswa_list:
+        return []
+    
+    # Get absensi for these siswa on the given date
+    siswa_ids = [siswa["id"] for siswa in siswa_list]
+    absensi_list = await db.absensi_kelas.find(
+        {"siswa_id": {"$in": siswa_ids}, "tanggal": tanggal},
+        {"_id": 0}
+    ).to_list(100)
+    
+    # Get kelas info
+    kelas_ids = list(set([siswa.get("kelas_id") for siswa in siswa_list if siswa.get("kelas_id")]))
+    kelas_map = {}
+    if kelas_ids:
+        kelas_list = await db.kelas.find({"id": {"$in": kelas_ids}}, {"_id": 0}).to_list(100)
+        for kelas in kelas_list:
+            kelas_map[kelas["id"]] = kelas["nama"]
+    
+    # Build response
+    result = []
+    for siswa in siswa_list:
+        absensi = next((a for a in absensi_list if a["siswa_id"] == siswa["id"]), None)
+        
+        result.append({
+            "siswa_id": siswa["id"],
+            "siswa_nama": siswa["nama"],
+            "kelas_nama": kelas_map.get(siswa.get("kelas_id")),
+            "status": absensi["status"] if absensi else None,
+            "waktu_absen": absensi.get("waktu_absen") if absensi else None
+        })
+    
+    return result
+
+
+
 @api_router.get("/wali/{wali_id}/whatsapp-message")
 async def get_wali_whatsapp_message(wali_id: str, _: dict = Depends(get_current_admin)):
     """Generate WhatsApp message for wali"""
