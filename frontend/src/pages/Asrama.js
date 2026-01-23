@@ -101,14 +101,14 @@ const Asrama = () => {
         </div>
         <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>
           <DialogTrigger asChild>
-            <Button data-testid="add-asrama-button">
+            <Button data-testid="add-asrama-button" className="btn-ripple active-scale shadow-card hover:shadow-card-hover transition-smooth">
               <Plus className="mr-2" size={20} />
               Tambah Asrama
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="animate-scale-in">
             <DialogHeader>
-              <DialogTitle>{editMode ? 'Edit Asrama' : 'Tambah Asrama'}</DialogTitle>
+              <DialogTitle className="font-display">{editMode ? 'Edit Asrama' : 'Tambah Asrama'}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -154,17 +154,19 @@ const Asrama = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Asrama Putra */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Building className="mr-2" size={20} />
-              Asrama Putra ({putraList.length})
+        <Card className="card-hover shadow-card hover:shadow-card-hover transition-smooth animate-scale-in">
+          <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100">
+            <CardTitle className="flex items-center font-display">
+              <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center mr-3">
+                <Building className="text-white" size={20} />
+              </div>
+              <span>Asrama Putra ({putraList.length})</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <div className="space-y-3">
-              {putraList.map((asrama) => (
-                <div key={asrama.id} className="p-4 border rounded-lg flex justify-between items-center" data-testid={`asrama-item-${asrama.id}`}>
+              {putraList.map((asrama, index) => (
+                <div key={asrama.id} className="p-4 border rounded-xl flex justify-between items-center hover-lift transition-smooth animate-fade-in shadow-sm" data-testid={`asrama-item-${asrama.id}`} style={{ animationDelay: `${index * 50}ms` }}>
                   <div>
                     <p className="font-semibold text-gray-800">{asrama.nama}</p>
                     <p className="text-sm text-gray-600">Kapasitas: {asrama.kapasitas} santri</p>
@@ -187,17 +189,19 @@ const Asrama = () => {
         </Card>
 
         {/* Asrama Putri */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Building className="mr-2" size={20} />
-              Asrama Putri ({putriList.length})
+        <Card className="card-hover shadow-card hover:shadow-card-hover transition-smooth animate-scale-in" style={{ animationDelay: '100ms' }}>
+          <CardHeader className="bg-gradient-to-r from-pink-50 to-pink-100">
+            <CardTitle className="flex items-center font-display">
+              <div className="w-10 h-10 bg-pink-600 rounded-xl flex items-center justify-center mr-3">
+                <Building className="text-white" size={20} />
+              </div>
+              <span>Asrama Putri ({putriList.length})</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <div className="space-y-3">
-              {putriList.map((asrama) => (
-                <div key={asrama.id} className="p-4 border rounded-lg flex justify-between items-center" data-testid={`asrama-item-${asrama.id}`}>
+              {putriList.map((asrama, index) => (
+                <div key={asrama.id} className="p-4 border rounded-xl flex justify-between items-center hover-lift transition-smooth animate-fade-in shadow-sm" data-testid={`asrama-item-${asrama.id}`} style={{ animationDelay: `${index * 50}ms` }}>
                   <div>
                     <p className="font-semibold text-gray-800">{asrama.nama}</p>
                     <p className="text-sm text-gray-600">Kapasitas: {asrama.kapasitas} santri</p>
