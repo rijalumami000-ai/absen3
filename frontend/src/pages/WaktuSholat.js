@@ -112,12 +112,12 @@ const WaktuSholat = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             {waktuSholatItems.map((item, index) => (
-              <Card key={index} className={`border-2 ${item.color}`} data-testid={`waktu-${item.name.toLowerCase()}`}>
+              <Card key={index} className={`border-2 ${item.color} card-hover shadow-card hover:shadow-card-hover transition-smooth animate-scale-in`} data-testid={`waktu-${item.name.toLowerCase()}`} style={{ animationDelay: `${index * 100}ms` }}>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg text-gray-700">{item.name}</CardTitle>
+                  <CardTitle className="text-lg text-gray-700 font-display">{item.name}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-gray-800">
+                  <div className="text-3xl font-bold text-gray-800 font-mono">
                     {item.time || '-'}
                   </div>
                   <div className="text-xs text-gray-500 mt-1">WIB</div>
@@ -126,9 +126,9 @@ const WaktuSholat = () => {
             ))}
           </div>
 
-          <Card className="mt-6">
+          <Card className="mt-6 shadow-card animate-fade-in" style={{ animationDelay: '500ms' }}>
             <CardHeader>
-              <CardTitle>Informasi</CardTitle>
+              <CardTitle className="font-display">Informasi</CardTitle>
             </CardHeader>
             <CardContent>
               <ul className="list-disc list-inside space-y-2 text-sm text-gray-600">
