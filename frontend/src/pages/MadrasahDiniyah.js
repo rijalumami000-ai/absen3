@@ -187,14 +187,14 @@ const MadrasahDiniyah = () => {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center animate-slide-in-left">
         <div>
           <h1 className="text-3xl font-display font-bold text-foreground">Madrasah Diniyah</h1>
           <p className="text-muted-foreground mt-1">Kelola siswa Madrasah Diniyah</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 animate-slide-in-right">
           <Dialog open={isLinkSantriOpen} onOpenChange={setIsLinkSantriOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" onClick={openLinkSantriDialog}>
