@@ -1560,11 +1560,6 @@ async def get_pengabsen_riwayat(
 
     return {"items": items}
 
-async def delete_pengabsen(pengabsen_id: str, _: dict = Depends(get_current_admin)):
-    result = await db.pengabsen.delete_one({"id": pengabsen_id})
-    if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Pengabsen tidak ditemukan")
-    return {"message": "Pengabsen berhasil dihapus"}
 
 # ==================== PEMBIMBING ENDPOINTS (REVISED - Kode Akses) ====================
 
