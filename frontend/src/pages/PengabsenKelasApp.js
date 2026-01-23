@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePengabsenKelasAuth } from '@/contexts/PengabsenKelasAuthContext';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import axios from 'axios';
-import { Html5Qrcode } from 'html5-qrcode';
+import { Scanner } from '@yudiel/react-qr-scanner';
 import { 
   QrCode, 
   LogOut, 
@@ -35,8 +35,6 @@ const PengabsenKelasApp = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date().toISOString().slice(0, 7)); // YYYY-MM
   const [scanning, setScanning] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
-  const qrCodeRef = useRef(null);
-  const html5QrCode = useRef(null);
 
   useEffect(() => {
     loadKelas();
@@ -82,66 +80,18 @@ const PengabsenKelasApp = () => {
     }
   };
 
-  const handleScanQR = async () => {
-    if (isScanning) {
-      // Stop scanning
-      if (html5QrCode.current) {
-        try {
-          await html5QrCode.current.stop();
-          html5QrCode.current.clear();
-        } catch (err) {
-          console.error('Error stopping scanner:', err);
-        }
-      }
-      setIsScanning(false);
-      return;
-    }
-
-    // Start scanning
-    setIsScanning(true);
+  const handleScanQR = async (result) => {
+    if (scanning) return; // Prevent double scan
     
-    try {
-      html5QrCode.current = new Html5Qrcode("qr-reader");
-      
-      const config = {
-        fps: 10,
-        qrbox: { width: 250, height: 250 }
-      };
-      
-      await html5QrCode.current.start(
-        { facingMode: "environment" },
-        config,
-        async (decodedText) => {
-          // QR Code detected
-          console.log('QR Code detected:', decodedText);
-          
-          // Stop scanner
-          await html5QrCode.current.stop();
-          setIsScanning(false);
-          
-          // Process the QR code
-          await processQRCode(decodedText);
-        },
-        (errorMessage) => {
-          // Ignore errors during scanning
-        }
-      );
-    } catch (err) {
-      console.error('Error starting scanner:', err);
-      toast.error('Gagal memulai kamera. Pastikan izin kamera sudah diberikan.');
-      setIsScanning(false);
-    }
-  };
-
-  const processQRCode = async (qrData) => {
     setScanning(true);
+    
     try {
       let parsedData;
       try {
-        parsedData = JSON.parse(qrData);
+        parsedData = JSON.parse(result);
       } catch {
         // If not JSON, assume it's just an ID
-        parsedData = { id: qrData, type: 'santri' };
+        parsedData = { id: result, type: 'santri' };
       }
 
       const token = localStorage.getItem('pengabsen_kelas_token');
@@ -152,10 +102,13 @@ const PengabsenKelasApp = () => {
       );
       
       toast.success(response.data.message || 'Absensi berhasil dicatat');
+      
+      // Stop scanning after success
+      setIsScanning(false);
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Gagal mencatat absensi');
     } finally {
-      setScanning(false);
+      setTimeout(() => setScanning(false), 2000); // Prevent rapid re-scan
     }
   };
 
@@ -280,9 +233,9 @@ const PengabsenKelasApp = () => {
         {view === 'scan' ? (
           /* Scan View */
           <div className="flex flex-col items-center justify-center py-12">
-            <div className="bg-card rounded-2xl shadow-lg p-8 max-w-md w-full text-center">
+            <div className="bg-card rounded-2xl shadow-lg p-8 max-w-md w-full">
               {!isScanning ? (
-                <>
+                <div className="text-center">
                   <div className="w-32 h-32 mx-auto mb-6 bg-primary-100 rounded-full flex items-center justify-center">
                     <QrCode className="w-16 h-16 text-primary-700" />
                   </div>
@@ -291,19 +244,40 @@ const PengabsenKelasApp = () => {
                     Scan QR code siswa untuk mencatat kehadiran hari ini
                   </p>
                   <Button
-                    onClick={handleScanQR}
+                    onClick={() => setIsScanning(true)}
                     size="lg"
                     className="w-full"
                     disabled={scanning}
                   >
-                    {scanning ? 'Memproses...' : 'Mulai Scan'}
+                    Mulai Scan
                   </Button>
-                </>
+                </div>
               ) : (
-                <>
-                  <div id="qr-reader" className="w-full mb-4 rounded-lg overflow-hidden"></div>
+                <div>
+                  <div className="mb-4">
+                    <Scanner
+                      onScan={(result) => {
+                        if (result && result[0]) {
+                          handleScanQR(result[0].rawValue);
+                        }
+                      }}
+                      onError={(error) => console.log(error?.message)}
+                      constraints={{
+                        facingMode: 'environment'
+                      }}
+                      styles={{
+                        container: {
+                          width: '100%',
+                          paddingTop: '100%',
+                          position: 'relative',
+                          overflow: 'hidden',
+                          borderRadius: '12px'
+                        }
+                      }}
+                    />
+                  </div>
                   <Button
-                    onClick={handleScanQR}
+                    onClick={() => setIsScanning(false)}
                     variant="outline"
                     size="lg"
                     className="w-full"
@@ -311,10 +285,10 @@ const PengabsenKelasApp = () => {
                     <X className="w-4 h-4 mr-2" />
                     Batal
                   </Button>
-                  <p className="text-xs text-muted-foreground mt-4">
+                  <p className="text-xs text-muted-foreground mt-4 text-center">
                     Arahkan kamera ke QR Code siswa
                   </p>
-                </>
+                </div>
               )}
             </div>
           </div>
