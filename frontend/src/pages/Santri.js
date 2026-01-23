@@ -113,6 +113,56 @@ const Santri = () => {
     setDialogOpen(true);
   };
 
+
+  const loadMadrasahStatus = async (santriId) => {
+    try {
+      const response = await santriAPI.get(`${santriId}/madrasah-status`);
+      setMadrasahStatus(response.data);
+    } catch (error) {
+      setMadrasahStatus(null);
+    }
+  };
+
+  const handleOpenLinkMadrasah = async (santri) => {
+    setSelectedSantri(santri);
+    await loadMadrasahStatus(santri.id);
+    
+    // Load kelas list
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/kelas`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
+      const data = await response.json();
+      setKelasList(data);
+    } catch (error) {
+      console.error('Failed to load kelas');
+    }
+    
+    setLinkMadrasahDialogOpen(true);
+  };
+
+  const handleLinkToMadrasah = async (kelasId = null) => {
+    try {
+      await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/santri/${selectedSantri.id}/link-to-madrasah?kelas_id=${kelasId || ''}`,
+        {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        }
+      );
+      toast({ title: "Sukses", description: "Santri berhasil didaftarkan ke Madrasah Diniyah" });
+      setLinkMadrasahDialogOpen(false);
+      loadSantri();
+    } catch (error) {
+      toast({ 
+        title: "Error", 
+        description: error.response?.data?.detail || "Gagal mendaftarkan santri",
+        variant: "destructive"
+      });
+    }
+  };
+
+
   const handleDelete = async (id) => {
     if (!window.confirm('Yakin ingin menghapus santri ini? QR code juga akan dihapus.')) return;
     try {
