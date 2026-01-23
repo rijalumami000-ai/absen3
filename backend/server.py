@@ -906,11 +906,22 @@ async def get_santri(
     
     santri_list = await db.santri.find(query, {"_id": 0, "qr_code": 0}).to_list(1000)
     
+    # Get all santri IDs that are linked to madrasah
+    santri_ids = [s["id"] for s in santri_list]
+    linked_santri = await db.siswa_madrasah.find(
+        {"santri_id": {"$in": santri_ids}},
+        {"_id": 0, "santri_id": 1}
+    ).to_list(1000)
+    linked_ids = set([s["santri_id"] for s in linked_santri])
+    
     for santri in santri_list:
         if isinstance(santri['created_at'], str):
             santri['created_at'] = datetime.fromisoformat(santri['created_at'])
         if isinstance(santri['updated_at'], str):
             santri['updated_at'] = datetime.fromisoformat(santri['updated_at'])
+        
+        # Add is_in_madrasah flag
+        santri['is_in_madrasah'] = santri["id"] in linked_ids
     
     return santri_list
 
