@@ -93,10 +93,10 @@ const Asrama = () => {
   if (loading) return <div className="flex justify-center p-8">Memuat data...</div>;
 
   return (
-    <div data-testid="asrama-page">
-      <div className="flex justify-between items-center mb-6">
+    <div data-testid="asrama-page" className="animate-fade-in">
+      <div className="flex justify-between items-center mb-6 animate-slide-in-left">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Kelola Asrama</h1>
+          <h1 className="text-3xl font-bold text-gray-800 font-display">Kelola Asrama Santri</h1>
           <p className="text-gray-600 mt-1">Manajemen data asrama putra dan putri</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>
