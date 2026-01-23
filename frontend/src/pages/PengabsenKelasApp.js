@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePengabsenKelasAuth } from '@/contexts/PengabsenKelasAuthContext';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import axios from 'axios';
+import { Html5Qrcode } from 'html5-qrcode';
 import { 
   QrCode, 
   LogOut, 
@@ -11,7 +12,8 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
-  Heart
+  Heart,
+  X
 } from 'lucide-react';
 import {
   Select,
@@ -32,6 +34,9 @@ const PengabsenKelasApp = () => {
   const [gridData, setGridData] = useState([]);
   const [currentMonth, setCurrentMonth] = useState(new Date().toISOString().slice(0, 7)); // YYYY-MM
   const [scanning, setScanning] = useState(false);
+  const [isScanning, setIsScanning] = useState(false);
+  const qrCodeRef = useRef(null);
+  const html5QrCode = useRef(null);
 
   useEffect(() => {
     loadKelas();
