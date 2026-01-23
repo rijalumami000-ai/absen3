@@ -607,6 +607,40 @@ async def get_current_admin(credentials: HTTPAuthorizationCredentials = Depends(
         raise HTTPException(status_code=401, detail="Invalid authentication credentials")
 
 
+async def get_current_pengabsen_kelas(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
+    try:
+        token = credentials.credentials
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        pengabsen_kelas_id: str = payload.get("sub")
+        if pengabsen_kelas_id is None:
+            raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+
+        pengabsen = await db.pengabsen_kelas.find_one({"id": pengabsen_kelas_id}, {"_id": 0})
+        if pengabsen is None:
+            raise HTTPException(status_code=401, detail="Pengabsen kelas not found")
+
+        return pengabsen
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+
+
+async def get_current_pembimbing_kelas(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
+    try:
+        token = credentials.credentials
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        pembimbing_kelas_id: str = payload.get("sub")
+        if pembimbing_kelas_id is None:
+            raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+
+        pembimbing = await db.pembimbing_kelas.find_one({"id": pembimbing_kelas_id}, {"_id": 0})
+        if pembimbing is None:
+            raise HTTPException(status_code=401, detail="Pembimbing kelas not found")
+
+        return pembimbing
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+
+
 def generate_kode_akses() -> str:
     """Generate random 9-digit access code for Pembimbing"""
     import random
