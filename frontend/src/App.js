@@ -402,14 +402,14 @@ function App() {
 }
 
 function AppContent() {
-  const location = window.location.pathname;
+  const location = useLocation();
   
   // Check if current route is a PWA route
-  const isPWARoute = location.startsWith('/pengabsen-app') || 
-                     location.startsWith('/wali-app') || 
-                     location.startsWith('/pembimbing-app') ||
-                     location.startsWith('/pengabsen-kelas-app') ||
-                     location.startsWith('/monitoring-kelas-app');
+  const isPWARoute = location.pathname.startsWith('/pengabsen-app') || 
+                     location.pathname.startsWith('/wali-app') || 
+                     location.pathname.startsWith('/pembimbing-app') ||
+                     location.pathname.startsWith('/pengabsen-kelas-app') ||
+                     location.pathname.startsWith('/monitoring-kelas-app');
   
   // If it's a PWA route, don't wrap with AuthProvider
   if (isPWARoute) {
