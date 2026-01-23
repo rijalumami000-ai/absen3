@@ -1001,6 +1001,9 @@ async def delete_santri(santri_id: str, _: dict = Depends(get_current_admin)):
     # Sync wali after deletion
     await sync_wali_santri()
     
+    # Also delete siswa_madrasah yang linked ke santri ini
+    await db.siswa_madrasah.delete_many({"santri_id": santri_id})
+    
     return {"message": "Santri berhasil dihapus"}
 
 # EXCEL IMPORT/EXPORT
