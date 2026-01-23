@@ -17,6 +17,10 @@ import Kelas from '@/pages/Kelas';
 import MadrasahDiniyah from '@/pages/MadrasahDiniyah';
 import PengabsenKelas from '@/pages/PengabsenKelas';
 import PembimbingKelas from '@/pages/PembimbingKelas';
+import PengabsenKelasAppLogin from '@/pages/PengabsenKelasAppLogin';
+import PengabsenKelasApp from '@/pages/PengabsenKelasApp';
+import MonitoringKelasAppLogin from '@/pages/MonitoringKelasAppLogin';
+import MonitoringKelasApp from '@/pages/MonitoringKelasApp';
 import PengabsenAppLogin from '@/pages/PengabsenAppLogin';
 import PengabsenApp from '@/pages/PengabsenApp';
 import { PengabsenAuthProvider, usePengabsenAuth } from '@/contexts/PengabsenAuthContext';
@@ -26,6 +30,8 @@ import { WaliAuthProvider, useWaliAuth } from '@/contexts/WaliAuthContext';
 import PembimbingAppLogin from '@/pages/PembimbingAppLogin';
 import PembimbingApp from '@/pages/PembimbingApp';
 import { PembimbingAuthProvider, usePembimbingAuth } from '@/contexts/PembimbingAuthContext';
+import { PengabsenKelasAuthProvider, usePengabsenKelasAuth } from '@/contexts/PengabsenKelasAuthContext';
+import { PembimbingKelasAuthProvider, usePembimbingKelasAuth } from '@/contexts/PembimbingKelasAuthContext';
 import '@/App.css';
 
 const ProtectedRoute = ({ children }) => {
@@ -118,6 +124,42 @@ const PembimbingProtectedRoute = ({ children }) => {
   return children;
 };
 
+const PengabsenKelasProtectedRoute = ({ children }) => {
+  const { user, loading } = usePengabsenKelasAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-gray-500">Memuat...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/pengabsen-kelas-app/login" replace />;
+  }
+
+  return children;
+};
+
+const PembimbingKelasProtectedRoute = ({ children }) => {
+  const { user, loading } = usePembimbingKelasAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-gray-500">Memuat...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/monitoring-kelas-app/login" replace />;
+  }
+
+  return children;
+};
+
 function AppRoutes() {
   return (
     <Routes>
@@ -181,6 +223,42 @@ function AppRoutes() {
               <PembimbingApp />
             </PembimbingProtectedRoute>
           </PembimbingAuthProvider>
+        }
+      />
+      <Route
+        path="/pengabsen-kelas-app/login"
+        element={
+          <PengabsenKelasAuthProvider>
+            <PengabsenKelasAppLogin />
+          </PengabsenKelasAuthProvider>
+        }
+      />
+      <Route
+        path="/pengabsen-kelas-app"
+        element={
+          <PengabsenKelasAuthProvider>
+            <PengabsenKelasProtectedRoute>
+              <PengabsenKelasApp />
+            </PengabsenKelasProtectedRoute>
+          </PengabsenKelasAuthProvider>
+        }
+      />
+      <Route
+        path="/monitoring-kelas-app/login"
+        element={
+          <PembimbingKelasAuthProvider>
+            <MonitoringKelasAppLogin />
+          </PembimbingKelasAuthProvider>
+        }
+      />
+      <Route
+        path="/monitoring-kelas-app"
+        element={
+          <PembimbingKelasAuthProvider>
+            <PembimbingKelasProtectedRoute>
+              <MonitoringKelasApp />
+            </PembimbingKelasProtectedRoute>
+          </PembimbingKelasAuthProvider>
         }
       />
       <Route
