@@ -163,14 +163,7 @@ const PembimbingKelasProtectedRoute = ({ children }) => {
 function AppRoutes() {
   return (
     <Routes>
-      <Route
-        path="/login"
-        element={
-          <PublicRoute>
-            <Login />
-          </PublicRoute>
-        }
-      />
+      {/* PWA Routes - PRIORITAS PERTAMA */}
       <Route
         path="/pengabsen-app/login"
         element={
@@ -259,6 +252,16 @@ function AppRoutes() {
               <MonitoringKelasApp />
             </PembimbingKelasProtectedRoute>
           </PembimbingKelasAuthProvider>
+        }
+      />
+      
+      {/* Admin Routes */}
+      <Route
+        path="/login"
+        element={
+          <PublicRoute>
+            <Login />
+          </PublicRoute>
         }
       />
       <Route
