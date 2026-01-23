@@ -168,7 +168,7 @@ const Pembimbing = () => {
     <div className="space-y-6" data-testid="pembimbing-admin-page">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Kelola Pembimbing</h1>
+          <h1 className="text-2xl font-bold text-gray-800 font-display">Kelola Monitoring Sholat</h1>
           <p className="text-gray-500 mt-1">Daftar pembimbing yang bertugas mengawasi santri</p>
         </div>
         <Button onClick={openAddDialog} data-testid="add-pembimbing-btn">
