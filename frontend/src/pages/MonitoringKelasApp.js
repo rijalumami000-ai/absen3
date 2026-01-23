@@ -79,6 +79,11 @@ const MonitoringKelasApp = () => {
         user.kelas_ids.includes(kelas.id)
       );
       setKelasList(accessibleKelas);
+      
+      // Auto-select first kelas if needed
+      if (accessibleKelas.length > 0 && !selectedKelas) {
+        setSelectedKelas(accessibleKelas[0].id);
+      }
     } catch (error) {
       console.error('Failed to load kelas list');
     }
