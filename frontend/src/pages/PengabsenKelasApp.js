@@ -255,7 +255,7 @@ const PengabsenKelasApp = () => {
                 </div>
               ) : (
                 <div>
-                  <div className="mb-4">
+                  <div className="mb-4 w-full">
                     <Scanner
                       onScan={(result) => {
                         if (result && result[0]) {
@@ -265,15 +265,6 @@ const PengabsenKelasApp = () => {
                       onError={(error) => console.log(error?.message)}
                       constraints={{
                         facingMode: 'environment'
-                      }}
-                      styles={{
-                        container: {
-                          width: '100%',
-                          paddingTop: '100%',
-                          position: 'relative',
-                          overflow: 'hidden',
-                          borderRadius: '12px'
-                        }
                       }}
                     />
                   </div>
