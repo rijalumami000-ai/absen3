@@ -13,6 +13,8 @@ import Pembimbing from '@/pages/Pembimbing';
 import Absensi from '@/pages/Absensi';
 import WaktuSholat from '@/pages/WaktuSholat';
 import Settings from '@/pages/Settings';
+import Kelas from '@/pages/Kelas';
+import MadrasahDiniyah from '@/pages/MadrasahDiniyah';
 import PengabsenAppLogin from '@/pages/PengabsenAppLogin';
 import PengabsenApp from '@/pages/PengabsenApp';
 import { PengabsenAuthProvider, usePengabsenAuth } from '@/contexts/PengabsenAuthContext';
@@ -240,6 +242,22 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <WaktuSholat />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/kelas"
+        element={
+          <ProtectedRoute>
+            <Kelas />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/madrasah-diniyah"
+        element={
+          <ProtectedRoute>
+            <MadrasahDiniyah />
           </ProtectedRoute>
         }
       />
