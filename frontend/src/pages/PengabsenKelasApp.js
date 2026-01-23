@@ -281,24 +281,41 @@ const PengabsenKelasApp = () => {
           /* Scan View */
           <div className="flex flex-col items-center justify-center py-12">
             <div className="bg-card rounded-2xl shadow-lg p-8 max-w-md w-full text-center">
-              <div className="w-32 h-32 mx-auto mb-6 bg-primary-100 rounded-full flex items-center justify-center">
-                <QrCode className="w-16 h-16 text-primary-700" />
-              </div>
-              <h2 className="text-2xl font-display font-bold mb-2">Scan QR Code</h2>
-              <p className="text-muted-foreground mb-6">
-                Scan QR code siswa untuk mencatat kehadiran hari ini
-              </p>
-              <Button
-                onClick={handleScanQR}
-                size="lg"
-                className="w-full"
-                disabled={scanning}
-              >
-                {scanning ? 'Memproses...' : 'Mulai Scan'}
-              </Button>
-              <p className="text-xs text-muted-foreground mt-4">
-                Pastikan kamera memiliki akses untuk scan QR
-              </p>
+              {!isScanning ? (
+                <>
+                  <div className="w-32 h-32 mx-auto mb-6 bg-primary-100 rounded-full flex items-center justify-center">
+                    <QrCode className="w-16 h-16 text-primary-700" />
+                  </div>
+                  <h2 className="text-2xl font-display font-bold mb-2">Scan QR Code</h2>
+                  <p className="text-muted-foreground mb-6">
+                    Scan QR code siswa untuk mencatat kehadiran hari ini
+                  </p>
+                  <Button
+                    onClick={handleScanQR}
+                    size="lg"
+                    className="w-full"
+                    disabled={scanning}
+                  >
+                    {scanning ? 'Memproses...' : 'Mulai Scan'}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <div id="qr-reader" className="w-full mb-4 rounded-lg overflow-hidden"></div>
+                  <Button
+                    onClick={handleScanQR}
+                    variant="outline"
+                    size="lg"
+                    className="w-full"
+                  >
+                    <X className="w-4 h-4 mr-2" />
+                    Batal
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-4">
+                    Arahkan kamera ke QR Code siswa
+                  </p>
+                </>
+              )}
             </div>
           </div>
         ) : (
