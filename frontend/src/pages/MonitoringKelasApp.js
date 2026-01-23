@@ -31,6 +31,7 @@ const MonitoringKelasApp = () => {
   const [view, setView] = useState('dashboard'); // 'dashboard' or 'history'
   const [stats, setStats] = useState(null);
   const [history, setHistory] = useState([]);
+  const [kelasList, setKelasList] = useState([]); // Add kelas list state
   const [selectedKelas, setSelectedKelas] = useState('');
   const [dateRange, setDateRange] = useState({
     start: new Date().toISOString().slice(0, 10),
@@ -42,6 +43,7 @@ const MonitoringKelasApp = () => {
     if (view === 'dashboard') {
       loadStatistik();
     }
+    loadKelasList(); // Load kelas list for both views
   }, [view]);
 
   useEffect(() => {
@@ -62,6 +64,23 @@ const MonitoringKelasApp = () => {
       toast.error('Gagal memuat statistik');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadKelasList = async () => {
+    try {
+      const token = localStorage.getItem('pembimbing_kelas_token');
+      const response = await axios.get(
+        `${API_URL}/api/kelas`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      // Filter only kelas that user has access to
+      const accessibleKelas = response.data.filter(kelas => 
+        user.kelas_ids.includes(kelas.id)
+      );
+      setKelasList(accessibleKelas);
+    } catch (error) {
+      console.error('Failed to load kelas list');
     }
   };
 
@@ -286,10 +305,9 @@ const MonitoringKelasApp = () => {
                       <SelectValue placeholder="Semua Kelas" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Semua Kelas</SelectItem>
-                      {stats?.per_kelas?.map(kelas => (
-                        <SelectItem key={kelas.kelas_id} value={kelas.kelas_id}>
-                          {kelas.kelas_nama}
+                      {kelasList.map(kelas => (
+                        <SelectItem key={kelas.id} value={kelas.id}>
+                          {kelas.nama}
                         </SelectItem>
                       ))}
                     </SelectContent>
