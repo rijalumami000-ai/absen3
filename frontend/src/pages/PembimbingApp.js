@@ -484,13 +484,51 @@ const PembimbingApp = () => {
 
             <div className="bg-white rounded-lg shadow p-4">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold text-gray-700">
-                  Daftar Absensi Santri Hari Ini
-                </h3>
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-700">
+                    Daftar Absensi Santri Hari Ini
+                  </h3>
+                  {selectedStatWaktu && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Difilter berdasarkan waktu sholat{' '}
+                      {waktuLabels.find((w) => w.key === selectedStatWaktu)?.label}
+                    </p>
+                  )}
+                </div>
                 <Button variant="outline" size="sm" onClick={loadTodayData} disabled={loadingData}>
                   {loadingData ? 'Memuat...' : 'Refresh'}
                 </Button>
               </div>
+
+              {/* Search & Status Filter */}
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3">
+                <div className="relative flex-1">
+                  <input
+                    type="text"
+                    value={todaySearch}
+                    onChange={(e) => setTodaySearch(e.target.value)}
+                    placeholder="Cari nama / NIS / asrama..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                  />
+                </div>
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="text-gray-600">Status:</span>
+                  <select
+                    value={todayStatus}
+                    onChange={(e) => setTodayStatus(e.target.value)}
+                    className="px-2 py-1.5 border border-gray-300 rounded-lg text-xs bg-white"
+                  >
+                    <option value="all">Semua</option>
+                    <option value="hadir">Hadir</option>
+                    <option value="alfa">Alfa</option>
+                    <option value="sakit">Sakit</option>
+                    <option value="izin">Izin</option>
+                    <option value="haid">Haid</option>
+                    <option value="istihadhoh">Istihadhoh</option>
+                  </select>
+                </div>
+              </div>
+
               {loadingData ? (
                 <div className="py-4 text-sm text-gray-500">Memuat data...</div>
               ) : (
