@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 // Function to download Pengabsen Sholat as PDF
 export const downloadPengabsenPDF = (pengabsenList, asramaList) => {
@@ -35,7 +35,7 @@ export const downloadPengabsenPDF = (pengabsenList, asramaList) => {
   ]);
   
   // Generate table
-  doc.autoTable({
+  autoTable(doc, {
     startY: 35,
     head: [['No', 'Nama', 'Username', 'Kode Akses', 'Kontak', 'Asrama']],
     body: tableData,
