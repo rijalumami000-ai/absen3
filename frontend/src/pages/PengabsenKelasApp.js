@@ -26,6 +26,14 @@ import {
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
+const getTodayLocalYMD = () => {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+};
+
 const PengabsenKelasApp = () => {
   const { user, logout } = usePengabsenKelasAuth();
   const { appSettings } = useAppSettings();
@@ -34,7 +42,10 @@ const PengabsenKelasApp = () => {
   const [kelasList, setKelasList] = useState([]);
   const [selectedKelas, setSelectedKelas] = useState('');
   const [gridData, setGridData] = useState([]);
-  const [currentMonth, setCurrentMonth] = useState(new Date().toISOString().slice(0, 7)); // YYYY-MM
+  const [currentMonth, setCurrentMonth] = useState(() => {
+    const today = getTodayLocalYMD();
+    return today.slice(0, 7); // YYYY-MM
+  });
   const [scanning, setScanning] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [scanSuccess, setScanSuccess] = useState(false);
