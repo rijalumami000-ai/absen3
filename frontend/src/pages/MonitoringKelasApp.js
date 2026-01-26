@@ -97,7 +97,7 @@ const MonitoringKelasApp = () => {
         tanggal_end: dateRange.end
       });
       
-      if (selectedKelas) {
+      if (selectedKelas && selectedKelas !== 'all') {
         params.append('kelas_id', selectedKelas);
       }
 
