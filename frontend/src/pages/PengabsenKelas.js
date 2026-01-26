@@ -148,7 +148,7 @@ const PengabsenKelas = () => {
         <div className="flex gap-2">
           <Button 
             variant="outline" 
-            onClick={() => downloadPengabsenKelasPDF(pengabsen, kelas)}
+            onClick={() => downloadPengabsenKelasPDF(pengabsenList, kelasList)}
             className="hover-lift transition-smooth active-scale"
           >
             <FileDown className="w-4 h-4 mr-2" />
