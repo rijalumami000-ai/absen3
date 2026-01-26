@@ -101,9 +101,9 @@ const PengabsenKelasApp = () => {
 
   const handleScanQR = async (result) => {
     if (scanning) return; // Prevent double scan
-    
+
     setScanning(true);
-    
+
     try {
       let parsedData;
       try {
@@ -119,9 +119,11 @@ const PengabsenKelasApp = () => {
         parsedData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      
+
       toast.success(response.data.message || 'Absensi berhasil dicatat');
-      
+      setScanSuccess(true);
+      setTimeout(() => setScanSuccess(false), 1200);
+
       // Stop scanning after success
       setIsScanning(false);
     } catch (error) {
