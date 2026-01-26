@@ -184,6 +184,10 @@ const PengabsenKelasApp = () => {
       loadGridData();
     } catch (error) {
       toast.error('Gagal mencatat absensi');
+    } finally {
+      // Setelah absensi manual berhasil/gagal, muat ulang grid dan status manual dari server
+      loadGridData();
+      loadManualStudents();
     }
   };
 
