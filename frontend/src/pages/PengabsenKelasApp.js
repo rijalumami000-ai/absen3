@@ -111,7 +111,7 @@ const PengabsenKelasApp = () => {
       let parsedData;
       try {
         parsedData = JSON.parse(result);
-      } catch {
+      } catch (error) {
         // If not JSON, assume it's just an ID
         parsedData = { id: result, type: 'santri' };
       }
