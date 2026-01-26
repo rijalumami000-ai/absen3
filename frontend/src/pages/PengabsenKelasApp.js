@@ -389,6 +389,7 @@ const PengabsenKelasApp = () => {
             </div>
           </div>
           </div>
+          </>
         ) : (
           /* Grid View */
           <div className="space-y-4">
