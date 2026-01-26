@@ -254,24 +254,69 @@ const Layout = ({ children }) => {
 
         <nav className="p-4 overflow-y-auto h-[calc(100%-180px)]">
           <ul className="space-y-1">
-            {menuItems.map((item) => {
-              const isActive = location.pathname === item.path;
-              return (
-                <li key={item.path}>
-                  <Link
-                    to={item.path}
-                    onClick={() => setSidebarOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                      isActive
-                        ? 'bg-primary-700 text-white'
-                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                    }`}
-                  >
-                    <item.icon className="w-5 h-5" />
-                    <span>{item.label}</span>
-                  </Link>
-                </li>
-              );
+            {menuStructure.map((menu) => {
+              if (menu.type === 'single') {
+                const isActive = location.pathname === menu.path;
+                return (
+                  <li key={menu.id}>
+                    <Link
+                      to={menu.path}
+                      onClick={() => setSidebarOpen(false)}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                        isActive
+                          ? 'bg-primary-700 text-white'
+                          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                      }`}
+                    >
+                      <menu.icon className="w-5 h-5" />
+                      <span>{menu.label}</span>
+                    </Link>
+                  </li>
+                );
+              } else if (menu.type === 'group') {
+                const isOpen = openMenus[menu.id];
+                const hasActiveChild = menu.items.some(item => location.pathname === item.path);
+                return (
+                  <li key={menu.id}>
+                    <button
+                      onClick={() => toggleMenu(menu.id)}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                        hasActiveChild
+                          ? 'bg-primary-100 text-primary-700'
+                          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                      }`}
+                    >
+                      <menu.icon className="w-5 h-5" />
+                      <span className="flex-1 text-left">{menu.label}</span>
+                      <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    {isOpen && (
+                      <ul className="mt-1 ml-4 space-y-1">
+                        {menu.items.map((item) => {
+                          const isActive = location.pathname === item.path;
+                          return (
+                            <li key={item.path}>
+                              <Link
+                                to={item.path}
+                                onClick={() => setSidebarOpen(false)}
+                                className={`flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                                  isActive
+                                    ? 'bg-primary-700 text-white'
+                                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                                }`}
+                              >
+                                <item.icon className="w-4 h-4" />
+                                <span>{item.label}</span>
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
+                  </li>
+                );
+              }
+              return null;
             })}
           </ul>
         </nav>
