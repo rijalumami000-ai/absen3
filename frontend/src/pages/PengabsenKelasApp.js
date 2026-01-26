@@ -297,9 +297,14 @@ const PengabsenKelasApp = () => {
                       }}
                       onError={(error) => console.log(error?.message)}
                       constraints={{
-                        facingMode: 'environment'
+                        facingMode: 'environment',
                       }}
                     />
+                    {scanSuccess && (
+                      <div className="mt-3 text-center text-sm font-semibold text-emerald-600">
+                        Scan berhasil!
+                      </div>
+                    )}
                   </div>
                   <Button
                     onClick={() => setIsScanning(false)}
