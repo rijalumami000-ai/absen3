@@ -80,10 +80,23 @@ const PengabsenKelasApp = () => {
   const loadManualStudents = async () => {
     try {
       const token = localStorage.getItem('pengabsen_kelas_token');
-      const response = await axios.get(`${API_URL}/api/pengabsen-kelas/siswa-saya`, {
+      const siswaResp = await axios.get(`${API_URL}/api/pengabsen-kelas/siswa-saya`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setManualStudents(response.data || []);
+      setManualStudents(siswaResp.data || []);
+
+      // Ambil status absensi hari ini supaya dropdown manual tetap sinkron setelah refresh
+      const today = new Date().toISOString().slice(0, 10);
+      const riwayatResp = await axios.get(
+        `${API_URL}/api/absensi-kelas/riwayat?tanggal_start=${today}&tanggal_end=${today}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      const map = {};
+      (riwayatResp.data || []).forEach((item) => {
+        map[item.siswa_id] = item.status;
+      });
+      setManualStatusMap(map);
     } catch (error) {
       toast.error('Gagal memuat daftar siswa');
     }
