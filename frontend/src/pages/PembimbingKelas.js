@@ -161,8 +161,8 @@ const PembimbingKelas = () => {
                 Tambah Monitoring Kelas
               </Button>
             </DialogTrigger>
-          <DialogContent className="max-w-md animate-scale-in">
-            <DialogHeader>
+            <DialogContent className="max-w-md animate-scale-in">
+              <DialogHeader>
               <DialogTitle className="font-display">Tambah Monitoring Kelas</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
