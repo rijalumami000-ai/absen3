@@ -66,6 +66,13 @@ const PengabsenKelasApp = () => {
 
       // Auto-select first kelas if not selected yet
       if (accessibleKelas.length > 0 && !selectedKelas) {
+        setSelectedKelas(accessibleKelas[0].id);
+      }
+    } catch (error) {
+      toast.error('Gagal memuat data kelas');
+    }
+  };
+
   const loadManualStudents = async () => {
     try {
       const token = localStorage.getItem('pengabsen_kelas_token');
@@ -75,14 +82,6 @@ const PengabsenKelasApp = () => {
       setManualStudents(response.data || []);
     } catch (error) {
       toast.error('Gagal memuat daftar siswa');
-    }
-  };
-
-
-        setSelectedKelas(accessibleKelas[0].id);
-      }
-    } catch (error) {
-      toast.error('Gagal memuat data kelas');
     }
   };
 
