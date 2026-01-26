@@ -347,7 +347,7 @@ const MadrasahDiniyah = () => {
               <SelectValue placeholder="Semua Kelas" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Semua Kelas</SelectItem>
+              <SelectItem value="all">Semua Kelas</SelectItem>
               {kelasList.map((kelas) => (
                 <SelectItem key={kelas.id} value={kelas.id}>
                   {kelas.nama}
