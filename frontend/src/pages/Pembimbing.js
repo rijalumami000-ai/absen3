@@ -218,14 +218,14 @@ const Pembimbing = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {pembimbing.length === 0 ? (
+              {filteredPembimbing.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
-                    Belum ada data pembimbing
+                    {searchQuery ? 'Tidak ada hasil pencarian' : 'Belum ada data pembimbing'}
                   </td>
                 </tr>
               ) : (
-                pembimbing.map((p) => (
+                filteredPembimbing.map((p) => (
                   <tr key={p.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3">
                       <div className="font-medium text-gray-900">{p.nama}</div>
