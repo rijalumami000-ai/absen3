@@ -234,7 +234,7 @@ const WaliApp = () => {
             </svg>
           </div>
           <div>
-            <h1 className="font-display text-lg font-bold text-foreground">Wali Santri Ponpes Al-Hamid</h1>
+            <h1 className="font-display text-lg font-bold text-foreground">{appSettings.wali_title || 'Wali Santri Ponpes Al-Hamid'}</h1>
             <p className="text-xs text-muted-foreground">{user.nama}</p>
           </div>
         </div>
