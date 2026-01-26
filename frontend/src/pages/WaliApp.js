@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWaliAuth } from '@/contexts/WaliAuthContext';
+import { useAppSettings } from '@/contexts/AppSettingsContext';
 import { waliAppAPI } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -8,6 +9,7 @@ import { requestNotificationPermission, onMessageListener } from '@/firebase';
 
 const WaliApp = () => {
   const { user, loading, logout } = useWaliAuth();
+  const { appSettings } = useAppSettings();
   const [todayData, setTodayData] = useState(null);
   const [notificationStatus, setNotificationStatus] = useState('unknown');
   const [activeTab, setActiveTab] = useState('sholat'); // 'sholat' or 'kelas'
