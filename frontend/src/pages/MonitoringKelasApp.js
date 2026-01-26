@@ -111,6 +111,13 @@ const MonitoringKelasApp = () => {
       const response = await axios.get(
         `${API_URL}/api/pembimbing-kelas/absensi-riwayat?${params}`,
         { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setHistory(response.data);
+    } catch (error) {
+      toast.error('Gagal memuat riwayat');
+    }
+  };
+
   const loadKelasDetail = async (kelasId, kelasNama) => {
     try {
       setLoadingDetail(true);
