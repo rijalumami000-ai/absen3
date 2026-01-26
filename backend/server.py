@@ -3109,6 +3109,7 @@ async def create_absensi_kelas_manual(
     # Check if already exists
     existing = await db.absensi_kelas.find_one({
         "siswa_id": data.siswa_id,
+        "kelas_id": data.kelas_id,
         "tanggal": data.tanggal
     }, {"_id": 0})
     
