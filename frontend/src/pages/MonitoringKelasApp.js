@@ -145,14 +145,6 @@ const MonitoringKelasApp = () => {
     }
   };
 
-
-      );
-      setHistory(response.data);
-    } catch (error) {
-      toast.error('Gagal memuat riwayat');
-    }
-  };
-
   const handleLogout = () => {
     logout();
     navigate('/monitoring-kelas-app/login');
