@@ -185,7 +185,7 @@ const PengabsenApp = () => {
     </div>
   );
 
-  const groupedByAsrama = data.reduce((acc, row) => {
+  const groupedByAsrama = filteredData.reduce((acc, row) => {
     const key = row.asrama_id || 'tanpa-asrama';
     if (!acc[key]) {
       acc[key] = {
