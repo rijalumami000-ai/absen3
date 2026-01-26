@@ -334,7 +334,7 @@ const Santri = () => {
     <div data-testid="santri-page" className="animate-fade-in">
       <div className="flex justify-between items-center mb-6 animate-slide-in-left">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800 font-display">Kelola Santri</h1>
+          <h1 className="text-3xl font-bold text-gray-800 font-display">Kelola Database Santri/Siswa</h1>
           <p className="text-gray-600 mt-1">Manajemen data santri dan QR code</p>
         </div>
         <div className="flex gap-2 animate-slide-in-right">

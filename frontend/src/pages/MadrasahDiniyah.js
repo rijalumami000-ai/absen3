@@ -191,7 +191,7 @@ const MadrasahDiniyah = () => {
       {/* Header */}
       <div className="flex justify-between items-center animate-slide-in-left">
         <div>
-          <h1 className="text-3xl font-display font-bold text-foreground">Madrasah Diniyah</h1>
+          <h1 className="text-3xl font-display font-bold text-foreground">Siswa Madin</h1>
           <p className="text-muted-foreground mt-1">Kelola siswa Madrasah Diniyah</p>
         </div>
         <div className="flex gap-2 animate-slide-in-right">

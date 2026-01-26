@@ -141,7 +141,7 @@ const PengabsenKelas = () => {
       {/* Header */}
       <div className="flex justify-between items-center animate-slide-in-left">
         <div>
-          <h1 className="text-3xl font-display font-bold text-foreground">Pengabsen Kelas</h1>
+          <h1 className="text-3xl font-display font-bold text-foreground">Pengabsen Kelas Madin</h1>
           <p className="text-muted-foreground mt-1">Kelola pengabsen untuk Madrasah Diniyah</p>
         </div>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
