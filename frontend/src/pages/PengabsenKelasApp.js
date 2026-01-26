@@ -455,16 +455,17 @@ const PengabsenKelasApp = () => {
                                 if (abs.absensi_id) {
                                   updateAbsensiStatus(abs.absensi_id, newStatus);
                                 } else {
-                                  createManualAbsensi(siswa.siswa_id, abs.tanggal, newStatus);
+                                  createManualAbsensi(siswa.siswa_id, siswa.kelas_id, abs.tanggal, newStatus);
                                 }
                               }}
                               className="w-full bg-transparent border-none text-xs cursor-pointer"
                             >
                               <option value="">-</option>
-                              <option value="hadir">✓</option>
-                              <option value="alfa">✗</option>
-                              <option value="izin">I</option>
-                              <option value="sakit">S</option>
+                              <option value="hadir"></option>
+                              <option value="alfa">a</option>
+                              <option value="izin">i</option>
+                              <option value="sakit">s</option>
+                              <option value="telat">t</option>
                             </select>
                           </td>
                         ))}
