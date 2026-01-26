@@ -7,16 +7,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { ClipboardList, Users, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 
+const getTodayLocalYMD = () => {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+};
+
 const Absensi = () => {
   const [detailData, setDetailData] = useState(null);
   const [asramaList, setAsramaList] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filterTanggal, setFilterTanggal] = useState(new Date().toISOString().split('T')[0]);
+  const [filterTanggal, setFilterTanggal] = useState(getTodayLocalYMD());
   const [filterAsrama, setFilterAsrama] = useState('');
   const [filterGender, setFilterGender] = useState('');
   const [filterPeriode, setFilterPeriode] = useState('hari');
-  const [tanggalStart, setTanggalStart] = useState(new Date().toISOString().split('T')[0]);
-  const [tanggalEnd, setTanggalEnd] = useState(new Date().toISOString().split('T')[0]);
+  const [tanggalStart, setTanggalStart] = useState(getTodayLocalYMD());
+  const [tanggalEnd, setTanggalEnd] = useState(getTodayLocalYMD());
   const { toast } = useToast();
 
   useEffect(() => {
