@@ -388,7 +388,7 @@ const PengabsenKelasApp = () => {
               )}
             </div>
           </div>
-          </>
+          </React.Fragment>
         ) : (
           /* Grid View */
           <div className="space-y-4">
