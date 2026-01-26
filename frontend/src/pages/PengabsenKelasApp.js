@@ -41,6 +41,10 @@ const PengabsenKelasApp = () => {
   const [manualStudents, setManualStudents] = useState([]);
   const [manualSearch, setManualSearch] = useState('');
   const [manualStatusMap, setManualStatusMap] = useState({});
+  const firstHalfDays = Array.from({ length: 15 }, (_, i) => i + 1);
+  const secondHalfDays = Array.from({ length: 16 }, (_, i) => i + 16);
+
+
 
   useEffect(() => {
     loadKelas();
@@ -199,6 +203,8 @@ const PengabsenKelasApp = () => {
         return 'bg-blue-100';
       case 'sakit':
         return 'bg-orange-100';
+      case 'telat':
+        return 'bg-yellow-100';
       default:
         return 'bg-gray-50';
     }

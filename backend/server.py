@@ -408,7 +408,7 @@ class AbsensiKelas(BaseModel):
     siswa_id: str
     kelas_id: str
     tanggal: str  # YYYY-MM-DD
-    status: Literal["hadir", "alfa", "izin", "sakit", "telat"]
+    status: Literal["hadir", "alfa", "izin", "sakit", "telat"]  # a: alfa, i: izin, s: sakit, t: telat
     waktu_absen: Optional[datetime] = None
     pengabsen_kelas_id: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
