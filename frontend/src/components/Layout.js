@@ -114,25 +114,69 @@ const Layout = ({ children }) => {
         {/* Navigation */}
         <nav className="flex-1 p-4 overflow-y-auto">
           <ul className="space-y-1">
-            {menuItems.map((item, index) => {
-              const isActive = location.pathname === item.path;
-              return (
-                <li key={item.path} className="animate-fade-in" style={{ animationDelay: `${index * 30}ms` }}>
-                  <Link
-                    to={item.path}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 group relative overflow-hidden hover-lift ${
-                      isActive
-                        ? 'bg-primary-700 text-white shadow-lg'
-                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                    }`}
-                  >
-                    {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary-500 rounded-r-full animate-scale-in" />}
-                    <item.icon className={`w-5 h-5 transition-transform duration-200 ${isActive ? 'text-white scale-110' : 'text-muted-foreground group-hover:text-foreground group-hover:scale-110'}`} />
-                    <span className="flex-1">{item.label}</span>
-                    {isActive && <ChevronRight className="w-4 h-4 animate-slide-in-right" />}
-                  </Link>
-                </li>
-              );
+            {menuStructure.map((menu, index) => {
+              if (menu.type === 'single') {
+                const isActive = location.pathname === menu.path;
+                return (
+                  <li key={menu.id} className="animate-fade-in" style={{ animationDelay: `${index * 30}ms` }}>
+                    <Link
+                      to={menu.path}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 group relative overflow-hidden hover-lift ${
+                        isActive
+                          ? 'bg-primary-700 text-white shadow-lg'
+                          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                      }`}
+                    >
+                      {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary-500 rounded-r-full animate-scale-in" />}
+                      <menu.icon className={`w-5 h-5 transition-transform duration-200 ${isActive ? 'text-white scale-110' : 'text-muted-foreground group-hover:text-foreground group-hover:scale-110'}`} />
+                      <span className="flex-1">{menu.label}</span>
+                      {isActive && <ChevronRight className="w-4 h-4 animate-slide-in-right" />}
+                    </Link>
+                  </li>
+                );
+              } else if (menu.type === 'group') {
+                const isOpen = openMenus[menu.id];
+                const hasActiveChild = menu.items.some(item => location.pathname === item.path);
+                return (
+                  <li key={menu.id} className="animate-fade-in" style={{ animationDelay: `${index * 30}ms` }}>
+                    <button
+                      onClick={() => toggleMenu(menu.id)}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 hover-lift ${
+                        hasActiveChild
+                          ? 'bg-primary-100 text-primary-700'
+                          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                      }`}
+                    >
+                      <menu.icon className="w-5 h-5" />
+                      <span className="flex-1 text-left">{menu.label}</span>
+                      <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    {isOpen && (
+                      <ul className="mt-1 ml-4 space-y-1 animate-scale-in">
+                        {menu.items.map((item) => {
+                          const isActive = location.pathname === item.path;
+                          return (
+                            <li key={item.path}>
+                              <Link
+                                to={item.path}
+                                className={`flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                                  isActive
+                                    ? 'bg-primary-700 text-white shadow-md'
+                                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                                }`}
+                              >
+                                <item.icon className="w-4 h-4" />
+                                <span className="flex-1">{item.label}</span>
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
+                  </li>
+                );
+              }
+              return null;
             })}
           </ul>
         </nav>
