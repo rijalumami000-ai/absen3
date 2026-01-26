@@ -2828,6 +2828,15 @@ async def update_siswa_madrasah(siswa_id: str, data: SiswaMadrasahUpdate, _: dic
     if updated_siswa.get("kelas_id"):
         kelas = await db.kelas.find_one({"id": updated_siswa["kelas_id"]}, {"_id": 0})
         kelas_nama = kelas["nama"] if kelas else None
+    
+    has_qr = bool(updated_siswa.get("santri_id") or updated_siswa.get("qr_code"))
+    
+    if isinstance(updated_siswa.get('created_at'), str):
+        updated_siswa['created_at'] = datetime.fromisoformat(updated_siswa['created_at'])
+    if isinstance(updated_siswa.get('updated_at'), str):
+        updated_siswa['updated_at'] = datetime.fromisoformat(updated_siswa['updated_at'])
+    
+    return SiswaMadrasahResponse(**updated_siswa, kelas_nama=kelas_nama, has_qr=has_qr)
 
 @api_router.get("/pengabsen-kelas/siswa-saya")
 async def get_pengabsen_kelas_siswa_saya(current_pengabsen: dict = Depends(get_current_pengabsen_kelas)):
