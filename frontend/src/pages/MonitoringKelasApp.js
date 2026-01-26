@@ -35,6 +35,11 @@ const MonitoringKelasApp = () => {
   const [history, setHistory] = useState([]);
   const [kelasList, setKelasList] = useState([]); // Add kelas list state
   const [selectedKelas, setSelectedKelas] = useState('');
+  const [selectedKelasDetail, setSelectedKelasDetail] = useState(null); // { id, nama }
+  const [kelasDetailData, setKelasDetailData] = useState([]);
+  const [kelasDetailSearch, setKelasDetailSearch] = useState('');
+  const [kelasDetailStatus, setKelasDetailStatus] = useState('all');
+  const [loadingDetail, setLoadingDetail] = useState(false);
   const [dateRange, setDateRange] = useState({
     start: new Date().toISOString().slice(0, 10),
     end: new Date().toISOString().slice(0, 10)
@@ -106,6 +111,34 @@ const MonitoringKelasApp = () => {
       const response = await axios.get(
         `${API_URL}/api/pembimbing-kelas/absensi-riwayat?${params}`,
         { headers: { Authorization: `Bearer ${token}` } }
+  const loadKelasDetail = async (kelasId, kelasNama) => {
+    try {
+      setLoadingDetail(true);
+      setSelectedKelasDetail({ id: kelasId, nama: kelasNama });
+      setKelasDetailSearch('');
+      setKelasDetailStatus('all');
+
+      const token = localStorage.getItem('pembimbing_kelas_token');
+      const today = new Date().toISOString().slice(0, 10);
+      const params = new URLSearchParams({
+        tanggal_start: today,
+        tanggal_end: today,
+        kelas_id: kelasId,
+      });
+
+      const response = await axios.get(
+        `${API_URL}/api/pembimbing-kelas/absensi-riwayat?${params.toString()}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setKelasDetailData(response.data || []);
+    } catch (error) {
+      toast.error('Gagal memuat detail kelas');
+    } finally {
+      setLoadingDetail(false);
+    }
+  };
+
+
       );
       setHistory(response.data);
     } catch (error) {
@@ -123,7 +156,8 @@ const MonitoringKelasApp = () => {
       hadir: { icon: CheckCircle, color: 'text-green-600 bg-green-100', label: 'Hadir' },
       alfa: { icon: XCircle, color: 'text-red-600 bg-red-100', label: 'Alfa' },
       izin: { icon: AlertCircle, color: 'text-blue-600 bg-blue-100', label: 'Izin' },
-      sakit: { icon: Heart, color: 'text-orange-600 bg-orange-100', label: 'Sakit' }
+      sakit: { icon: Heart, color: 'text-orange-600 bg-orange-100', label: 'Sakit' },
+      telat: { icon: AlertCircle, color: 'text-yellow-600 bg-yellow-100', label: 'Telat' },
     };
     
     const config = configs[status] || configs.hadir;
