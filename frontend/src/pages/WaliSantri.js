@@ -106,15 +106,41 @@ const WaliSantri = () => {
     }
   };
 
+  // Filter wali by search query
+  const filteredWaliList = waliList.filter((wali) => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return wali.nama?.toLowerCase().includes(query) ||
+           wali.username?.toLowerCase().includes(query) ||
+           wali.nomor_hp?.toLowerCase().includes(query) ||
+           wali.nama_anak?.some(nama => nama?.toLowerCase().includes(query));
+  });
+
   if (loading) return <div className="flex justify-center p-8">Memuat data...</div>;
 
   return (
-    <div data-testid="wali-page">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Kelola Wali Santri</h1>
+    <div data-testid="wali-page" className="animate-fade-in">
+      <div className="mb-6 animate-slide-in-left">
+        <h1 className="text-3xl font-bold text-gray-800 font-display">Kelola Wali Santri</h1>
         <p className="text-gray-600 mt-1">Data wali santri (otomatis dari data santri)</p>
         <p className="text-sm text-amber-600 mt-2">⚠️ Data wali tidak bisa dihapus. Untuk mengubah data, edit dari menu Santri.</p>
       </div>
+
+      {/* Search Box */}
+      <Card className="mb-6 shadow-card animate-scale-in">
+        <CardContent className="p-4">
+          <Label>Cari Wali / Santri / No HP</Label>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              placeholder="Cari wali santri..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="bg-white rounded-lg shadow overflow-x-auto">
         <table className="w-full">
@@ -130,7 +156,7 @@ const WaliSantri = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {waliList.map((wali) => (
+            {filteredWaliList.map((wali) => (
               <tr key={wali.id} data-testid={`wali-row-${wali.id}`}>
                 <td className="px-6 py-4">
                   <div className="flex items-center">
