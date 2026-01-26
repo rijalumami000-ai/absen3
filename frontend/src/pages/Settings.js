@@ -81,9 +81,13 @@ const Settings = () => {
     try {
       setSavingAppSettings(true);
       await settingsAPI.updateAppSettings(appSettings);
+      
+      // Reload settings after save
+      await loadAppSettings();
+      
       toast({
         title: 'Berhasil',
-        description: 'Pengaturan judul aplikasi berhasil disimpan',
+        description: 'Pengaturan judul aplikasi berhasil disimpan. Refresh halaman PWA untuk melihat perubahan.',
       });
     } catch (error) {
       toast({
