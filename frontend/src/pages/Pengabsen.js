@@ -22,9 +22,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { RefreshCw, Copy, Check, Plus, Pencil, Trash2, UserCheck, Search } from 'lucide-react';
+import { RefreshCw, Copy, Check, Plus, Pencil, Trash2, UserCheck, Search, FileDown } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { downloadPengabsenPDF } from '@/lib/pdfUtils';
 
 const Pengabsen = () => {
   const [pengabsen, setPengabsen] = useState([]);
@@ -187,10 +188,20 @@ const Pengabsen = () => {
           <h1 className="text-2xl font-bold text-gray-800 font-display">Kelola Pengabsen Sholat</h1>
           <p className="text-gray-500 mt-1">Daftar pengabsen yang bertugas mencatat absensi santri</p>
         </div>
-        <Button onClick={openAddDialog} data-testid="add-pengabsen-btn" className="btn-ripple active-scale shadow-card hover:shadow-card-hover transition-smooth">
-          <Plus className="w-4 h-4 mr-2" />
-          Tambah Pengabsen
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            onClick={() => downloadPengabsenPDF(filteredPengabsen, asrama)}
+            className="hover-lift transition-smooth active-scale"
+          >
+            <FileDown className="w-4 h-4 mr-2" />
+            Download PDF
+          </Button>
+          <Button onClick={openAddDialog} data-testid="add-pengabsen-btn" className="btn-ripple active-scale shadow-card hover:shadow-card-hover transition-smooth">
+            <Plus className="w-4 h-4 mr-2" />
+            Tambah Pengabsen
+          </Button>
+        </div>
       </div>
 
       {/* Search Box */}
