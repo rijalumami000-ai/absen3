@@ -4,8 +4,6 @@ import autoTable from 'jspdf-autotable';
 // Function to download Pengabsen Sholat as PDF
 export const downloadPengabsenPDF = (pengabsenList, asramaList) => {
   try {
-    console.log('downloadPengabsenPDF called', { pengabsenList, asramaList });
-    
     const doc = new jsPDF();
     
     // Title
@@ -37,8 +35,6 @@ export const downloadPengabsenPDF = (pengabsenList, asramaList) => {
       getAsramaNames(p.asrama_ids)
     ]);
     
-    console.log('Table data prepared', tableData);
-    
     // Generate table
     autoTable(doc, {
       startY: 35,
@@ -54,12 +50,8 @@ export const downloadPengabsenPDF = (pengabsenList, asramaList) => {
       }
     });
     
-    console.log('AutoTable generated, saving PDF...');
-    
     // Save PDF
     doc.save(`Pengabsen_Sholat_${new Date().getTime()}.pdf`);
-    
-    console.log('PDF saved successfully');
   } catch (error) {
     console.error('Error generating PDF:', error);
     alert('Gagal membuat PDF: ' + error.message);
