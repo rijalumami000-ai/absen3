@@ -378,8 +378,10 @@ function AppRoutes() {
 function App() {
   return (
     <BrowserRouter>
-      <AppContent />
-      <Toaster />
+      <AppSettingsProvider>
+        <AppContent />
+        <Toaster />
+      </AppSettingsProvider>
     </BrowserRouter>
   );
 }
