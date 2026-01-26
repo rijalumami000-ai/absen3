@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, QrCode, Search, Link, UserPlus, Users } from 'lucide-react';
+import { Plus, Edit2, Trash2, QrCode, Search, Link, UserPlus, Users, FileDown } from 'lucide-react';
+import { downloadSiswaMadinPDF } from '@/lib/pdfUtils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -195,6 +196,14 @@ const MadrasahDiniyah = () => {
           <p className="text-muted-foreground mt-1">Kelola siswa Madrasah Diniyah</p>
         </div>
         <div className="flex gap-2 animate-slide-in-right">
+          <Button 
+            variant="outline" 
+            onClick={() => downloadSiswaMadinPDF(siswa, kelas)}
+            className="hover-lift transition-smooth active-scale"
+          >
+            <FileDown className="w-4 h-4 mr-2" />
+            Download PDF
+          </Button>
           <Dialog open={isLinkSantriOpen} onOpenChange={setIsLinkSantriOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" onClick={openLinkSantriDialog}>
