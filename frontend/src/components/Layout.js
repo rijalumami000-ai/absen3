@@ -16,10 +16,12 @@ import {
   X,
   Settings,
   ChevronRight,
+  ChevronDown,
   BookOpen,
   GraduationCap,
   ClipboardCheck,
-  Eye
+  Eye,
+  Database
 } from 'lucide-react';
 
 const Layout = ({ children }) => {
@@ -27,21 +29,62 @@ const Layout = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [openMenus, setOpenMenus] = useState({});
 
-  const menuItems = [
-    { path: '/dashboard', icon: Home, label: 'Dashboard' },
-    { path: '/asrama', icon: Building, label: 'Asrama Santri' },
-    { path: '/santri', icon: Users, label: 'Santri' },
-    { path: '/wali', icon: UserCircle, label: 'Wali Santri' },
-    { path: '/pengabsen', icon: UserCheck, label: 'Pengabsen Sholat' },
-    { path: '/pembimbing', icon: UserCog, label: 'Monitoring Sholat' },
-    { path: '/absensi', icon: ClipboardList, label: 'Riwayat Absensi Sholat' },
-    { path: '/waktu-sholat', icon: Clock, label: 'Waktu Sholat' },
-    { path: '/kelas', icon: GraduationCap, label: 'Kelas Madrasah Diniyah' },
-    { path: '/madrasah-diniyah', icon: BookOpen, label: 'Madrasah Diniyah' },
-    { path: '/pengabsen-kelas', icon: ClipboardCheck, label: 'Pengabsen Kelas' },
-    { path: '/monitoring-kelas', icon: Eye, label: 'Monitoring Kelas' },
-    { path: '/settings', icon: Settings, label: 'Pengaturan' },
+  const toggleMenu = (menuId) => {
+    setOpenMenus(prev => ({ ...prev, [menuId]: !prev[menuId] }));
+  };
+
+  const menuStructure = [
+    { 
+      id: 'dashboard',
+      type: 'single', 
+      path: '/dashboard', 
+      icon: Home, 
+      label: 'Dashboard' 
+    },
+    {
+      id: 'setting-pesantren',
+      type: 'group',
+      icon: Building,
+      label: 'Setting Pesantren',
+      items: [
+        { path: '/santri', icon: Database, label: 'Database Santri/Siswa' },
+        { path: '/asrama', icon: Building, label: 'Asrama Santri' },
+        { path: '/wali', icon: UserCircle, label: 'Wali Santri' },
+      ]
+    },
+    {
+      id: 'absensi-pesantren',
+      type: 'group',
+      icon: ClipboardList,
+      label: 'Absensi Pesantren',
+      items: [
+        { path: '/pengabsen', icon: UserCheck, label: 'Pengabsen Sholat' },
+        { path: '/pembimbing', icon: UserCog, label: 'Monitoring Sholat' },
+        { path: '/absensi', icon: ClipboardList, label: 'Riwayat Absensi Sholat' },
+        { path: '/waktu-sholat', icon: Clock, label: 'Waktu Sholat' },
+      ]
+    },
+    {
+      id: 'setting-madrasah',
+      type: 'group',
+      icon: GraduationCap,
+      label: 'Setting Madrasah Diniyah',
+      items: [
+        { path: '/madrasah-diniyah', icon: BookOpen, label: 'Siswa Madin' },
+        { path: '/kelas', icon: GraduationCap, label: 'Kelas Madrasah Diniyah' },
+        { path: '/pengabsen-kelas', icon: ClipboardCheck, label: 'Pengabsen Kelas Madin' },
+        { path: '/monitoring-kelas', icon: Eye, label: 'Monitoring Kelas Madin' },
+      ]
+    },
+    { 
+      id: 'settings',
+      type: 'single', 
+      path: '/settings', 
+      icon: Settings, 
+      label: 'Pengaturan' 
+    },
   ];
 
   const handleLogout = () => {
