@@ -328,7 +328,7 @@ const PengabsenKelasApp = () => {
             </div>
             </div>
 
-            {/* Manual attendance list */
+            {/* Manual attendance list */}
             <div className="mt-8 max-w-5xl mx-auto w-full">
             <div className="bg-card rounded-xl border border-border p-4 mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
               <div>
