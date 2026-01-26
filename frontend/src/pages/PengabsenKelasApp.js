@@ -51,16 +51,13 @@ const PengabsenKelasApp = () => {
   const loadKelas = async () => {
     try {
       const token = localStorage.getItem('pengabsen_kelas_token');
-      const response = await axios.get(`${API_URL}/api/kelas`, {
-        headers: { Authorization: `Bearer ${token}` }
+      const response = await axios.get(`${API_URL}/api/pengabsen-kelas/kelas-saya`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-      
-      // Filter only kelas that user has access to
-      const accessibleKelas = response.data.filter(kelas => 
-        user.kelas_ids.includes(kelas.id)
-      );
+
+      const accessibleKelas = response.data;
       setKelasList(accessibleKelas);
-      
+
       // Auto-select first kelas if not selected yet
       if (accessibleKelas.length > 0 && !selectedKelas) {
         setSelectedKelas(accessibleKelas[0].id);

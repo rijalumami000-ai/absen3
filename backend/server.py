@@ -2693,6 +2693,23 @@ async def get_kelas_siswa(kelas_id: str, _: dict = Depends(get_current_admin)):
     
     return result
 
+@api_router.get("/pengabsen-kelas/kelas-saya", response_model=List[KelasResponse])
+async def get_kelas_saya(current_pengabsen: dict = Depends(get_current_pengabsen_kelas)):
+    """Daftar kelas yang dapat diakses oleh Pengabsen Kelas (berdasarkan kelas_ids)."""
+    kelas_ids = current_pengabsen.get("kelas_ids", []) or []
+    if not kelas_ids:
+        return []
+
+    kelas_list = await db.kelas.find({"id": {"$in": kelas_ids}}, {"_id": 0}).to_list(1000)
+
+    result: List[KelasResponse] = []
+    for kelas in kelas_list:
+        jumlah_siswa = await db.siswa_madrasah.count_documents({"kelas_id": kelas["id"]})
+        result.append(KelasResponse(**kelas, jumlah_siswa=jumlah_siswa))
+
+    return result
+
+
 # ==================== SISWA MADRASAH ENDPOINTS ====================
 
 @api_router.get("/siswa-madrasah", response_model=List[SiswaMadrasahResponse])
