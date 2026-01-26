@@ -459,7 +459,7 @@ const PengabsenKelasApp = () => {
                               className="w-full bg-transparent border-none text-xs cursor-pointer"
                             >
                               <option value="">-</option>
-                              <option value="hadir"></option>
+                              <option value="hadir">✓</option>
                               <option value="alfa">a</option>
                               <option value="izin">i</option>
                               <option value="sakit">s</option>
