@@ -427,14 +427,14 @@ const PengabsenKelasApp = () => {
               </div>
             </div>
 
-            {/* Grid Table */}
+            {/* Grid Table: 1-15 */}
             <div className="bg-card rounded-xl border border-border overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead className="bg-muted">
                     <tr>
                       <th className="px-4 py-3 text-left font-semibold sticky left-0 bg-muted">Nama Siswa</th>
-                      {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
+                      {firstHalfDays.map((day) => (
                         <th key={day} className="px-2 py-3 text-center font-semibold min-w-[40px]">
                           {day}
                         </th>
@@ -447,7 +447,9 @@ const PengabsenKelasApp = () => {
                         <td className="px-4 py-2 font-medium sticky left-0 bg-card">
                           {siswa.siswa_nama}
                         </td>
-                        {siswa.absensi.map((abs, idx) => (
+                        {siswa.absensi
+                          .filter((_, idx) => idx < 15)
+                          .map((abs, idx) => (
                           <td
                             key={idx}
                             className={`px-2 py-2 text-center ${getStatusBgColor(abs.status)}`}
