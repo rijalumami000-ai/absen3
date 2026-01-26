@@ -142,17 +142,16 @@ const PengabsenKelasApp = () => {
       );
       toast.success('Status absensi diupdate');
       loadGridData();
+    } catch (error) {
+      toast.error('Gagal update status');
+    }
+  };
+
   const handleManualStatusChange = async (siswaId, kelasId, status) => {
     setManualStatusMap((prev) => ({ ...prev, [siswaId]: status }));
     if (!status) return;
     const today = new Date().toISOString().slice(0, 10);
     await createManualAbsensi(siswaId, kelasId, today, status);
-  };
-
-
-    } catch (error) {
-      toast.error('Gagal update status');
-    }
   };
 
   const createManualAbsensi = async (siswaId, kelasId, tanggal, status) => {
