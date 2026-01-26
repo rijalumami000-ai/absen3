@@ -22,11 +22,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { RefreshCw, Copy, Check, Plus, Pencil, Trash2, UserCheck } from 'lucide-react';
+import { RefreshCw, Copy, Check, Plus, Pencil, Trash2, UserCheck, Search } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const Pengabsen = () => {
   const [pengabsen, setPengabsen] = useState([]);
   const [asrama, setAsrama] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
