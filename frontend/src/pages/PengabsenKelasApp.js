@@ -37,9 +37,15 @@ const PengabsenKelasApp = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date().toISOString().slice(0, 7)); // YYYY-MM
   const [scanning, setScanning] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
+  const [scanSuccess, setScanSuccess] = useState(false);
+  const [manualStudents, setManualStudents] = useState([]);
+  const [manualSearch, setManualSearch] = useState('');
+  const [manualStatusMap, setManualStatusMap] = useState({});
 
   useEffect(() => {
     loadKelas();
+    loadManualStudents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -60,6 +66,19 @@ const PengabsenKelasApp = () => {
 
       // Auto-select first kelas if not selected yet
       if (accessibleKelas.length > 0 && !selectedKelas) {
+  const loadManualStudents = async () => {
+    try {
+      const token = localStorage.getItem('pengabsen_kelas_token');
+      const response = await axios.get(`${API_URL}/api/pengabsen-kelas/siswa-saya`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setManualStudents(response.data || []);
+    } catch (error) {
+      toast.error('Gagal memuat daftar siswa');
+    }
+  };
+
+
         setSelectedKelas(accessibleKelas[0].id);
       }
     } catch (error) {
@@ -122,17 +141,25 @@ const PengabsenKelasApp = () => {
       );
       toast.success('Status absensi diupdate');
       loadGridData();
+  const handleManualStatusChange = async (siswaId, kelasId, status) => {
+    setManualStatusMap((prev) => ({ ...prev, [siswaId]: status }));
+    if (!status) return;
+    const today = new Date().toISOString().slice(0, 10);
+    await createManualAbsensi(siswaId, kelasId, today, status);
+  };
+
+
     } catch (error) {
       toast.error('Gagal update status');
     }
   };
 
-  const createManualAbsensi = async (siswaId, tanggal, status) => {
+  const createManualAbsensi = async (siswaId, kelasId, tanggal, status) => {
     try {
       const token = localStorage.getItem('pengabsen_kelas_token');
       await axios.post(
         `${API_URL}/api/absensi-kelas/manual`,
-        { siswa_id: siswaId, kelas_id: selectedKelas, tanggal, status },
+        { siswa_id: siswaId, kelas_id: kelasId, tanggal, status },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success('Absensi dicatat');
