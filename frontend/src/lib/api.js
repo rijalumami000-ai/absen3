@@ -173,6 +173,8 @@ export const waktuSholatAPI = {
 export const settingsAPI = {
   getWaliNotifikasi: () => axios.get(`${API}/settings/wali-notifikasi`, { headers: getAuthHeader() }),
   updateWaliNotifikasi: (data) => axios.put(`${API}/settings/wali-notifikasi`, data, { headers: getAuthHeader() }),
+  getAppSettings: () => axios.get(`${API}/settings/app`),
+  updateAppSettings: (data) => axios.put(`${API}/settings/app`, data, { headers: getAuthHeader() }),
 };
 
 // Pembimbing PWA API
