@@ -27,7 +27,7 @@ const MadrasahDiniyah = () => {
   const [kelasList, setKelasList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [kelasFilter, setKelasFilter] = useState('');
+  const [kelasFilter, setKelasFilter] = useState('all');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isLinkSantriOpen, setIsLinkSantriOpen] = useState(false);
