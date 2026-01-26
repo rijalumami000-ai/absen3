@@ -27,6 +27,7 @@ const STATUS_OPTIONS = [
 
 const PengabsenApp = () => {
   const { user, loading, logout } = usePengabsenAuth();
+  const { appSettings } = useAppSettings();
   const [activeTab, setActiveTab] = useState('today'); // 'today' | 'history'
   const [waktu, setWaktu] = useState('maghrib');
   const [data, setData] = useState([]);
