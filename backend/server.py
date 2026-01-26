@@ -3034,6 +3034,7 @@ async def get_absensi_kelas_grid(
         siswa_data = {
             "siswa_id": siswa["id"],
             "siswa_nama": siswa["nama"],
+            "kelas_id": kelas_id,
             "absensi": []
         }
         
