@@ -215,6 +215,7 @@ const PembimbingKelas = () => {
             </div>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       {/* Search */}
