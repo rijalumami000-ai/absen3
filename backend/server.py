@@ -2481,6 +2481,27 @@ class WaliNotifikasiSettings(BaseModel):
     istihadhoh: str = "{nama} tidak mengikuti sholat {waktu} pada hari ini karena sedang istihadhoh (istihadhoh)"
 
 
+# App Settings Models
+class AppSettings(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default="default")
+    admin_title: str = Field(default="Admin Panel Absensi Santri Dan Siswa")
+    wali_title: str = Field(default="Wali Santri Ponpes Al-Hamid")
+    pengabsen_title: str = Field(default="Pengabsen Sholat Ponpes Al-Hamid")
+    pembimbing_title: str = Field(default="Monitoring Sholat Ponpes Al-Hamid")
+    pengabsen_kelas_title: str = Field(default="Pengabsen Kelas Madin")
+    monitoring_kelas_title: str = Field(default="Monitoring Kelas Madin")
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class AppSettingsUpdate(BaseModel):
+    admin_title: Optional[str] = None
+    wali_title: Optional[str] = None
+    pengabsen_title: Optional[str] = None
+    pembimbing_title: Optional[str] = None
+    pengabsen_kelas_title: Optional[str] = None
+    monitoring_kelas_title: Optional[str] = None
+
+
 @api_router.get("/settings/wali-notifikasi")
 async def get_wali_notifikasi_settings(_: dict = Depends(get_current_admin)):
     """Get notification template settings for Wali Santri"""
