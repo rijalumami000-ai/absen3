@@ -261,8 +261,26 @@ const PembimbingApp = () => {
       return <div className="py-4 text-sm text-gray-500">Tidak ada data santri.</div>;
     }
 
+    const filtered = data.data.filter((s) => {
+      const q = todaySearch.toLowerCase();
+      const matchSearch =
+        !q ||
+        s.nama.toLowerCase().includes(q) ||
+        (s.nis && s.nis.toLowerCase().includes(q)) ||
+        (s.nama_asrama && s.nama_asrama.toLowerCase().includes(q));
+
+      const matchStatus =
+        todayStatus === 'all' ||
+        (selectedStatWaktu
+          ? s.status?.[selectedStatWaktu] === todayStatus
+          : // jika tidak pilih waktu spesifik, cek jika salah satu waktu punya status tsb
+            Object.values(s.status || {}).some((st) => st === todayStatus));
+
+      return matchSearch && matchStatus;
+    });
+
     const grouped = {};
-    data.data.forEach((s) => {
+    filtered.forEach((s) => {
       const key = s.nama_asrama || 'Lainnya';
       if (!grouped[key]) grouped[key] = [];
       grouped[key].push(s);
@@ -284,6 +302,7 @@ const PembimbingApp = () => {
                   <div>
                     <div className="text-sm font-semibold text-gray-800">{santri.nama}</div>
                     <div className="text-xs text-gray-500">NIS: {santri.nis}</div>
+                    <div className="text-xs text-gray-500">Asrama: {santri.nama_asrama || '-'}</div>
                   </div>
                   <div className="flex flex-wrap gap-2 mt-2 md:mt-0">
                     {waktuLabels.map((w) => (
