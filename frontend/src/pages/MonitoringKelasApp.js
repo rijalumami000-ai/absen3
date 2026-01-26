@@ -40,6 +40,8 @@ const MonitoringKelasApp = () => {
   const [kelasDetailSearch, setKelasDetailSearch] = useState('');
   const [kelasDetailStatus, setKelasDetailStatus] = useState('all');
   const [loadingDetail, setLoadingDetail] = useState(false);
+  const [historySearch, setHistorySearch] = useState('');
+  const [historyStatus, setHistoryStatus] = useState('all');
   const [dateRange, setDateRange] = useState({
     start: new Date().toISOString().slice(0, 10),
     end: new Date().toISOString().slice(0, 10)
@@ -474,6 +476,34 @@ const MonitoringKelasApp = () => {
               </div>
             </div>
 
+            {/* History Filters (Search + Status) */}
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  value={historySearch}
+                  onChange={(e) => setHistorySearch(e.target.value)}
+                  placeholder="Cari nama siswa atau kelas..."
+                  className="w-full px-3 py-2 border border-border rounded-lg text-sm pl-3"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mr-2">Filter Status:</label>
+                <select
+                  value={historyStatus}
+                  onChange={(e) => setHistoryStatus(e.target.value)}
+                  className="px-3 py-2 border border-border rounded-lg text-sm bg-background"
+                >
+                  <option value="all">Semua</option>
+                  <option value="hadir">Hadir</option>
+                  <option value="alfa">Alfa</option>
+                  <option value="izin">Izin</option>
+                  <option value="sakit">Sakit</option>
+                  <option value="telat">Telat</option>
+                </select>
+              </div>
+            </div>
+
             {/* History Table */}
             <div className="bg-card rounded-xl border border-border overflow-hidden">
               <div className="overflow-x-auto">
@@ -490,22 +520,38 @@ const MonitoringKelasApp = () => {
                   <tbody className="divide-y divide-border">
                     {history.length === 0 ? (
                       <tr>
-                        <td colSpan="5" className="px-6 py-12 text-center text-muted-foreground">
+                        <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
                           Tidak ada data riwayat
                         </td>
                       </tr>
                     ) : (
-                      history.map((item) => (
-                        <tr key={item.id} className="hover:bg-muted/50">
-                          <td className="px-6 py-4 text-sm">{item.tanggal}</td>
-                          <td className="px-6 py-4 text-sm font-medium">{item.siswa_nama}</td>
-                          <td className="px-6 py-4 text-sm text-muted-foreground">{item.kelas_nama}</td>
-                          <td className="px-6 py-4">{getStatusBadge(item.status)}</td>
-                          <td className="px-6 py-4 text-sm text-muted-foreground">
-                            {item.waktu_absen ? new Date(item.waktu_absen).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '-'}
-                          </td>
-                        </tr>
-                      ))
+                      history
+                        .filter((item) => {
+                          const q = historySearch.toLowerCase();
+                          const matchSearch =
+                            !q ||
+                            item.siswa_nama.toLowerCase().includes(q) ||
+                            item.kelas_nama.toLowerCase().includes(q);
+                          const matchStatus =
+                            historyStatus === 'all' || item.status === historyStatus;
+                          return matchSearch && matchStatus;
+                        })
+                        .map((item) => (
+                          <tr key={item.id} className="hover:bg-muted/50">
+                            <td className="px-6 py-4 text-sm">{item.tanggal}</td>
+                            <td className="px-6 py-4 text-sm font-medium">{item.siswa_nama}</td>
+                            <td className="px-6 py-4 text-sm text-muted-foreground">{item.kelas_nama}</td>
+                            <td className="px-6 py-4">{getStatusBadge(item.status)}</td>
+                            <td className="px-6 py-4 text-sm text-muted-foreground">
+                              {item.waktu_absen
+                                ? new Date(item.waktu_absen).toLocaleTimeString('id-ID', {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                  })
+                                : '-'}
+                            </td>
+                          </tr>
+                        ))
                     )}
                   </tbody>
                 </table>
