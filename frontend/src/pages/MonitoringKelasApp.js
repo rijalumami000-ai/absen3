@@ -290,20 +290,45 @@ const MonitoringKelasApp = () => {
 
               {/* Per Kelas Stats */}
               <div className="bg-card rounded-xl border border-border overflow-hidden">
-                <div className="px-6 py-4 border-b border-border">
-                  <h2 className="font-display font-bold text-lg">Statistik Per Kelas</h2>
+                <div className="px-6 py-4 border-b border-border flex items-center justify-between gap-4">
+                  <div>
+                    <h2 className="font-display font-bold text-lg">Statistik Per Kelas</h2>
+                    <p className="text-xs text-muted-foreground">Klik salah satu baris kelas untuk melihat daftar siswa dan status kehadiran hari ini.</p>
+                  </div>
+                  {selectedKelasDetail && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedKelasDetail(null);
+                        setKelasDetailData([]);
+                      }}
+                    >
+                      Tutup Detail
+                    </Button>
+                  )}
                 </div>
-                <div className="p-6">
-                  <div className="space-y-4">
-                    {stats?.per_kelas?.map(kelas => (
-                      <div key={kelas.kelas_id} className="flex items-center justify-between p-4 bg-muted rounded-lg">
+                <div className="p-6 space-y-6">
+                  <div className="space-y-3">
+                    {stats?.per_kelas?.map((kelas) => (
+                      <button
+                        key={kelas.kelas_id}
+                        type="button"
+                        onClick={() => loadKelasDetail(kelas.kelas_id, kelas.kelas_nama)}
+                        className={`w-full flex items-center justify-between p-4 rounded-lg border transition-smooth text-left ${
+                          selectedKelasDetail?.id === kelas.kelas_id
+                            ? 'border-green-600 bg-emerald-50'
+                            : 'border-border bg-muted hover:bg-muted/70'
+                        }`}
+                      >
                         <div>
-                          <p className="font-semibold">{kelas.kelas_nama}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {kelas.total_siswa} siswa
+                          <p className="font-semibold text-foreground">{kelas.kelas_nama}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {kelas.total_siswa} siswa &bull; Sudah absen: {kelas.sudah_absen} &bull; Belum:{' '}
+                            {kelas.belum_absen}
                           </p>
                         </div>
-                        <div className="flex gap-4 text-sm">
+                        <div className="flex items-center gap-3 text-xs">
                           <div className="text-center">
                             <p className="font-bold text-green-700">{kelas.sudah_absen}</p>
                             <p className="text-xs text-muted-foreground">Sudah</p>
@@ -313,9 +338,91 @@ const MonitoringKelasApp = () => {
                             <p className="text-xs text-muted-foreground">Belum</p>
                           </div>
                         </div>
-                      </div>
+                      </button>
                     ))}
                   </div>
+
+                  {selectedKelasDetail && (
+                    <div className="border-t border-border pt-4 mt-2">
+                      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3">
+                        <div>
+                          <h3 className="text-sm font-semibold text-foreground">
+                            Detail Kehadiran Kelas {selectedKelasDetail.nama}
+                          </h3>
+                          <p className="text-xs text-muted-foreground">Menampilkan daftar siswa dan status kehadiran hari ini.</p>
+                        </div>
+                        <div className="flex flex-wrap gap-2 items-center">
+                          <input
+                            type="text"
+                            value={kelasDetailSearch}
+                            onChange={(e) => setKelasDetailSearch(e.target.value)}
+                            placeholder="Cari nama siswa..."
+                            className="px-3 py-1.5 border border-border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                          />
+                          <select
+                            value={kelasDetailStatus}
+                            onChange={(e) => setKelasDetailStatus(e.target.value)}
+                            className="px-2 py-1.5 border border-border rounded-lg text-xs bg-background"
+                          >
+                            <option value="all">Semua Status</option>
+                            <option value="hadir">Hadir</option>
+                            <option value="alfa">Alfa</option>
+                            <option value="izin">Izin</option>
+                            <option value="sakit">Sakit</option>
+                            <option value="telat">Telat</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {loadingDetail ? (
+                        <div className="py-4 text-sm text-muted-foreground">Memuat detail...</div>
+                      ) : (
+                        <div className="max-h-80 overflow-y-auto border border-border rounded-lg">
+                          <table className="w-full text-xs">
+                            <thead className="bg-muted sticky top-0">
+                              <tr>
+                                <th className="px-3 py-2 text-left font-semibold">Nama Siswa</th>
+                                <th className="px-3 py-2 text-left font-semibold">Tanggal</th>
+                                <th className="px-3 py-2 text-left font-semibold">Status</th>
+                                <th className="px-3 py-2 text-left font-semibold">Waktu</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-border bg-card">
+                              {kelasDetailData
+                                .filter((row) => {
+                                  const q = kelasDetailSearch.toLowerCase();
+                                  const matchNama = !q || row.siswa_nama.toLowerCase().includes(q);
+                                  const matchStatus = kelasDetailStatus === 'all' || row.status === kelasDetailStatus;
+                                  return matchNama && matchStatus;
+                                })
+                                .map((row) => (
+                                  <tr key={row.id} className="hover:bg-muted/60">
+                                    <td className="px-3 py-2 font-medium text-foreground">{row.siswa_nama}</td>
+                                    <td className="px-3 py-2 text-muted-foreground">{row.tanggal}</td>
+                                    <td className="px-3 py-2">{getStatusBadge(row.status)}</td>
+                                    <td className="px-3 py-2 text-muted-foreground">
+                                      {row.waktu_absen
+                                        ? new Date(row.waktu_absen).toLocaleTimeString('id-ID', {
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                          })
+                                        : '-'}
+                                    </td>
+                                  </tr>
+                                ))}
+                              {kelasDetailData.length === 0 && (
+                                <tr>
+                                  <td colSpan={4} className="px-3 py-4 text-center text-xs text-muted-foreground">
+                                    Belum ada data kehadiran untuk hari ini.
+                                  </td>
+                                </tr>
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
