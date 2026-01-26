@@ -3,54 +3,67 @@ import autoTable from 'jspdf-autotable';
 
 // Function to download Pengabsen Sholat as PDF
 export const downloadPengabsenPDF = (pengabsenList, asramaList) => {
-  const doc = new jsPDF();
-  
-  // Title
-  doc.setFontSize(18);
-  doc.text('Daftar Pengabsen Sholat', 14, 20);
-  
-  doc.setFontSize(11);
-  doc.text(`Tanggal: ${new Date().toLocaleDateString('id-ID')}`, 14, 28);
-  
-  // Get asrama names helper
-  const getAsramaNames = (asramaIds) => {
-    if (!asramaIds || asramaIds.length === 0) return '-';
-    return asramaIds
-      .map(id => {
-        const asrama = asramaList.find(a => a.id === id);
-        return asrama ? asrama.nama : '';
-      })
-      .filter(name => name)
-      .join(', ');
-  };
-  
-  // Prepare table data
-  const tableData = pengabsenList.map((p, index) => [
-    index + 1,
-    p.nama,
-    p.username,
-    p.kode_akses || '-',
-    p.email_atau_hp || '-',
-    getAsramaNames(p.asrama_ids)
-  ]);
-  
-  // Generate table
-  autoTable(doc, {
-    startY: 35,
-    head: [['No', 'Nama', 'Username', 'Kode Akses', 'Kontak', 'Asrama']],
-    body: tableData,
-    theme: 'grid',
-    headStyles: { fillColor: [79, 70, 229], fontStyle: 'bold' },
-    styles: { fontSize: 9 },
-    columnStyles: {
-      0: { cellWidth: 10 },
-      3: { cellWidth: 25 },
-      5: { cellWidth: 35 }
-    }
-  });
-  
-  // Save PDF
-  doc.save(`Pengabsen_Sholat_${new Date().getTime()}.pdf`);
+  try {
+    console.log('downloadPengabsenPDF called', { pengabsenList, asramaList });
+    
+    const doc = new jsPDF();
+    
+    // Title
+    doc.setFontSize(18);
+    doc.text('Daftar Pengabsen Sholat', 14, 20);
+    
+    doc.setFontSize(11);
+    doc.text(`Tanggal: ${new Date().toLocaleDateString('id-ID')}`, 14, 28);
+    
+    // Get asrama names helper
+    const getAsramaNames = (asramaIds) => {
+      if (!asramaIds || asramaIds.length === 0) return '-';
+      return asramaIds
+        .map(id => {
+          const asrama = asramaList.find(a => a.id === id);
+          return asrama ? asrama.nama : '';
+        })
+        .filter(name => name)
+        .join(', ');
+    };
+    
+    // Prepare table data
+    const tableData = pengabsenList.map((p, index) => [
+      index + 1,
+      p.nama,
+      p.username,
+      p.kode_akses || '-',
+      p.email_atau_hp || '-',
+      getAsramaNames(p.asrama_ids)
+    ]);
+    
+    console.log('Table data prepared', tableData);
+    
+    // Generate table
+    autoTable(doc, {
+      startY: 35,
+      head: [['No', 'Nama', 'Username', 'Kode Akses', 'Kontak', 'Asrama']],
+      body: tableData,
+      theme: 'grid',
+      headStyles: { fillColor: [79, 70, 229], fontStyle: 'bold' },
+      styles: { fontSize: 9 },
+      columnStyles: {
+        0: { cellWidth: 10 },
+        3: { cellWidth: 25 },
+        5: { cellWidth: 35 }
+      }
+    });
+    
+    console.log('AutoTable generated, saving PDF...');
+    
+    // Save PDF
+    doc.save(`Pengabsen_Sholat_${new Date().getTime()}.pdf`);
+    
+    console.log('PDF saved successfully');
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    alert('Gagal membuat PDF: ' + error.message);
+  }
 };
 
 // Function to download Pembimbing/Monitoring Sholat as PDF
