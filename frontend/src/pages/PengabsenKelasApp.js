@@ -482,6 +482,66 @@ const PengabsenKelasApp = () => {
                 </table>
               </div>
             </div>
+            {/* Grid Table: 16-31 */}
+            <div className="bg-card rounded-xl border border-border overflow-hidden mt-6">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-muted">
+                    <tr>
+                      <th className="px-4 py-3 text-left font-semibold sticky left-0 bg-muted">Nama Siswa</th>
+                      {secondHalfDays.map((day) => (
+                        <th key={day} className="px-2 py-3 text-center font-semibold min-w-[40px]">
+                          {day}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {gridData.map((siswa) => (
+                      <tr key={siswa.siswa_id} className="border-t border-border hover:bg-muted/50">
+                        <td className="px-4 py-2 font-medium sticky left-0 bg-card">
+                          {siswa.siswa_nama}
+                        </td>
+                        {siswa.absensi
+                          .filter((_, idx) => idx >= 15)
+                          .map((abs, idx) => (
+                            <td
+                              key={idx}
+                              className={`px-2 py-2 text-center ${getStatusBgColor(abs.status)}`}
+                            >
+                              <select
+                                value={abs.status || ''}
+                                onChange={(e) => {
+                                  const newStatus = e.target.value;
+                                  if (abs.absensi_id) {
+                                    updateAbsensiStatus(abs.absensi_id, newStatus);
+                                  } else {
+                                    createManualAbsensi(
+                                      siswa.siswa_id,
+                                      siswa.kelas_id,
+                                      abs.tanggal,
+                                      newStatus
+                                    );
+                                  }
+                                }}
+                                className="w-full bg-transparent border-none text-xs cursor-pointer"
+                              >
+                                <option value="">-</option>
+                                <option value="hadir"></option>
+                                <option value="alfa">a</option>
+                                <option value="izin">i</option>
+                                <option value="sakit">s</option>
+                                <option value="telat">t</option>
+                              </select>
+                            </td>
+                          ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
 
             {/* Legend */}
             <div className="bg-card rounded-xl border border-border p-4">
