@@ -468,9 +468,21 @@ const Santri = () => {
       </div>
 
       {/* Filters */}
-      <Card className="mb-6">
+      <Card className="mb-6 shadow-card">
         <CardContent className="p-4">
           <div className="flex flex-wrap gap-4">
+            <div className="flex-1 min-w-[250px]">
+              <Label>Cari Nama / NIS / Wali</Label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  placeholder="Cari santri..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
             <div className="flex-1 min-w-[200px]">
               <Label>Filter Jenis Kelamin</Label>
               <Select value={filterGender || 'all'} onValueChange={(val) => setFilterGender(val === 'all' ? '' : val)}>
@@ -517,7 +529,7 @@ const Santri = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {santriList.map((santri) => (
+            {filteredSantriList.map((santri) => (
               <tr key={santri.id} data-testid={`santri-row-${santri.id}`}>
                 <td className="px-6 py-4 text-sm text-gray-900">{santri.nis}</td>
                 <td className="px-6 py-4 text-sm font-medium text-gray-900">
