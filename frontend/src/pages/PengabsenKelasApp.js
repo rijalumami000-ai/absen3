@@ -27,6 +27,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const PengabsenKelasApp = () => {
   const { user, logout } = usePengabsenKelasAuth();
+  const { appSettings } = useAppSettings();
   const navigate = useNavigate();
   const [view, setView] = useState('scan'); // 'scan' or 'grid'
   const [kelasList, setKelasList] = useState([]);
