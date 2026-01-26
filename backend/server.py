@@ -2536,6 +2536,50 @@ async def update_wali_notifikasi_settings(data: WaliNotifikasiSettings, _: dict 
     return {"message": "Pengaturan notifikasi berhasil disimpan"}
 
 
+# ==================== APP SETTINGS ENDPOINTS ====================
+
+@api_router.get("/settings/app")
+async def get_app_settings():
+    """Get application title settings (public endpoint)"""
+    settings = await db.settings.find_one({"id": "app_settings"}, {"_id": 0})
+    if not settings:
+        # Return defaults
+        defaults = AppSettings()
+        return defaults.model_dump()
+    
+    return {
+        "id": settings.get("id", "default"),
+        "admin_title": settings.get("admin_title", "Admin Panel Absensi Santri Dan Siswa"),
+        "wali_title": settings.get("wali_title", "Wali Santri Ponpes Al-Hamid"),
+        "pengabsen_title": settings.get("pengabsen_title", "Pengabsen Sholat Ponpes Al-Hamid"),
+        "pembimbing_title": settings.get("pembimbing_title", "Monitoring Sholat Ponpes Al-Hamid"),
+        "pengabsen_kelas_title": settings.get("pengabsen_kelas_title", "Pengabsen Kelas Madin"),
+        "monitoring_kelas_title": settings.get("monitoring_kelas_title", "Monitoring Kelas Madin"),
+        "updated_at": settings.get("updated_at", datetime.now(timezone.utc).isoformat())
+    }
+
+
+@api_router.put("/settings/app")
+async def update_app_settings(data: AppSettingsUpdate, _: dict = Depends(get_current_admin)):
+    """Update application title settings (admin only)"""
+    update_data = {k: v for k, v in data.model_dump().items() if v is not None}
+    
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No data to update")
+    
+    update_data["id"] = "app_settings"
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.settings.update_one(
+        {"id": "app_settings"},
+        {"$set": update_data},
+        upsert=True
+    )
+    
+    return {"message": "App settings berhasil diupdate"}
+
+
+
 # ==================== INITIALIZATION ====================
 
 @api_router.get("/")
