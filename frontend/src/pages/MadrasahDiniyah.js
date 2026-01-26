@@ -179,7 +179,7 @@ const MadrasahDiniyah = () => {
   };
 
   const filteredSiswa = siswaList.filter((siswa) => {
-    const matchKelas = !kelasFilter || siswa.kelas_id === kelasFilter;
+    const matchKelas = kelasFilter === 'all' || siswa.kelas_id === kelasFilter;
     const query = searchQuery.toLowerCase();
     const matchSearch =
       !query ||
