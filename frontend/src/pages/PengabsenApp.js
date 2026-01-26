@@ -150,8 +150,7 @@ const PengabsenApp = () => {
   const filteredData = data.filter((row) => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
-    return row.nama?.toLowerCase().includes(query) ||
-           row.nis?.toLowerCase().includes(query);
+    return row.nama?.toLowerCase().includes(query);
   });
 
   // Group filtered data by asrama
@@ -183,40 +182,176 @@ const PengabsenApp = () => {
       </header>
 
       <main className="flex-1 p-4 space-y-4 max-w-4xl mx-auto w-full">
+        <div className="flex gap-2 mb-4">
+          <button
+            type="button"
+            onClick={() => setActiveTab('today')}
+            className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
+              activeTab === 'today'
+                ? 'bg-emerald-500 text-white border-emerald-500'
+                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            Absensi Hari Ini
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTab('history');
+              loadHistory();
+            }}
+            className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
+              activeTab === 'history'
+                ? 'bg-emerald-500 text-white border-emerald-500'
+                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            Riwayat Saya
+          </button>
+        </div>
 
         {activeTab === 'today' && (
           <>
+            <section className="bg-white rounded-lg shadow p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-sm font-semibold text-gray-700">Scan QR Santri</h2>
+                <Button
+                  variant={scanning ? 'outline' : 'default'}
+                  size="sm"
+                  onClick={() => setScanning((prev) => !prev)}
+                >
+                  {scanning ? 'Stop Kamera' : 'Mulai Scan'}
+                </Button>
+              </div>
+
+              {!scanning ? (
+                <p className="text-xs text-gray-500">
+                  Tekan tombol <span className="font-semibold">Mulai Scan</span> untuk mengaktifkan kamera dan scan QR
+                  santri. Pastikan Anda mengizinkan akses kamera di browser.
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  <div
+                    className={`aspect-video max-w-md mx-auto overflow-hidden rounded-xl border bg-black transition-colors duration-300 ${
+                      showScanSuccess ? 'border-emerald-500' : 'border-gray-300'
+                    }`}
+                  >
+                    <Scanner
+                      onScan={async (detected) => {
+                        try {
+                          if (!detected || detected.length === 0) return;
+                          const code = detected[0];
+                          const text = code.rawValue || '';
+                          if (!text) return;
+
+                          const parsed = JSON.parse(text);
+                          if (!parsed.santri_id) {
+                            throw new Error('QR tidak berisi santri_id');
+                          }
+
+                          const now = Date.now();
+                          if (now - lastScanAt < 1500) {
+                            // dalam 1.5 detik, abaikan untuk mencegah double scan
+                            return;
+                          }
+
+                          setLastScanAt(now);
+                          setShowScanSuccess(true);
+                          setTimeout(() => setShowScanSuccess(false), 1000);
+
+                          setLastScan({ raw: text, parsed, waktu });
+                          await pengabsenAppAPI.upsertAbsensi({
+                            santri_id: parsed.santri_id,
+                            waktu_sholat: waktu,
+                            status_absen: 'hadir',
+                          });
+                          await loadData(waktu);
+                          toast({
+                            title: 'Scan Berhasil',
+                            description: `Hadir: ${parsed.nama || 'Santri'} (${parsed.nis || '-'})`,
+                          });
+                        } catch (e) {
+                          console.error(e);
+                          toast({
+                            title: 'QR tidak valid',
+                            description: 'Pastikan QR berasal dari sistem ini.',
+                            variant: 'destructive',
+                          });
+                        }
+                      }}
+                      onError={(error) => {
+                        console.warn(error);
+                      }}
+                      components={{
+                        audio: false,
+                      }}
+                      styles={{
+                        container: { width: '100%', height: '100%' },
+                        video: { width: '100%', height: '100%', objectFit: 'cover' },
+                      }}
+                    />
+                  </div>
+
+                  {showScanSuccess && (
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="bg-emerald-500/80 text-white px-6 py-3 rounded-full text-lg font-bold shadow-lg">
+                        HADIR
+                      </div>
+                    </div>
+                  )}
+
+                  {lastScan && (
+                    <div className="text-xs text-gray-600 bg-emerald-50 border border-emerald-100 rounded-lg p-3">
+                      <div className="font-semibold mb-1">Scan terakhir:</div>
+                      <div>Nama: {lastScan.parsed.nama}</div>
+                      <div>NIS: {lastScan.parsed.nis}</div>
+                      <div>Waktu Sholat: {WAKTU_OPTIONS.find((w) => w.value === lastScan.waktu)?.label}</div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </section>
+
             <section className="bg-white rounded-lg shadow p-4">
               <h2 className="text-sm font-semibold text-gray-700 mb-2">Pilih Waktu Sholat</h2>
               <div className="flex flex-wrap gap-2">
                 {WAKTU_OPTIONS.map((opt) => (
                   <button
-                key={opt.value}
-                type="button"
-                onClick={() => setWaktu(opt.value)}
-                className={`px-3 py-1 rounded-full text-sm border transition-colors ${
-                  waktu === opt.value
-                    ? 'bg-emerald-500 text-white border-emerald-500'
-                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
-        </section>
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setWaktu(opt.value)}
+                    className={`px-3 py-1 rounded-full text-sm border transition-colors ${
+                      waktu === opt.value
+                        ? 'bg-emerald-500 text-white border-emerald-500'
+                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </section>
 
-        <section className="bg-white rounded-lg shadow p-4">
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <h2 className="text-sm font-semibold text-gray-700">Daftar Santri & Status</h2>
-              <p className="text-xs text-gray-500 mt-1">
-                Total: <span className="font-semibold">{totalSantri}</span> santri &mdash; Hadir:{' '}
-                <span className="text-emerald-600 font-semibold">{hadirCount}</span> &mdash; Belum:{' '}
-                <span className="text-amber-600 font-semibold">{belumCount}</span>
-              </p>
-            </div>
-          </div>
+            <section className="bg-white rounded-lg shadow p-4">
+              <div className="flex flex-col gap-3 mb-3 md:flex-row md:items-center md:justify-between">
+                <div>
+                  <h2 className="text-sm font-semibold text-gray-700">Daftar Santri & Status</h2>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Total: <span className="font-semibold">{totalSantri}</span> santri &mdash; Hadir:{' '}
+                    <span className="text-emerald-600 font-semibold">{hadirCount}</span> &mdash; Belum:{' '}
+                    <span className="text-amber-600 font-semibold">{belumCount}</span>
+                  </p>
+                </div>
+                <div className="w-full md:w-64">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Cari nama santri..."
+                    className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  />
+                </div>
+              </div>
 
           {loadingData ? (
             <div className="py-6 text-center text-gray-500">Memuat data...</div>
