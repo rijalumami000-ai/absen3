@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 const Settings = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [savingAppSettings, setSavingAppSettings] = useState(false);
   const [templates, setTemplates] = useState({
     hadir: '',
     alfa: '',
@@ -17,10 +18,19 @@ const Settings = () => {
     haid: '',
     istihadhoh: '',
   });
+  const [appSettings, setAppSettings] = useState({
+    admin_title: '',
+    wali_title: '',
+    pengabsen_title: '',
+    pembimbing_title: '',
+    pengabsen_kelas_title: '',
+    monitoring_kelas_title: '',
+  });
   const { toast } = useToast();
 
   useEffect(() => {
     loadSettings();
+    loadAppSettings();
   }, []);
 
   const loadSettings = async () => {
@@ -36,6 +46,15 @@ const Settings = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadAppSettings = async () => {
+    try {
+      const response = await settingsAPI.getAppSettings();
+      setAppSettings(response.data);
+    } catch (error) {
+      console.error('Failed to load app settings:', error);
     }
   };
 
