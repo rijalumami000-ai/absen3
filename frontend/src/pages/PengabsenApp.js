@@ -192,7 +192,7 @@ const PengabsenApp = () => {
     <div className="min-h-screen bg-slate-50 flex flex-col" data-testid="pengabsen-app-page">
       <header className="bg-white shadow-sm px-4 py-3 flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-semibold text-gray-800">Absensi Sholat - Pengabsen</h1>
+          <h1 className="text-lg font-semibold text-gray-800">Pengabsen Sholat Ponpes Al-Hamid</h1>
           <p className="text-xs text-gray-500">{user.nama} (@{user.username})</p>
         </div>
         <Button variant="outline" size="sm" onClick={logout}>

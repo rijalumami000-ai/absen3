@@ -376,7 +376,7 @@ const PembimbingApp = () => {
             </svg>
           </div>
           <div>
-            <h1 className="text-lg font-display font-semibold">Monitoring Sholat</h1>
+            <h1 className="text-lg font-display font-semibold">Monitoring Sholat Ponpes Al-Hamid</h1>
             <p className="text-xs text-indigo-100">{user.nama}</p>
           </div>
         </div>

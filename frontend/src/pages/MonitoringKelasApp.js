@@ -145,7 +145,7 @@ const MonitoringKelasApp = () => {
               <BarChart className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-xl font-display font-bold">Monitoring Kelas</h1>
+              <h1 className="text-xl font-display font-bold">Monitoring Kelas Madin</h1>
               <p className="text-sm text-green-100">{user?.nama}</p>
             </div>
           </div>
