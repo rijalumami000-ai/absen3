@@ -155,36 +155,6 @@ const PengabsenApp = () => {
   });
 
   // Group filtered data by asrama
-  const groupedList = React.useMemo(() => {
-    <div className="flex gap-2 mb-4">
-      <button
-        type="button"
-        onClick={() => setActiveTab('today')}
-        className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
-          activeTab === 'today'
-            ? 'bg-emerald-500 text-white border-emerald-500'
-            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-        }`}
-      >
-        Absensi Hari Ini
-      </button>
-      <button
-        type="button"
-        onClick={() => {
-          setActiveTab('history');
-          loadHistory();
-        }}
-        className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
-          activeTab === 'history'
-            ? 'bg-emerald-500 text-white border-emerald-500'
-            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-        }`}
-      >
-        Riwayat Saya
-      </button>
-    </div>
-  );
-
   const groupedByAsrama = filteredData.reduce((acc, row) => {
     const key = row.asrama_id || 'tanpa-asrama';
     if (!acc[key]) {
