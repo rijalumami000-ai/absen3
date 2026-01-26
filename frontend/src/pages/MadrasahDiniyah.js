@@ -27,6 +27,7 @@ const MadrasahDiniyah = () => {
   const [kelasList, setKelasList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [kelasFilter, setKelasFilter] = useState('');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isLinkSantriOpen, setIsLinkSantriOpen] = useState(false);
@@ -177,10 +178,15 @@ const MadrasahDiniyah = () => {
     }
   };
 
-  const filteredSiswa = siswaList.filter(siswa =>
-    siswa.nama.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (siswa.kelas_nama && siswa.kelas_nama.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const filteredSiswa = siswaList.filter((siswa) => {
+    const matchKelas = !kelasFilter || siswa.kelas_id === kelasFilter;
+    const query = searchQuery.toLowerCase();
+    const matchSearch =
+      !query ||
+      siswa.nama.toLowerCase().includes(query) ||
+      (siswa.kelas_nama && siswa.kelas_nama.toLowerCase().includes(query));
+    return matchKelas && matchSearch;
+  });
 
   // Filter santri yang belum di-link
   const availableSantri = santriList.filter(santri => 
@@ -198,7 +204,7 @@ const MadrasahDiniyah = () => {
         <div className="flex gap-2 animate-slide-in-right">
           <Button 
             variant="outline" 
-            onClick={() => downloadSiswaMadinPDF(siswa, kelas)}
+            onClick={() => downloadSiswaMadinPDF(filteredSiswa, kelasList)}
             className="hover-lift transition-smooth active-scale"
           >
             <FileDown className="w-4 h-4 mr-2" />
