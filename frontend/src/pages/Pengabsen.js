@@ -163,6 +163,15 @@ const Pengabsen = () => {
       .join(', ');
   };
 
+  // Filter pengabsen by search
+  const filteredPengabsen = pengabsen.filter((p) => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return p.nama?.toLowerCase().includes(query) ||
+           p.username?.toLowerCase().includes(query) ||
+           p.email_atau_hp?.toLowerCase().includes(query);
+  });
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -184,6 +193,22 @@ const Pengabsen = () => {
         </Button>
       </div>
 
+      {/* Search Box */}
+      <Card className="shadow-card animate-scale-in">
+        <CardContent className="p-4">
+          <Label>Cari Pengabsen</Label>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              placeholder="Cari nama, username, atau kontak..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+        </CardContent>
+      </Card>
+
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -198,14 +223,14 @@ const Pengabsen = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {pengabsen.length === 0 ? (
+              {filteredPengabsen.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
-                    Belum ada data pengabsen
+                    {searchQuery ? 'Tidak ada hasil pencarian' : 'Belum ada data pengabsen'}
                   </td>
                 </tr>
               ) : (
-                pengabsen.map((p) => (
+                filteredPengabsen.map((p) => (
                   <tr key={p.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3">
                       <div className="flex items-center">
