@@ -34,7 +34,7 @@ const MonitoringKelasApp = () => {
   const [stats, setStats] = useState(null);
   const [history, setHistory] = useState([]);
   const [kelasList, setKelasList] = useState([]); // Add kelas list state
-  const [selectedKelas, setSelectedKelas] = useState('');
+  const [selectedKelas, setSelectedKelas] = useState('all');
   const [selectedKelasDetail, setSelectedKelasDetail] = useState(null); // { id, nama }
   const [kelasDetailData, setKelasDetailData] = useState([]);
   const [kelasDetailSearch, setKelasDetailSearch] = useState('');
@@ -80,19 +80,10 @@ const MonitoringKelasApp = () => {
     try {
       const token = localStorage.getItem('pembimbing_kelas_token');
       const response = await axios.get(
-        `${API_URL}/api/kelas`,
+        `${API_URL}/api/pembimbing-kelas/kelas-saya`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      // Filter only kelas that user has access to
-      const accessibleKelas = response.data.filter(kelas => 
-        user.kelas_ids.includes(kelas.id)
-      );
-      setKelasList(accessibleKelas);
-      
-      // Auto-select first kelas if needed
-      if (accessibleKelas.length > 0 && !selectedKelas) {
-        setSelectedKelas(accessibleKelas[0].id);
-      }
+      setKelasList(response.data || []);
     } catch (error) {
       console.error('Failed to load kelas list');
     }
