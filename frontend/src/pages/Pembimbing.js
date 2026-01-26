@@ -22,8 +22,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { RefreshCw, Copy, Check, Plus, Pencil, Trash2, Search } from 'lucide-react';
+import { RefreshCw, Copy, Check, Plus, Pencil, Trash2, Search, FileDown } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { downloadPembimbingPDF } from '@/lib/pdfUtils';
 
 const Pembimbing = () => {
   const [pembimbing, setPembimbing] = useState([]);
@@ -182,10 +183,20 @@ const Pembimbing = () => {
           <h1 className="text-2xl font-bold text-gray-800 font-display">Kelola Monitoring Sholat</h1>
           <p className="text-gray-500 mt-1">Daftar pembimbing yang bertugas mengawasi santri</p>
         </div>
-        <Button onClick={openAddDialog} data-testid="add-pembimbing-btn" className="btn-ripple active-scale shadow-card hover:shadow-card-hover transition-smooth">
-          <Plus className="w-4 h-4 mr-2" />
-          Tambah Pembimbing
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            onClick={() => downloadPembimbingPDF(filteredPembimbing, asrama)}
+            className="hover-lift transition-smooth active-scale"
+          >
+            <FileDown className="w-4 h-4 mr-2" />
+            Download PDF
+          </Button>
+          <Button onClick={openAddDialog} data-testid="add-pembimbing-btn" className="btn-ripple active-scale shadow-card hover:shadow-card-hover transition-smooth">
+            <Plus className="w-4 h-4 mr-2" />
+            Tambah Pembimbing
+          </Button>
+        </div>
       </div>
 
       {/* Search Box */}
