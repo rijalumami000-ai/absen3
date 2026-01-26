@@ -30,6 +30,7 @@ const PengabsenApp = () => {
   const { user, loading, logout } = usePengabsenAuth();
   const { appSettings } = useAppSettings();
   const [activeTab, setActiveTab] = useState('today'); // 'today' | 'history'
+  const [searchQuery, setSearchQuery] = useState('');
   const [waktu, setWaktu] = useState('maghrib');
   const [data, setData] = useState([]);
   const [loadingData, setLoadingData] = useState(false);
