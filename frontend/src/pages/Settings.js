@@ -128,8 +128,72 @@ const Settings = () => {
         <p className="text-gray-500 mt-1">Kelola pengaturan aplikasi</p>
       </div>
 
+      {/* App Titles Settings */}
       <Card className="shadow-card card-hover transition-smooth animate-scale-in">
-        <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50">
+        <CardHeader className="bg-gradient-to-r from-purple-50 to-indigo-50">
+          <CardTitle className="text-lg font-display">Judul Aplikasi</CardTitle>
+          <CardDescription>
+            Customize judul yang tampil di setiap aplikasi
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-6 space-y-4">
+          <div>
+            <Label>Judul Dashboard Admin</Label>
+            <Input
+              value={appSettings.admin_title}
+              onChange={(e) => handleAppSettingsChange('admin_title', e.target.value)}
+              placeholder="Admin Panel Absensi Santri Dan Siswa"
+            />
+          </div>
+          <div>
+            <Label>Judul Aplikasi Wali Santri</Label>
+            <Input
+              value={appSettings.wali_title}
+              onChange={(e) => handleAppSettingsChange('wali_title', e.target.value)}
+              placeholder="Wali Santri Ponpes Al-Hamid"
+            />
+          </div>
+          <div>
+            <Label>Judul Aplikasi Pengabsen Sholat</Label>
+            <Input
+              value={appSettings.pengabsen_title}
+              onChange={(e) => handleAppSettingsChange('pengabsen_title', e.target.value)}
+              placeholder="Pengabsen Sholat Ponpes Al-Hamid"
+            />
+          </div>
+          <div>
+            <Label>Judul Aplikasi Monitoring Sholat</Label>
+            <Input
+              value={appSettings.pembimbing_title}
+              onChange={(e) => handleAppSettingsChange('pembimbing_title', e.target.value)}
+              placeholder="Monitoring Sholat Ponpes Al-Hamid"
+            />
+          </div>
+          <div>
+            <Label>Judul Aplikasi Pengabsen Kelas Madin</Label>
+            <Input
+              value={appSettings.pengabsen_kelas_title}
+              onChange={(e) => handleAppSettingsChange('pengabsen_kelas_title', e.target.value)}
+              placeholder="Pengabsen Kelas Madin"
+            />
+          </div>
+          <div>
+            <Label>Judul Aplikasi Monitoring Kelas Madin</Label>
+            <Input
+              value={appSettings.monitoring_kelas_title}
+              onChange={(e) => handleAppSettingsChange('monitoring_kelas_title', e.target.value)}
+              placeholder="Monitoring Kelas Madin"
+            />
+          </div>
+          <Button onClick={handleSaveAppSettings} disabled={savingAppSettings} className="w-full btn-ripple active-scale">
+            {savingAppSettings ? 'Menyimpan...' : 'Simpan Judul Aplikasi'}
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Notification Template Settings */}
+      <Card className="shadow-card card-hover transition-smooth animate-scale-in">
+        <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50">
           <CardTitle className="text-lg font-display">Template Notifikasi Wali Santri</CardTitle>
           <CardDescription>
             Atur pesan notifikasi yang dikirim ke Wali Santri ketika status absensi anak mereka diperbarui.
