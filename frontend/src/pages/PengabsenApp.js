@@ -40,8 +40,15 @@ const PengabsenApp = () => {
   const [showScanSuccess, setShowScanSuccess] = useState(false);
   const [historyItems, setHistoryItems] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
-  const [historyStart, setHistoryStart] = useState(() => new Date().toISOString().split('T')[0]);
-  const [historyEnd, setHistoryEnd] = useState(() => new Date().toISOString().split('T')[0]);
+  const getTodayLocalYMD = () => {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  };
+  const [historyStart, setHistoryStart] = useState(() => getTodayLocalYMD());
+  const [historyEnd, setHistoryEnd] = useState(() => getTodayLocalYMD());
   const [historyDetail, setHistoryDetail] = useState(null);
   const [loadingHistoryDetail, setLoadingHistoryDetail] = useState(false);
   const { toast } = useToast();

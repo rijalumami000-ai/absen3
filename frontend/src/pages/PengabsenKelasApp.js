@@ -86,7 +86,7 @@ const PengabsenKelasApp = () => {
       setManualStudents(siswaResp.data || []);
 
       // Ambil status absensi hari ini supaya dropdown manual tetap sinkron setelah refresh
-      const today = new Date().toISOString().slice(0, 10);
+      const today = getTodayLocalYMD();
       const riwayatResp = await axios.get(
         `${API_URL}/api/absensi-kelas/riwayat?tanggal_start=${today}&tanggal_end=${today}`,
         { headers: { Authorization: `Bearer ${token}` } }
@@ -181,7 +181,7 @@ const PengabsenKelasApp = () => {
   const handleManualStatusChange = async (siswaId, kelasId, status) => {
     setManualStatusMap((prev) => ({ ...prev, [siswaId]: status }));
     if (!status) return;
-    const today = new Date().toISOString().slice(0, 10);
+    const today = getTodayLocalYMD();
     await createManualAbsensi(siswaId, kelasId, today, status);
   };
 
