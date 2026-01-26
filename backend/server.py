@@ -2854,11 +2854,6 @@ async def get_pengabsen_kelas_siswa_saya(current_pengabsen: dict = Depends(get_c
 
     return result
 
-    
-    has_qr = bool(updated_siswa.get("santri_id") or updated_siswa.get("qr_code"))
-    
-    return SiswaMadrasahResponse(**updated_siswa, kelas_nama=kelas_nama, has_qr=has_qr)
-
 @api_router.delete("/siswa-madrasah/{siswa_id}")
 async def delete_siswa_madrasah(siswa_id: str, _: dict = Depends(get_current_admin)):
     result = await db.siswa_madrasah.delete_one({"id": siswa_id})
