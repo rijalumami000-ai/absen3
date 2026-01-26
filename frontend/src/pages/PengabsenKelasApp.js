@@ -269,7 +269,8 @@ const PengabsenKelasApp = () => {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto p-4">
         {view === 'scan' ? (
-          /* Scan View */
+          <>
+          {/* Scan View */}
           <div className="flex flex-col items-center justify-center py-12">
             <div className="bg-card rounded-2xl shadow-lg p-8 max-w-md w-full">
               {!isScanning ? (
