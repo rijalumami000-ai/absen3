@@ -289,6 +289,68 @@ const PengabsenKelasApp = () => {
               ) : (
                 <div>
                   <div className="mb-4 w-full">
+          {/* Manual attendance list */}
+          <div className="mt-8 max-w-5xl mx-auto w-full">
+            <div className="bg-card rounded-xl border border-border p-4 mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+              <div>
+                <h3 className="text-sm font-semibold">Absensi Manual</h3>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Gunakan untuk mencatat Alfa (a), Izin (i), Sakit (s), atau Telat (t) jika tidak melalui scan QR.
+                </p>
+              </div>
+              <div className="w-full md:w-64">
+                <input
+                  type="text"
+                  value={manualSearch}
+                  onChange={(e) => setManualSearch(e.target.value)}
+                  placeholder="Cari nama siswa..."
+                  className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1">
+              {manualStudents
+                .filter((s) =>
+                  manualSearch
+                    ? s.siswa_nama.toLowerCase().includes(manualSearch.toLowerCase())
+                    : true
+                )
+                .map((s) => (
+                  <div
+                    key={s.siswa_id}
+                    className="flex items-center justify-between bg-card rounded-lg border border-border px-3 py-2 text-sm"
+                  >
+                    <div>
+                      <div className="font-medium text-foreground">{s.siswa_nama}</div>
+                      <div className="text-xs text-muted-foreground">Kelas: {s.kelas_nama || '-'}</div>
+                    </div>
+                    <select
+                      value={manualStatusMap[s.siswa_id] || ''}
+                      onChange={(e) =>
+                        handleManualStatusChange(s.siswa_id, s.kelas_id, e.target.value)
+                      }
+                      className="border border-border rounded-md px-2 py-1 text-xs bg-background cursor-pointer"
+                    >
+                      <option value="">-</option>
+                      <option value="hadir">✓ Hadir</option>
+                      <option value="alfa">a Alfa</option>
+                      <option value="izin">i Izin</option>
+                      <option value="sakit">s Sakit</option>
+                      <option value="telat">t Telat</option>
+                    </select>
+                  </div>
+                ))}
+
+              {manualStudents.length === 0 && (
+                <p className="text-xs text-muted-foreground text-center">
+                  Belum ada data siswa untuk kelas yang Anda kelola.
+                </p>
+              )}
+            </div>
+          </div>
+
+
                     <Scanner
                       onScan={(result) => {
                         if (result && result[0]) {
