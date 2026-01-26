@@ -329,6 +329,18 @@ const Santri = () => {
     return asrama ? asrama.nama : '-';
   };
 
+  // Filter and search santri
+  const filteredSantriList = santriList.filter((santri) => {
+    const matchesGender = !filterGender || santri.gender === filterGender;
+    const matchesAsrama = !filterAsrama || santri.asrama_id === filterAsrama;
+    const matchesSearch = !searchQuery || 
+      santri.nama.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      santri.nis.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      santri.nama_wali?.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    return matchesGender && matchesAsrama && matchesSearch;
+  });
+
   if (loading) return <div className="flex justify-center p-8">Memuat data...</div>;
 
   return (
