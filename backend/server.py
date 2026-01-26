@@ -3139,6 +3139,21 @@ async def create_absensi_kelas_manual(
     
     return {"message": "Absensi berhasil dicatat", "absensi_id": absensi.id}
 
+@api_router.delete("/absensi-kelas/{absensi_id}")
+async def delete_absensi_kelas(absensi_id: str, current_pengabsen: dict = Depends(get_current_pengabsen_kelas)):
+    """Hapus absensi kelas sehingga kembali menjadi '-' di grid"""
+    absensi = await db.absensi_kelas.find_one({"id": absensi_id}, {"_id": 0})
+    if not absensi:
+        # Jika sudah tidak ada, anggap sukses supaya UI tidak error
+        return {"message": "Absensi sudah tidak ada"}
+
+    if absensi["kelas_id"] not in current_pengabsen.get("kelas_ids", []):
+        raise HTTPException(status_code=403, detail="Anda tidak memiliki akses ke kelas ini")
+
+    await db.absensi_kelas.delete_one({"id": absensi_id})
+    return {"message": "Absensi berhasil dihapus"}
+
+
 # ==================== PENGABSEN KELAS ENDPOINTS ====================
 
 @api_router.get("/pengabsen-kelas", response_model=List[PengabsenKelasResponse])

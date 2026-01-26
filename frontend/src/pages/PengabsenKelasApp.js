@@ -459,6 +459,13 @@ const PengabsenKelasApp = () => {
                               value={abs.status || ''}
                               onChange={(e) => {
                                 const newStatus = e.target.value;
+                                if (newStatus === '') {
+                                  if (abs.absensi_id) {
+                                    deleteAbsensi(abs.absensi_id);
+                                  }
+                                  return;
+                                }
+
                                 if (abs.absensi_id) {
                                   updateAbsensiStatus(abs.absensi_id, newStatus);
                                 } else {
@@ -513,16 +520,23 @@ const PengabsenKelasApp = () => {
                                 value={abs.status || ''}
                                 onChange={(e) => {
                                   const newStatus = e.target.value;
+                                if (newStatus === '') {
                                   if (abs.absensi_id) {
-                                    updateAbsensiStatus(abs.absensi_id, newStatus);
-                                  } else {
-                                    createManualAbsensi(
-                                      siswa.siswa_id,
-                                      siswa.kelas_id,
-                                      abs.tanggal,
-                                      newStatus
-                                    );
+                                    deleteAbsensi(abs.absensi_id);
                                   }
+                                  return;
+                                }
+
+                                if (abs.absensi_id) {
+                                  updateAbsensiStatus(abs.absensi_id, newStatus);
+                                } else {
+                                  createManualAbsensi(
+                                    siswa.siswa_id,
+                                    siswa.kelas_id,
+                                    abs.tanggal,
+                                    newStatus
+                                  );
+                                }
                                 }}
                                 className="w-full bg-transparent border-none text-xs cursor-pointer"
                               >
