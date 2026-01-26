@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Key, Search, Copy } from 'lucide-react';
+import { Plus, Edit2, Trash2, Key, Search, Copy, FileDown } from 'lucide-react';
+import { downloadMonitoringKelasPDF } from '@/lib/pdfUtils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -144,13 +145,22 @@ const PembimbingKelas = () => {
           <h1 className="text-3xl font-display font-bold text-foreground">Monitoring Kelas Madin</h1>
           <p className="text-muted-foreground mt-1">Kelola akun monitoring untuk Madrasah Diniyah</p>
         </div>
-        <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={resetForm} className="btn-ripple active-scale shadow-card hover:shadow-card-hover transition-smooth">
-              <Plus className="w-4 h-4 mr-2" />
-              Tambah Monitoring Kelas
-            </Button>
-          </DialogTrigger>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            onClick={() => downloadMonitoringKelasPDF(pembimbing, kelas)}
+            className="hover-lift transition-smooth active-scale"
+          >
+            <FileDown className="w-4 h-4 mr-2" />
+            Download PDF
+          </Button>
+          <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+            <DialogTrigger asChild>
+              <Button onClick={resetForm} className="btn-ripple active-scale shadow-card hover:shadow-card-hover transition-smooth">
+                <Plus className="w-4 h-4 mr-2" />
+                Tambah Monitoring Kelas
+              </Button>
+            </DialogTrigger>
           <DialogContent className="max-w-md animate-scale-in">
             <DialogHeader>
               <DialogTitle className="font-display">Tambah Monitoring Kelas</DialogTitle>
