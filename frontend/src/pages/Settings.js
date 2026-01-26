@@ -77,8 +77,31 @@ const Settings = () => {
     }
   };
 
+  const handleSaveAppSettings = async () => {
+    try {
+      setSavingAppSettings(true);
+      await settingsAPI.updateAppSettings(appSettings);
+      toast({
+        title: 'Berhasil',
+        description: 'Pengaturan judul aplikasi berhasil disimpan',
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Gagal menyimpan pengaturan judul aplikasi',
+        variant: 'destructive',
+      });
+    } finally {
+      setSavingAppSettings(false);
+    }
+  };
+
   const handleChange = (field, value) => {
     setTemplates((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleAppSettingsChange = (field, value) => {
+    setAppSettings((prev) => ({ ...prev, [field]: value }));
   };
 
   const statusLabels = {
