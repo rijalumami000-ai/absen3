@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { settingsAPI } from '@/lib/api';
+import { useAppSettings } from '@/contexts/AppSettingsContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
