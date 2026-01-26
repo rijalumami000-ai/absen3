@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePengabsenAuth } from '@/contexts/PengabsenAuthContext';
+import { useAppSettings } from '@/contexts/AppSettingsContext';
 import { pengabsenAppAPI } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
