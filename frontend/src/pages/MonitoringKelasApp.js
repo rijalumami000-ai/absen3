@@ -27,6 +27,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const MonitoringKelasApp = () => {
   const { user, logout } = usePembimbingKelasAuth();
+  const { appSettings } = useAppSettings();
   const navigate = useNavigate();
   const [view, setView] = useState('dashboard'); // 'dashboard' or 'history'
   const [stats, setStats] = useState(null);
