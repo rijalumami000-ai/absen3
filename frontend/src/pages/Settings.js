@@ -27,6 +27,7 @@ const Settings = () => {
     monitoring_kelas_title: '',
   });
   const { toast } = useToast();
+  const { reloadSettings } = useAppSettings();
 
   useEffect(() => {
     loadSettings();
@@ -82,12 +83,15 @@ const Settings = () => {
       setSavingAppSettings(true);
       await settingsAPI.updateAppSettings(appSettings);
       
-      // Reload settings after save
+      // Reload settings in context
+      await reloadSettings();
+      
+      // Reload local state
       await loadAppSettings();
       
       toast({
         title: 'Berhasil',
-        description: 'Pengaturan judul aplikasi berhasil disimpan. Refresh halaman PWA untuk melihat perubahan.',
+        description: 'Pengaturan judul aplikasi berhasil disimpan. Silakan buka/refresh aplikasi PWA untuk melihat perubahan.',
       });
     } catch (error) {
       toast({
