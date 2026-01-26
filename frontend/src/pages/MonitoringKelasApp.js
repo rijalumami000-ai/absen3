@@ -452,10 +452,11 @@ const MonitoringKelasApp = () => {
                   ) : (
                     <Select value={selectedKelas} onValueChange={setSelectedKelas}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Pilih kelas" />
+                        <SelectValue placeholder="Semua kelas" />
                       </SelectTrigger>
                       <SelectContent>
-                        {kelasList.map(kelas => (
+                        <SelectItem value="all">Semua Kelas</SelectItem>
+                        {kelasList.map((kelas) => (
                           <SelectItem key={kelas.id} value={kelas.id}>
                             {kelas.nama}
                           </SelectItem>
