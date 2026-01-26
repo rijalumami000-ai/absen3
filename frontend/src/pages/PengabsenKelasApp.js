@@ -150,6 +150,20 @@ const PengabsenKelasApp = () => {
       toast.error('Gagal update status');
     }
   };
+  const deleteAbsensi = async (absensiId) => {
+    try {
+      const token = localStorage.getItem('pengabsen_kelas_token');
+      await axios.delete(`${API_URL}/api/absensi-kelas/${absensiId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      toast.success('Absensi dihapus');
+      loadGridData();
+    } catch (error) {
+      toast.error('Gagal menghapus absensi');
+    }
+  };
+
+
 
   const handleManualStatusChange = async (siswaId, kelasId, status) => {
     setManualStatusMap((prev) => ({ ...prev, [siswaId]: status }));
