@@ -13,6 +13,9 @@ const PembimbingApp = () => {
   const [selectedWaktu, setSelectedWaktu] = useState(null);
   const [todayData, setTodayData] = useState(null);
   const [statistik, setStatistik] = useState(null);
+  const [todaySearch, setTodaySearch] = useState('');
+  const [todayStatus, setTodayStatus] = useState('all');
+  const [selectedStatWaktu, setSelectedStatWaktu] = useState(null); // waktu yang dipilih dari tabel statistik
   const [historyData, setHistoryData] = useState(null);
   const [loadingData, setLoadingData] = useState(false);
   const [periodType, setPeriodType] = useState('day'); // 'day', 'week', 'biweek1', 'biweek2', 'month', 'year'
@@ -198,9 +201,10 @@ const PembimbingApp = () => {
     if (!statistik) return null;
     return (
       <div className="bg-white rounded-lg shadow p-4 mb-4">
-        <h3 className="text-sm font-semibold text-gray-700 mb-3">
+        <h3 className="text-sm font-semibold text-gray-700 mb-1">
           Statistik Hari Ini ({statistik.total_santri} santri)
         </h3>
+        <p className="text-xs text-gray-500 mb-3">Klik salah satu baris waktu sholat untuk memfilter daftar santri di bawah.</p>
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <thead>
@@ -218,9 +222,23 @@ const PembimbingApp = () => {
             <tbody>
               {waktuLabels.map((w) => {
                 const stat = statistik.stats?.[w.key] || {};
+                const isSelected = selectedStatWaktu === w.key;
                 return (
-                  <tr key={w.key} className="border-t">
-                    <td className="px-2 py-1 font-medium">{w.label}</td>
+                  <tr
+                    key={w.key}
+                    className={`border-t cursor-pointer transition-colors ${
+                      isSelected ? 'bg-blue-50' : 'hover:bg-gray-50'
+                    }`}
+                    onClick={() => setSelectedStatWaktu(isSelected ? null : w.key)}
+                  >
+                    <td className="px-2 py-1 font-medium flex items-center gap-2">
+                      <span>{w.label}</span>
+                      {isSelected && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700">
+                          Dipilih
+                        </span>
+                      )}
+                    </td>
                     <td className="px-2 py-1 text-center">{stat.hadir || 0}</td>
                     <td className="px-2 py-1 text-center">{stat.alfa || 0}</td>
                     <td className="px-2 py-1 text-center">{stat.sakit || 0}</td>
