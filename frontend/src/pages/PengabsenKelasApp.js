@@ -293,8 +293,41 @@ const PengabsenKelasApp = () => {
               ) : (
                 <div>
                   <div className="mb-4 w-full">
-          {/* Manual attendance list */}
-          <div className="mt-8 max-w-5xl mx-auto w-full">
+                    <Scanner
+                      onScan={(result) => {
+                        if (result && result[0]) {
+                          handleScanQR(result[0].rawValue);
+                        }
+                      }}
+                      onError={(error) => console.log(error?.message)}
+                      constraints={{
+                        facingMode: 'environment',
+                      }}
+                    />
+                    {scanSuccess && (
+                      <div className="mt-3 text-center text-sm font-semibold text-emerald-600">
+                        Scan berhasil!
+                      </div>
+                    )}
+                  </div>
+                  <Button
+                    onClick={() => setIsScanning(false)}
+                    variant="outline"
+                    size="lg"
+                    className="w-full"
+                  >
+                    <X className="w-4 h-4 mr-2" />
+                    Batal
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-4 text-center">
+                    Arahkan kamera ke QR Code siswa
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Manual attendance list */
+            <div className="mt-8 max-w-5xl mx-auto w-full">
             <div className="bg-card rounded-xl border border-border p-4 mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
               <div>
                 <h3 className="text-sm font-semibold">Absensi Manual</h3>
