@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { AppSettingsProvider } from '@/contexts/AppSettingsContext';
 import { Toaster } from '@/components/ui/sonner';
 import Layout from '@/components/Layout';
 import Login from '@/pages/Login';
