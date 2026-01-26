@@ -215,6 +215,7 @@ const PengabsenKelas = () => {
             </div>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       {/* Search */}
