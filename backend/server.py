@@ -408,7 +408,7 @@ class AbsensiKelas(BaseModel):
     siswa_id: str
     kelas_id: str
     tanggal: str  # YYYY-MM-DD
-    status: Literal["hadir", "alfa", "izin", "sakit"]
+    status: Literal["hadir", "alfa", "izin", "sakit", "telat"]
     waktu_absen: Optional[datetime] = None
     pengabsen_kelas_id: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -417,10 +417,10 @@ class AbsensiKelasCreate(BaseModel):
     siswa_id: str
     kelas_id: str
     tanggal: str
-    status: Literal["hadir", "alfa", "izin", "sakit"]
+    status: Literal["hadir", "alfa", "izin", "sakit", "telat"]
 
 class AbsensiKelasUpdate(BaseModel):
-    status: Literal["hadir", "alfa", "izin", "sakit"]
+    status: Literal["hadir", "alfa", "izin", "sakit", "telat"]
 
 class AbsensiKelasResponse(BaseModel):
     id: str
@@ -2828,6 +2828,32 @@ async def update_siswa_madrasah(siswa_id: str, data: SiswaMadrasahUpdate, _: dic
     if updated_siswa.get("kelas_id"):
         kelas = await db.kelas.find_one({"id": updated_siswa["kelas_id"]}, {"_id": 0})
         kelas_nama = kelas["nama"] if kelas else None
+
+@api_router.get("/pengabsen-kelas/siswa-saya")
+async def get_pengabsen_kelas_siswa_saya(current_pengabsen: dict = Depends(get_current_pengabsen_kelas)):
+    """Daftar siswa madrasah untuk semua kelas yang dikelola Pengabsen Kelas."""
+    kelas_ids = current_pengabsen.get("kelas_ids", []) or []
+    if not kelas_ids:
+        return []
+
+    siswa_list = await db.siswa_madrasah.find({"kelas_id": {"$in": kelas_ids}}, {"_id": 0}).to_list(1000)
+    # Ambil nama kelas
+    kelas_docs = await db.kelas.find({"id": {"$in": kelas_ids}}, {"_id": 0}).to_list(1000)
+    kelas_map = {k["id"]: k["nama"] for k in kelas_docs}
+
+    result = []
+    for siswa in siswa_list:
+        result.append(
+            {
+                "siswa_id": siswa["id"],
+                "siswa_nama": siswa["nama"],
+                "kelas_id": siswa.get("kelas_id"),
+                "kelas_nama": kelas_map.get(siswa.get("kelas_id"), ""),
+            }
+        )
+
+    return result
+
     
     has_qr = bool(updated_siswa.get("santri_id") or updated_siswa.get("qr_code"))
     
