@@ -183,7 +183,6 @@ const PengabsenApp = () => {
       </header>
 
       <main className="flex-1 p-4 space-y-4 max-w-4xl mx-auto w-full">
-        {renderTabs()}
 
         {activeTab === 'today' && (
           <>
