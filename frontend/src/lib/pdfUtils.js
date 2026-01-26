@@ -83,7 +83,7 @@ export const downloadPembimbingPDF = (pembimbingList, asramaList) => {
     getAsramaNames(p.asrama_ids)
   ]);
   
-  doc.autoTable({
+  autoTable(doc, {
     startY: 35,
     head: [['No', 'Nama', 'Username', 'Kode Akses', 'Kontak', 'Asrama']],
     body: tableData,
@@ -125,7 +125,7 @@ export const downloadSiswaMadinPDF = (siswaList, kelasList) => {
     s.santri_id ? 'Ya' : 'Tidak'
   ]);
   
-  doc.autoTable({
+  autoTable(doc, {
     startY: 35,
     head: [['No', 'Nama', 'NIS', 'Gender', 'Kelas', 'Linked']],
     body: tableData,
@@ -171,7 +171,7 @@ export const downloadPengabsenKelasPDF = (pengabsenList, kelasList) => {
     getKelasNames(p.kelas_ids)
   ]);
   
-  doc.autoTable({
+  autoTable(doc, {
     startY: 35,
     head: [['No', 'Nama', 'Username', 'Kode Akses', 'Kelas']],
     body: tableData,
@@ -216,7 +216,7 @@ export const downloadMonitoringKelasPDF = (monitoringList, kelasList) => {
     getKelasNames(m.kelas_ids)
   ]);
   
-  doc.autoTable({
+  autoTable(doc, {
     startY: 35,
     head: [['No', 'Nama', 'Username', 'Kode Akses', 'Kelas']],
     body: tableData,
