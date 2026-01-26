@@ -388,7 +388,6 @@ const PengabsenKelasApp = () => {
               )}
             </div>
           </div>
-          </div>
           </>
         ) : (
           /* Grid View */
