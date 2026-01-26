@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePembimbingAuth } from '@/contexts/PembimbingAuthContext';
+import { useAppSettings } from '@/contexts/AppSettingsContext';
 import { pembimbingAppAPI } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
