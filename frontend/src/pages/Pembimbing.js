@@ -158,6 +158,15 @@ const Pembimbing = () => {
       .join(', ');
   };
 
+  // Filter pembimbing by search
+  const filteredPembimbing = pembimbing.filter((p) => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return p.nama?.toLowerCase().includes(query) ||
+           p.username?.toLowerCase().includes(query) ||
+           p.email_atau_hp?.toLowerCase().includes(query);
+  });
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -178,6 +187,22 @@ const Pembimbing = () => {
           Tambah Pembimbing
         </Button>
       </div>
+
+      {/* Search Box */}
+      <Card className="shadow-card animate-scale-in">
+        <CardContent className="p-4">
+          <Label>Cari Pembimbing</Label>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              placeholder="Cari nama, username, atau kontak..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="bg-white rounded-lg shadow-card overflow-hidden card-hover transition-smooth animate-scale-in">
         <div className="overflow-x-auto">
