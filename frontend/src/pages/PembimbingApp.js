@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 
 const PembimbingApp = () => {
   const { user, loading, logout } = usePembimbingAuth();
+  const { appSettings } = useAppSettings();
   const [activeTab, setActiveTab] = useState('today');
   const [selectedWaktu, setSelectedWaktu] = useState(null);
   const [todayData, setTodayData] = useState(null);
