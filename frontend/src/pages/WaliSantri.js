@@ -4,11 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Edit, UserCircle, MessageCircle, Copy } from 'lucide-react';
+import { Edit, UserCircle, MessageCircle, Copy, Search } from 'lucide-react';
 
 const WaliSantri = () => {
   const [waliList, setWaliList] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [waDialogOpen, setWaDialogOpen] = useState(false);
