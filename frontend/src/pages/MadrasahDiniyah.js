@@ -338,6 +338,37 @@ const MadrasahDiniyah = () => {
                 <Button onClick={handleCreate} className="w-full">
                   Simpan
                 </Button>
+      {/* Filter Kelas + Search */}
+      <div className="flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
+        <div className="w-full md:w-64 flex items-center gap-2">
+          <Label className="text-sm text-muted-foreground">Filter Kelas</Label>
+          <Select value={kelasFilter} onValueChange={setKelasFilter}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Semua Kelas" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Semua Kelas</SelectItem>
+              {kelasList.map((kelas) => (
+                <SelectItem key={kelas.id} value={kelas.id}>
+                  {kelas.nama}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          <Input
+            placeholder="Cari siswa atau kelas..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+      </div>
+
+
               </div>
             </DialogContent>
           </Dialog>
