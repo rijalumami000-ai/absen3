@@ -146,7 +146,16 @@ const PengabsenApp = () => {
   const hadirCount = data.filter((row) => row.status === 'hadir').length;
   const belumCount = data.filter((row) => row.status == null).length;
 
-  const renderTabs = () => (
+  // Filter data by search query
+  const filteredData = data.filter((row) => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return row.nama?.toLowerCase().includes(query) ||
+           row.nis?.toLowerCase().includes(query);
+  });
+
+  // Group filtered data by asrama
+  const groupedList = React.useMemo(() => {
     <div className="flex gap-2 mb-4">
       <button
         type="button"
