@@ -14,10 +14,6 @@ export const AppSettingsProvider = ({ children }) => {
   });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadSettings();
-  }, []);
-
   const loadSettings = async () => {
     try {
       const response = await settingsAPI.getAppSettings();
@@ -28,6 +24,21 @@ export const AppSettingsProvider = ({ children }) => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadSettings();
+    
+    // Reload settings every time window gains focus (user switches back to tab)
+    const handleFocus = () => {
+      loadSettings();
+    };
+    
+    window.addEventListener('focus', handleFocus);
+    
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, []);
 
   return (
     <AppSettingsContext.Provider value={{ appSettings, loading, reloadSettings: loadSettings }}>
