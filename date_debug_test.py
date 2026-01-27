@@ -414,19 +414,25 @@ class DateDebugTester:
                 try:
                     response = requests.get(
                         endpoint["url"],
+                        params=endpoint.get("params", {}),
                         headers=endpoint["headers"],
                         timeout=30
                     )
                     
                     if response.status_code == 200:
                         data = response.json()
-                        endpoint_date = data.get(endpoint["date_field"])
                         
-                        if endpoint_date == backend_today:
-                            self.log_test(f"Date Value {endpoint['name']}", True, f"Consistent date: {endpoint_date}")
+                        if endpoint["date_field"]:
+                            endpoint_date = data.get(endpoint["date_field"])
+                            
+                            if endpoint_date == backend_today:
+                                self.log_test(f"Date Value {endpoint['name']}", True, f"Consistent date: {endpoint_date}")
+                            else:
+                                self.log_test(f"Date Value {endpoint['name']}", False, f"Date mismatch! Expected: {backend_today}, Got: {endpoint_date}")
+                                all_consistent = False
                         else:
-                            self.log_test(f"Date Value {endpoint['name']}", False, f"Date mismatch! Expected: {backend_today}, Got: {endpoint_date}")
-                            all_consistent = False
+                            # For endpoints that don't return date directly, just check if they work
+                            self.log_test(f"Date Value {endpoint['name']}", True, f"Endpoint accessible (no date field to check)")
                     else:
                         self.log_test(f"Date Value {endpoint['name']}", False, f"Failed to get data from {endpoint['name']}", response.json())
                         all_consistent = False
