@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """
 Backend Test Suite for Absensi Sholat API
-Tests the updated endpoints after model changes
+Tests RBAC admin functionality and updated endpoints
 """
 
 import requests
 import json
 import sys
+import jwt
 from datetime import datetime
 from typing import Dict, Any, Optional
 
@@ -14,6 +15,14 @@ from typing import Dict, Any, Optional
 BASE_URL = "https://accessctrl-1.preview.emergentagent.com/api"
 ADMIN_USERNAME = "admin"
 ADMIN_PASSWORD = "admin123"
+
+# RBAC Test Accounts
+RBAC_TEST_ACCOUNTS = [
+    {"username": "admin", "password": "admin123", "expected_role": "superadmin"},
+    {"username": "alhamidcintamulya", "password": "alhamidku123", "expected_role": "superadmin"},
+    {"username": "alhamid", "password": "alhamidku123", "expected_role": "pesantren"},
+    {"username": "madin", "password": "madinku123", "expected_role": "madin"}
+]
 
 class AbsensiSholatTester:
     def __init__(self):
