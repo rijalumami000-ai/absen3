@@ -626,6 +626,10 @@ async def get_current_admin(credentials: HTTPAuthorizationCredentials = Depends(
         if admin is None:
             raise HTTPException(status_code=401, detail="Admin not found")
         
+        # Pastikan field role selalu ada di objek admin yang dikembalikan
+        if "role" not in admin:
+            admin["role"] = payload.get("role", "superadmin")
+        
         return admin
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid authentication credentials")
