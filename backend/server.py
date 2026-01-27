@@ -2658,13 +2658,6 @@ async def ensure_admin_account(username: str, nama: str, password: str, role: st
     if updates:
         await db.admins.update_one({"id": admin["id"]}, {"$set": updates})
 
-        {"id": "app_settings"},
-        {"$set": update_data},
-        upsert=True
-    )
-    
-    return {"message": "App settings berhasil diupdate"}
-
 
 
 # ==================== INITIALIZATION ====================
