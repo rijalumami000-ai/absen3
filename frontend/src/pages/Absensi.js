@@ -74,12 +74,12 @@ const Absensi = () => {
   }, []);
 
   useEffect(() => {
-    loadDetail();
-  }, [filterTanggal, filterAsrama, filterGender]);
-
-  useEffect(() => {
     calculateDateRange();
   }, [filterPeriode, filterTanggal]);
+
+  useEffect(() => {
+    loadDetail();
+  }, [tanggalStart, tanggalEnd, filterAsrama, filterGender]);
 
   const loadData = async () => {
     try {
