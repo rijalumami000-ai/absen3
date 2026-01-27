@@ -28,6 +28,46 @@ const RiwayatAbsensiMadin = () => {
   const [detail, setDetail] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const getPeriodeLabel = () => {
+    switch (filterPeriode) {
+      case 'hari':
+        return 'Periode: Per Hari';
+      case 'minggu1':
+        return 'Periode: Minggu 1';
+      case 'minggu2':
+        return 'Periode: Minggu 2';
+      case 'minggu3':
+        return 'Periode: Minggu 3';
+      case 'minggu4':
+        return 'Periode: Minggu 4';
+      case '2minggu1':
+        return 'Periode: 2 Minggu Pertama';
+      case '2minggu2':
+        return 'Periode: 2 Minggu Kedua';
+      case 'semester1':
+        return 'Periode: Semester 1 (Jan-Jun)';
+      case 'semester2':
+        return 'Periode: Semester 2 (Jul-Des)';
+      case 'tahun':
+        return 'Periode: Per Tahun';
+      default:
+        return '';
+    }
+  };
+
+  const getKelasLabel = () => {
+    if (filterKelas === 'all') return '';
+    const kelas = kelasList.find((k) => k.id === filterKelas);
+    return kelas ? kelas.nama : '';
+  };
+
+  const getGenderLabel = () => {
+    if (filterGender === 'all') return '';
+    if (filterGender === 'putra') return 'Laki-laki';
+    if (filterGender === 'putri') return 'Perempuan';
+    return '';
+  };
+
   useEffect(() => {
     loadKelas();
   }, []);
