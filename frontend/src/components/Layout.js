@@ -42,13 +42,15 @@ const Layout = ({ children }) => {
       type: 'single', 
       path: '/dashboard', 
       icon: Home, 
-      label: 'Dashboard' 
+      label: 'Dashboard',
+      allowedRoles: ['superadmin', 'pesantren', 'madin'],
     },
     {
       id: 'setting-pesantren',
       type: 'group',
       icon: Building,
       label: 'Setting Pesantren',
+      allowedRoles: ['superadmin', 'pesantren'],
       items: [
         { path: '/santri', icon: Database, label: 'Database Santri/Siswa' },
         { path: '/asrama', icon: Building, label: 'Asrama Santri' },
@@ -60,6 +62,7 @@ const Layout = ({ children }) => {
       type: 'group',
       icon: ClipboardList,
       label: 'Absensi Pesantren',
+      allowedRoles: ['superadmin', 'pesantren'],
       items: [
         { path: '/pengabsen', icon: UserCheck, label: 'Pengabsen Sholat' },
         { path: '/pembimbing', icon: UserCog, label: 'Monitoring Sholat' },
@@ -72,20 +75,31 @@ const Layout = ({ children }) => {
       type: 'group',
       icon: GraduationCap,
       label: 'Setting Madrasah Diniyah',
+      allowedRoles: ['superadmin', 'madin'],
       items: [
         { path: '/madrasah-diniyah', icon: BookOpen, label: 'Siswa Madin' },
         { path: '/kelas', icon: GraduationCap, label: 'Kelas Madrasah Diniyah' },
+      ]
+    },
+    {
+      id: 'absensi-madrasah',
+      type: 'group',
+      icon: ClipboardCheck,
+      label: 'Absensi Madrasah Diniyah',
+      allowedRoles: ['superadmin', 'madin'],
+      items: [
         { path: '/pengabsen-kelas', icon: ClipboardCheck, label: 'Pengabsen Kelas Madin' },
         { path: '/monitoring-kelas', icon: Eye, label: 'Monitoring Kelas Madin' },
         { path: '/riwayat-absensi-madin', icon: ClipboardList, label: 'Riwayat Absensi Madin' },
-      ]
+      ],
     },
     { 
       id: 'settings',
       type: 'single', 
       path: '/settings', 
       icon: Settings, 
-      label: 'Pengaturan' 
+      label: 'Pengaturan',
+      allowedRoles: ['superadmin'],
     },
   ];
 
