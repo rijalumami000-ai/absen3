@@ -163,7 +163,7 @@ const Absensi = () => {
         asrama_id: filterAsrama || undefined,
         gender: filterGender || undefined,
       });
-      setDetailData(response.data || []);
+      setDetailData(response.data?.detail || {});
     } catch (error) {
       console.error('Error loading detail:', error);
       setDetailData(null);
