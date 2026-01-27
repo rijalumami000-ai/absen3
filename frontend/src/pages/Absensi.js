@@ -157,12 +157,13 @@ const Absensi = () => {
 
   const loadDetail = async () => {
     try {
-      const response = await absensiAPI.getDetail(
-        filterTanggal,
-        filterAsrama || undefined,
-        filterGender || undefined
-      );
-      setDetailData(response.data);
+      const response = await absensiAPI.getRiwayat({
+        tanggal_start: tanggalStart,
+        tanggal_end: tanggalEnd,
+        asrama_id: filterAsrama || undefined,
+        gender: filterGender || undefined,
+      });
+      setDetailData(response.data || []);
     } catch (error) {
       console.error('Error loading detail:', error);
       setDetailData(null);
