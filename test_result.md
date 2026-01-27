@@ -312,11 +312,13 @@ metadata:
 
 test_plan:
   current_focus:
-    - "RBAC Admin Seeding Endpoint Testing"
-    - "RBAC Admin Login Testing"
-    - "RBAC Admin Profile Endpoint Testing"
-  stuck_tasks: []
-  test_all: true
+    - "Date Consistency Testing for Absensi Sholat"
+    - "Absensi Creation and Visibility Testing"
+    - "Timezone Edge Case Testing"
+    - "Wali Sync Issue Investigation"
+  stuck_tasks:
+    - "Wali Sync Issue Investigation"
+  test_all: false
   test_priority: "high_first"
 
 agent_communication:
