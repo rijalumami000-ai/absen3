@@ -169,6 +169,15 @@ export const waktuSholatAPI = {
   sync: (tanggal) => axios.post(`${API}/waktu-sholat/sync?tanggal=${tanggal}`, {}, { headers: getAuthHeader() }),
 };
 
+// Madin Absensi API (Admin)
+export const madinAbsensiAPI = {
+  getRiwayat: (params) =>
+    axios.get(`${API}/madin/absensi/riwayat`, {
+      params,
+      headers: getAuthHeader(),
+    }),
+};
+
 // Settings API
 export const settingsAPI = {
   getWaliNotifikasi: () => axios.get(`${API}/settings/wali-notifikasi`, { headers: getAuthHeader() }),
