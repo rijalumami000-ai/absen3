@@ -206,7 +206,11 @@ const Layout = ({ children }) => {
                           const handleItemClick = (e) => {
                             if (!isAllowedItem) {
                               e.preventDefault();
-                              alert('Anda tidak punya hak akses');
+                              toast({
+                                title: 'Akses Ditolak',
+                                description: 'Anda tidak punya hak akses',
+                                variant: 'destructive',
+                              });
                             }
                           };
                           return (
