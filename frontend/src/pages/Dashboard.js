@@ -120,44 +120,7 @@ const Dashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="card-hover animate-fade-in transition-smooth" style={{ animationDelay: '100ms' }}>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                <Users className="w-5 h-5 text-green-700" />
-              </div>
-              Statistik Kehadiran Hari Ini
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-green-50 rounded-xl hover-lift transition-smooth">
-                <span className="text-sm font-medium text-gray-700">Hadir</span>
-                <span className="text-lg font-bold text-green-700">{stats?.hadir || 0}</span>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-red-50 rounded-xl hover-lift transition-smooth">
-                <span className="text-sm font-medium text-gray-700">Alfa</span>
-                <span className="text-lg font-bold text-red-700">{stats?.alfa || 0}</span>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-xl hover-lift transition-smooth">
-                <span className="text-sm font-medium text-gray-700">Sakit</span>
-                <span className="text-lg font-bold text-yellow-700">{stats?.sakit || 0}</span>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-blue-50 rounded-xl hover-lift transition-smooth">
-                <span className="text-sm font-medium text-gray-700">Izin</span>
-                <span className="text-lg font-bold text-blue-700">{stats?.izin || 0}</span>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-purple-50 rounded-xl hover-lift transition-smooth">
-                <span className="text-sm font-medium text-gray-700">Haid</span>
-                <span className="text-lg font-bold text-purple-700">{stats?.haid || 0}</span>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-pink-50 rounded-xl hover-lift transition-smooth">
-                <span className="text-sm font-medium text-gray-700">Istihadhoh</span>
-                <span className="text-lg font-bold text-pink-700">{stats?.istihadhoh || 0}</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Kartu Statistik Hari ini dihapus sesuai permintaan, hanya menyisakan Informasi Sistem */}
 
         <Card className="card-hover animate-fade-in transition-smooth" style={{ animationDelay: '200ms' }}>
           <CardHeader>
