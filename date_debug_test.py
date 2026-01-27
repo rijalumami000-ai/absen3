@@ -401,7 +401,8 @@ class DateDebugTester:
                     "headers": self.wali_headers,
                     "date_field": "tanggal"
                 } if self.wali_headers else None
-            ]
+            # Filter out None values
+            endpoints_to_test = [ep for ep in endpoints_to_test if ep is not None]
             
             all_consistent = True
             
