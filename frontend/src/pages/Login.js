@@ -175,8 +175,20 @@ const Login = () => {
             </form>
 
             <div className="mt-6 pt-6 border-t border-border">
-              <p className="text-center text-sm text-muted-foreground">
-                Kredensial default: <code className="bg-muted px-2 py-0.5 rounded text-xs">admin / admin123</code>
+              <p className="text-center text-sm text-muted-foreground space-y-1">
+                <span className="block font-medium">Kredensial admin untuk uji coba:</span>
+                <span className="block">
+                  <code className="bg-muted px-2 py-0.5 rounded text-xs">admin / admin123</code> — Super Admin (lama)
+                </span>
+                <span className="block">
+                  <code className="bg-muted px-2 py-0.5 rounded text-xs">alhamidcintamulya / alhamidku123</code> — Super Admin
+                </span>
+                <span className="block">
+                  <code className="bg-muted px-2 py-0.5 rounded text-xs">alhamid / alhamidku123</code> — Admin Pesantren
+                </span>
+                <span className="block">
+                  <code className="bg-muted px-2 py-0.5 rounded text-xs">madin / madinku123</code> — Admin Madrasah Diniyah
+                </span>
               </p>
             </div>
           </div>
