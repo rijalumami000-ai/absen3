@@ -250,6 +250,34 @@ const Absensi = () => {
       {/* Filters */}
       <Card className="mb-6 shadow-card animate-scale-in">
         <CardContent className="p-4">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+            <div className="text-sm text-muted-foreground">
+              <div>{getPeriodeLabel()}</div>
+              <div>{`Periode tanggal: ${tanggalStart} s.d. ${tanggalEnd}`}</div>
+              <div>{`Asrama: ${getAsramaLabel()}`}</div>
+              <div>{`Gender: ${getGenderLabel() || 'Semua'}`}</div>
+            </div>
+            <div className="flex flex-wrap gap-2 justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  downloadRiwayatAbsensiSholatPDF(detailData || {}, {
+                    periodeLabel: getPeriodeLabel(),
+                    tanggalStart,
+                    tanggalEnd,
+                    asramaLabel: getAsramaLabel(),
+                    genderLabel: getGenderLabel(),
+                  })
+                }
+                disabled={!detailData}
+              >
+                <FileDown className="w-4 h-4 mr-2" />
+                Download PDF
+              </Button>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <Label>Periode</Label>
@@ -259,22 +287,41 @@ const Absensi = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="hari">Per Hari</SelectItem>
-                  <SelectItem value="minggu">Per Minggu</SelectItem>
-                  <SelectItem value="2minggu">Per 2 Minggu</SelectItem>
-                  <SelectItem value="bulan">Per Bulan</SelectItem>
-                  <SelectItem value="semester1">Semester 1 (6 bulan pertama)</SelectItem>
-                  <SelectItem value="semester2">Semester 2 (6 bulan kedua)</SelectItem>
+                  <SelectItem value="minggu1">Minggu 1</SelectItem>
+                  <SelectItem value="minggu2">Minggu 2</SelectItem>
+                  <SelectItem value="minggu3">Minggu 3</SelectItem>
+                  <SelectItem value="minggu4">Minggu 4</SelectItem>
+                  <SelectItem value="2minggu1">2 Minggu Pertama</SelectItem>
+                  <SelectItem value="2minggu2">2 Minggu Kedua</SelectItem>
+                  <SelectItem value="semester1">Semester 1 (Jan-Jun)</SelectItem>
+                  <SelectItem value="semester2">Semester 2 (Jul-Des)</SelectItem>
                   <SelectItem value="tahun">Per Tahun</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label>Tanggal</Label>
+              <Label>Tanggal Referensi</Label>
               <Input
                 type="date"
                 value={filterTanggal}
                 onChange={(e) => setFilterTanggal(e.target.value)}
                 data-testid="filter-tanggal-input"
+              />
+            </div>
+            <div>
+              <Label>Tanggal Mulai</Label>
+              <Input
+                type="date"
+                value={tanggalStart}
+                onChange={(e) => setTanggalStart(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label>Tanggal Selesai</Label>
+              <Input
+                type="date"
+                value={tanggalEnd}
+                onChange={(e) => setTanggalEnd(e.target.value)}
               />
             </div>
             <div>
@@ -308,22 +355,6 @@ const Absensi = () => {
                 </SelectContent>
               </Select>
             </div>
-          </div>
-          <div className="mt-4 flex justify-between items-center">
-            <div className="text-sm text-gray-600">
-              Menampilkan data: <strong>{tanggalStart}</strong> s/d <strong>{tanggalEnd}</strong>
-            </div>
-            {detailData && (
-              <Button
-                onClick={handleDownloadPDF}
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-2"
-              >
-                <FileDown size={16} />
-                Download PDF
-              </Button>
-            )}
           </div>
         </CardContent>
       </Card>
