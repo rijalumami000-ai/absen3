@@ -309,9 +309,6 @@ const Absensi = () => {
               </Select>
             </div>
           </div>
-          <div className="mt-4 text-sm text-gray-600">
-            Menampilkan data: <strong>{tanggalStart}</strong> s/d <strong>{tanggalEnd}</strong>
-          </div>
         </CardContent>
       </Card>
 
