@@ -200,6 +200,32 @@ const RiwayatAbsensiMadin = () => {
       {/* Filter Bar */}
       <Card className="mb-6 shadow-card animate-scale-in">
         <CardContent className="p-4">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+            <div className="text-sm text-muted-foreground">
+              <div>{getPeriodeLabel()}</div>
+              <div>{`Periode tanggal: ${tanggalStart} s.d. ${tanggalEnd}`}</div>
+            </div>
+            <div className="flex flex-wrap gap-2 justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  downloadRiwayatAbsensiMadinPDF(detail, {
+                    periodeLabel: getPeriodeLabel(),
+                    tanggalStart,
+                    tanggalEnd,
+                    kelasLabel: getKelasLabel(),
+                    genderLabel: getGenderLabel(),
+                  })
+                }
+                disabled={loading || detail.length === 0}
+              >
+                <FileDown className="w-4 h-4 mr-2" />
+                Download PDF
+              </Button>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <Label>Periode</Label>
