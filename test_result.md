@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test UI/UX redesign untuk semua halaman Admin dan PWA. Verify: Admin Pages Testing (Dashboard, Asrama Santri, Santri, Waktu Sholat, Riwayat Absensi Sholat, Pengabsen Sholat, Monitoring Sholat, Kelas Madrasah Diniyah, Madrasah Diniyah, Pengabsen Kelas, Monitoring Kelas, Settings) - verify cards have animations, hover effects, modern design, gradient headers, button ripple effects, modal animations. PWA Testing - test PWA login pages load correctly, verify consistent modern design. Key Visual Elements - all h1 titles use font-display class, cards have shadow-card and hover effects, buttons have btn-ripple and active-scale classes, page elements have fade-in/slide-in animations, no broken layouts, consistent color scheme, gradient headers on key components."
+user_problem_statement: "Test RBAC admin functionality for backend endpoints. Verify: 1) POST /api/init/admin endpoint (idempotent seeding), 2) Login with 4 admin accounts (admin/admin123->superadmin, alhamidcintamulya/alhamidku123->superadmin, alhamid/alhamidku123->pesantren, madin/madinku123->madin) and verify roles in response, 3) GET /api/auth/me with JWT tokens to verify role persistence, 4) Ensure JWT tokens contain correct role in payload."
 
 backend:
   - task: "Backend testing completed in previous session"
