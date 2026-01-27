@@ -251,7 +251,12 @@ const Layout = ({ children }) => {
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-medium text-foreground text-sm truncate">{user?.username}</p>
-              <p className="text-xs text-muted-foreground">Administrator</p>
+              <p className="text-xs text-muted-foreground">
+                {role === 'superadmin' && 'Super Admin'}
+                {role === 'pesantren' && 'Admin Pesantren'}
+                {role === 'madin' && 'Admin Madrasah Diniyah'}
+                {!role && 'Administrator'}
+              </p>
             </div>
           </div>
           <Button
