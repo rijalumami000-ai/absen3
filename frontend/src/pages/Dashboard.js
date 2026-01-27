@@ -18,13 +18,19 @@ const Dashboard = () => {
   const loadData = async () => {
     try {
       const today = new Date().toISOString().split('T')[0];
-      const [statsRes, santriRes] = await Promise.all([
+      const [statsRes, santriRes, siswaMadinRes] = await Promise.all([
         absensiAPI.getStats(today),
-        santriAPI.getAll({})
+        santriAPI.getAll({}),
+        // gunakan endpoint siswa madrasah langsung dari API umum
+        // (MadrasahDiniyah.js memanggil `/siswa-madrasah` via api default)
+        fetch(`${process.env.REACT_APP_BACKEND_URL}/api/siswa-madrasah`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        }).then((r) => r.json()),
       ]);
       
       setStats(statsRes.data);
       setTotalSantri(santriRes.data.length);
+      setTotalSiswaMadin((siswaMadinRes || []).length || 0);
     } catch (error) {
       toast({
         title: "Error",
