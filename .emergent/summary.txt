@@ -1,172 +1,139 @@
 <analysis>Here is the summary of the current session:
 
-**original_problem_statement**: The user wants to build a comprehensive prayer attendance application. The initial scope included an Admin Web App and three Progressive Web Apps (PWAs) for Attendants (Pengabsen), Guardians (Wali Santri), and Supervisors (Pembimbing).
+**original_problem_statement**: The user initially requested an application for prayer attendance. This evolved to include a Madrasah Diniyah module and a major UI redesign. The current primary objective is to implement a Role-Based Access Control (RBAC) system for the admin dashboard.
 
 **PRODUCT REQUIREMENTS**:
-- **Admin App**: Manage all data entities, generate QR codes, and view attendance.
-- **Pengabsen PWA**: Scan student QR codes to record attendance.
-- **Wali Santri PWA**: View their child's attendance and receive real-time push notifications.
-- **Pembimbing PWA**: A read-only app for supervisors to monitor attendance.
-- **Key Features Added**:
-    - **FCM Push Notifications**: Real-time notifications for guardians with customizable templates managed by the admin.
-    - **Login System Rework**: Migrated Pengabsen and Pembimbing authentication from passwords to a generated  for simpler, more secure access.
-    - **UI/UX Redesign**: A complete visual overhaul of all applications for a modern, professional look and feel.
-    - **PWA Compatibility**: Fixed issues preventing the app from being packaged by tools like PWA Builder.
-- **Recent Bug Reports**:
-    1.  The delete function for 'Pengabsen' in the Admin app is not working.
-    2.  Deleting a 'Santri' does not automatically delete the associated 'Wali Santri' if they have no other children, leading to orphaned data.
+-   **Admin Roles**: Create three distinct admin roles with specific credentials:
+    1.  **Super Admin**: Can access all menus.
+        -   Username:  / Password: 
+    2.  **Akun Pesantren**: Can only access Setting Pesantren and Absensi Pesantren.
+        -   Username:  / Password: 
+    3.  **Akun Madrasah Diniyah**: Can only access Setting Madrasah Diniyah and Absensi Madrasah Diniyah.
+        -   Username:  / Password: 
+-   **Menu Restructuring**:
+    -   Create a new dropdown menu named Absensi Madrasah Diniyah.
+    -   Move Pengabsen Kelas Madin, Monitoring Kelas Madin, and Riwayat Absensi Madin out of the Setting Madrasah Diniyah dropdown and into the new Absensi Madrasah Diniyah dropdown.
+-   **Menu Access Control**:
+    -   The Menu Pengaturan (main settings) should only be accessible by the Super Admin.
+    -   Implement frontend logic to hide or disable menu items based on the logged-in user's role. If a user tries to access a restricted menu, show an alert or redirect them.
 
 **User's preferred language**: Indonesian
 
 **what currently exists?**
-- A full-stack application with a FastAPI backend, MongoDB database, and a React frontend.
-- Four functional applications: Admin, Pengabsen (Attendant), Wali Santri (Guardian), and Pembimbing (Supervisor).
-- A complete UI/UX redesign has been applied across all apps, featuring a modern design system with new fonts (Playfair Display, Lato), colors, and layouts.
-- An end-to-end FCM push notification system is implemented and tested, allowing guardians to receive real-time attendance updates.
-- The application is fully PWA-ready, with a complete , a suite of icons, and a service worker to ensure compatibility with packaging tools and provide offline capabilities.
+A full-stack application for prayer and Madrasah attendance. The application has multiple PWAs for different user types (wali, pengabsen, etc.) and a comprehensive admin dashboard. The most recent feature added was a Riwayat Absensi Madin page with complex, interconnected filters and a PDF export function. The agent has just begun the groundwork for implementing the new RBAC system by exploring the relevant files.
 
 **Last working item**:
-- **Last item agent was working on**: Fixing two user-reported bugs related to data deletion.
-    1.  The backend endpoint to delete a 'Pengabsen' was broken.
-    2.  The logic to automatically delete a 'Wali Santri' when their last child is removed was missing.
-- **Status**: IN PROGRESS
-- **Agent Testing Done**: N
-- **Which testing method agent to use?**: backend testing agent. The agent should write and run tests to verify that the  and  endpoints function correctly, including the new cascading delete logic.
-- **User Testing Done**: N
+-   **Last item agent was working**: Implementing Role-Based Access Control (RBAC) for the admin dashboard. The agent had just started by analyzing the existing authentication and UI structure, viewing files like , , and  to plan the implementation. The goal is to create three distinct admin roles (Super Admin, Pesantren, Madrasah Diniyah) with specific menu access rights.
+-   **Status**: IN PROGRESS
+-   **Agent Testing Done**: N
+-   **Which testing method agent to use?**: both
+-   **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
-- **Issue 1**: (P0) The Delete Pengabsen feature in the Admin app is non-functional.
-- **Issue 2**: (P0) Deleting a Santri leaves an orphaned Wali Santri record if it was the only child.
+-   **Issue 1**: (P0) Implement Role-Based Access Control (RBAC).
 
 **Issues Detail**:
-- **Issue 1**: Delete Pengabsen function is not working.
-    - **Attempted fixes**: The agent identified a decorator () in  that was not attached to any function body, causing the endpoint to fail.
-    - **Next debug checklist**:
-        1.  In , correctly implement the  function and attach it to the decorator.
-        2.  Ensure the function performs .
-        3.  Restart the backend and test the endpoint using  or a testing agent.
-    - **Why fix this issue and what will be achieved with the fix?**: This is a critical bug preventing admins from managing users. Fixing it restores core CRUD functionality.
-    - **Status**: IN PROGRESS
-    - **Is recurring issue?**: N
-    - **Should Test frontend/backend/both after fix?**: Both
-    - **Blocked on other issue**: No
-
-- **Issue 2**: Deleting a Santri does not remove the associated Wali Santri.
-    - **Attempted fixes**: The agent found that the  function, which runs after a Santri is deleted, only handles user creation/updates, not deletions. The agent started to modify this function.
-    - **Next debug checklist**:
-        1.  Finalize the changes to the  function in .
-        2.  Add logic to identify all  with an empty  array and delete them from the database.
-        3.  Restart the backend and test by deleting a Santri who is the only child of a Wali, then verifying the Wali is also deleted.
-    - **Why fix this issue and what will be achieved with the fix?**: This ensures data integrity and prevents the database from accumulating orphaned  records.
-    - **Status**: IN PROGRESS
-    - **Is recurring issue?**: N
-    - **Should Test frontend/backend/both after fix?**: Backend
-    - **Blocked on other issue**: No
+-   **Issue 1**: Implement Role-Based Access Control (RBAC)
+    -   **Attempted fixes**: The agent has only performed initial reconnaissance by viewing files. No code changes have been made yet for this feature.
+    -   **Next debug checklist**:
+        1.  **Backend ():**
+            -   Modify the  Pydantic model to include a  field.
+            -   Update the  function or create a new seeding script to generate the three required user accounts (, , ) with their specified roles and hashed passwords.
+            -   Modify the login endpoint () to include the  in the JWT token payload.
+            -   Modify the user profile endpoint () to return the user's role.
+        2.  **Frontend:**
+            -   Update the  to store the user's  from the login/me response.
+            -   Refactor  to conditionally render menu items based on the  from the .
+            -   Implement the menu restructuring as per the requirements.
+    -   **Why fix this issue and what will be achieved with the fix?**: This is the primary feature requested by the user to secure the admin dashboard and provide scoped access to different administrative teams.
+    -   **Status**: IN PROGRESS
+    -   **Is recurring issue?**: N
+    -   **Should Test frontend/backend/both after fix?**: Both
+    -   **Blocked on other issue**: None
 
 **In progress Task List**:
-- None. The current work is classified as bug fixing.
+-   **Task 1**: Implement Role-Based Access Control (RBAC)
+    -   **Where to resume**: Start by modifying the backend  to support user roles, as outlined in the Next debug checklist for Issue 1.
+    -   **What will be achieved with this?**: This will complete the entire user request for scoped admin access, improving application security and organization.
+    -   **Status**: IN PROGRESS
+    -   **Should Test frontend/backend/both after fix?**: Both
+    -   **Blocked on something**: None
 
 **Upcoming and Future Tasks**
-- **Upcoming Tasks**:
-    - (P0) **Deploy Application**: After the two pending bug fixes are resolved and verified, the primary goal is to deploy the application for live use, as requested by the user.
-- **Future Tasks**:
-    - Implement a Dark Mode theme for user comfort.
-    - Add more engaging loading animations and micro-interactions.
-    - Create a feature to automatically notify a Pembimbing if a student is marked absent multiple times consecutively.
-    - Develop a weekly/monthly attendance report generation feature.
+-   **Future Tasks:**
+    -   **(Deferred)** Finalize the PWA-to-Android app separation project. The user requested to Skip dulu projek ini, simpan diingatanmu. This involves providing a clear guide or script to use the 5 generated manifest files (, etc.) with PWABuilder or Bubblewrap.
+    -   **(Deferred)** Implement Dark Mode.
+    -   **(Deferred)** Implement automated notifications for absences.
 
 **Completed work in this session**
-- **UI/UX Redesign**: A complete visual overhaul for all four applications (Admin, Pengabsen, Wali, Pembimbing) based on  guidelines.
-- **Pembimbing PWA**: Fully implemented, including  login, a dashboard with comprehensive statistics, and a history view with advanced date-range filtering.
-- **Pengabsen Login Rework**: Converted the login system from password-based to a more secure  system.
-- **PWA Readiness**: Resolved compatibility issues with PWA builders by creating a , app icons, and a service worker.
-- **FCM Push Notifications**: Successfully implemented and tested the end-to-end notification system for guardians.
-
-**Earlier issues found/mentioned but not fixed**
-- None.
-
-**Known issue recurrence from previous fork**
-- None.
+-   **Bug Fixes & Feature Enhancements**:
+    -   Fixed a blocking frontend compilation error in .
+    -   Successfully completed all 6 high-priority tasks from the previous user request list, including major enhancements to the Pengabsen Sholat, Pengabsen Kelas Madin, Monitoring Sholat, and Monitoring Kelas Madin PWAs.
+    -   Resolved a critical timezone bug across all PWAs and admin pages that caused dates to display incorrectly.
+-   **Deployment & Security**:
+    -   Fixed a deployment failure by adding a health-check endpoint to the backend to satisfy readiness probes.
+    -   Improved security by refactoring Firebase credential handling to use environment variables instead of a hardcoded file.
+-   **New Feature: Riwayat Absensi Madin**:
+    -   Built a new full-stack feature page in the admin dashboard for viewing Madrasah Diniyah attendance history.
+    -   Implemented complex, interconnected filters (by period, date range, class, gender).
+    -   Added a Download PDF function that exports the filtered data.
+-   **New Feature: PWA Manifests**:
+    -   Created 5 distinct manifest files (, etc.) for each PWA.
+    -   Configured each manifest with a unique name, start URL, scope, and icon path.
+    -   Uploaded and placed all user-provided custom icons into the  directory.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **Backend**: FastAPI, Pydantic, MongoDB (), JWT, .
-- **Frontend**: React, React Router, Axios, Tailwind CSS, .
-- **PWA**: Manifest, Service Workers for offline support and packaging.
-- **Design**: Custom fonts (Playfair Display, Lato), CSS variables, modern layouts.
-- **Notifications**: Firebase Cloud Messaging (FCM).
+-   **Role-Based Access Control (RBAC)**: The current focus. To be implemented using a  field in the user model, JWT payload modification, and conditional rendering on the frontend.
+-   **PWA Manifests**: Multiple manifest files created to allow each PWA to be installed as a separate application with its own name and icon.
+-   **Dynamic Date Filtering**: Complex frontend logic in  to handle interconnected date and period filters (e.g., selecting Semester 1 automatically sets the date range to Jan-Jun).
 
 **key DB schema**
-- ****: Field  was replaced with .
-- ****: Field  was replaced with .
-- ****: Contains  to store device tokens.
-
-**changes in tech stack**
-- No new technologies were added, but the project now correctly implements PWA standards and utilizes  for notifications.
+-   ****:  - **NEEDS to be updated** to include a  field (e.g., 'superadmin', 'pesantren', 'madin').
 
 **All files of reference**
-- : Contains all backend logic; modified for new features and bug fixes.
-- : New file for the Supervisor PWA.
-- : New file for PWA compatibility.
-- : New file for basic offline PWA support.
-- , : Updated for the new design system.
-- : Contains the up-to-date project requirements and status.
-- : Provides the specifications for the UI redesign.
-
-**key api endpoints**
-- : New endpoint for Supervisor PWA login.
-- , : New endpoints for Supervisor dashboard data.
-- : Updated to use .
-- , : New endpoints to generate access codes.
-- : Endpoint currently being fixed.
-- : Endpoint logic being modified to support cascading deletes.
+-   : Core backend file. Needs updates for the Admin model, user seeding, and JWT logic for RBAC.
+-   : Main navigation component for the admin dashboard. Needs menu restructuring and conditional rendering logic for RBAC.
+-   : Manages admin authentication state. Needs to be updated to handle the user's role.
+-   : The most recently completed feature page.
+-   : This directory now contains the 5 new manifest files and the  subdirectory with all custom icons.
 
 **Critical Info for New Agent**
-- The user is eager to deploy the application. Your immediate priority is to resolve the two pending bug fixes.
-- After fixing the bugs, perform a final verification and prepare to guide the user through deployment if requested.
-- The application is now fully PWA-compliant. Any further issues with tools like PWA Builder are unlikely to be related to the manifest or service worker setup.
-
-**documents and test reports created in this job**
-- 
--  (updated)
-- 
-- 
+-   **Top Priority is RBAC**: The user has clearly defined the new admin roles, credentials, and menu access rules. The entire implementation is the current task.
+-   **Backend First**: The RBAC implementation should start on the backend. You must modify the  model, create the new users (and handle hashing their passwords), and adjust the JWT to include the role.
+-   **Frontend Follows**: Once the backend supports roles, update the  to fetch and store the role. Then, implement the conditional menu rendering in .
+-   **Menu Restructuring**: As part of the RBAC task, remember to restructure the admin sidebar menu as requested (create the Absensi Madrasah Diniyah dropdown).
+-   **PWA Project is Paused**: The user explicitly said to Skip dulu projek ini, simpan diingatanmu regarding the PWA-to-Android separation. Do not work on it unless the user asks again. All necessary files (manifests, icons) are already in the repository.
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User**: Requested fixes for two bugs: non-functional 'delete Pengabsen' and missing cascading delete for 'Wali Santri'.
-2.  **User**: Confirmed to proceed with the PWA fixes.
-3.  **User**: Reported an issue with PWA Builder (Your manifest description is missing).
-4.  **User**: Asked about deployment steps and uploading to the PlayStore.
-5.  **User**: Stated that current features are sufficient and future work can come later.
-6.  **User**: Requested a UI/UX redesign to make the apps look more modern and professional.
-7.  **User**: Asked to continue the task.
-8.  **User**: Requested three enhancements: full stats on the Pembimbing dashboard, more history filters, and changing Pengabsen login to a code-based system.
-9.  **User**: Confirmed requirements for the Pembimbing PWA.
-10. **User**: Confirmed that previously pending tasks were complete and to start work on the Pembimbing PWA.
+1.  **User**: Asks about creating separate Android apps from the PWAs, with unique icons and names. Asks if app updates will reflect automatically after deployment.
+2.  **User**: Provides app names and confirms they will provide the icon files for the 5 PWAs.
+3.  **User**: Uploads icon files.
+4.  **User**: Uploads more icon files.
+5.  **User**: Uploads the final set of icon files.
+6.  **User**: Asks for an example of how to configure PWABuilder for the Wali Santri app.
+7.  **User**: Reports that PWABuilder is still showing the old app name/icon after they deployed, and asks the agent to fix it.
+8.  **User**: Decides to pause the PWA project and start a new major task: adding a Riwayat Absensi Madin page and implementing admin roles. Provides detailed requirements.
+9.  **User**: Confirms the plan for the Riwayat Absensi Madin page and RBAC.
+10. **User**: Confirms the Riwayat Absensi Madin page works and requests the PDF download feature for it.
 
 **Project Health Check:**
-- **Broken**:
-    - The  endpoint.
-    - The data integrity logic for deleting a  and its associated .
+-   **Broken**: No part of the application is currently broken.
+-   **Mocked**: None.
 
 **3rd Party Integrations**
-- **Al-Adhan API**: Used for fetching prayer times.
-- **Firebase Cloud Messaging (FCM)**: Fully integrated for push notifications.
-- **PWA Builder**: The application is now correctly configured for use with this tool.
+-   **jsPDF & jspdf-autotable**: Used for client-side PDF generation.
+-   **Al-Adhan API**: Used for fetching prayer times.
+-   **Firebase Cloud Messaging (FCM)**: Integrated for push notifications. Credential handling was recently improved to use environment variables.
+-   **@yudiel/react-qr-scanner**: Used for live QR code scanning in PWAs.
 
 **Testing status**
-- **Testing agent used after significant changes**: YES
-- **Troubleshoot agent used after agent stuck in loop**: NO
-- **Test files created**: , 
-- **Known regressions**: None.
+-   **Testing agent used after significant changes**: YES (in previous sessions, not for the very latest changes).
+-   **Troubleshoot agent used after agent stuck in loop**: NO
+-   **Test files created**: None.
+-   **Known regressions**: None.
 
 **Credentials to test flow:**
-- **Admin**:  / 
-- **Wali Santri**: Username from Admin UI / default password .
-- **Pengabsen**:  /  from Admin UI.
-- **Pembimbing**:  /  from Admin UI.
-
-**What agent forgot to execute**
-- The agent started but did not complete the implementation for the two user-reported bugs concerning the delete functionality for 'Pengabsen' and the cascading delete logic for 'Wali Santri'.</analysis>
+-   Default Admin:  /  (This will be replaced by the new role-based credentials).</analysis>
