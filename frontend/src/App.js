@@ -370,6 +370,22 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/settings-madrasah"
+        element={
+          <ProtectedRoute>
+            <MadrasahDiniyah />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/riwayat-absensi-madin"
+        element={
+          <ProtectedRoute>
+            <RiwayatAbsensiMadin />
+          </ProtectedRoute>
+        }
+      />
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
