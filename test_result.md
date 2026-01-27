@@ -264,12 +264,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Admin Dashboard UI/UX Testing"
-    - "Asrama Santri Page UI/UX Testing"
-    - "Santri Page UI/UX Testing"
-    - "Waktu Sholat Page UI/UX Testing"
-    - "PWA Login Pages UI/UX Testing"
-    - "Visual Elements and Styling Consistency"
+    - "RBAC Admin Seeding Endpoint Testing"
+    - "RBAC Admin Login Testing"
+    - "RBAC Admin Profile Endpoint Testing"
   stuck_tasks: []
   test_all: true
   test_priority: "high_first"
