@@ -1866,6 +1866,67 @@ async def get_santri_absensi_hari_ini(
     return {"tanggal": today, "waktu_sholat": waktu_sholat, "data": result}
 
 
+@api_router.post("/admin/fix-absensi-subuh-kemarin-ke-hari-ini")
+async def fix_absensi_subuh_kemarin_ke_hari_ini(_: dict = Depends(get_current_admin)):
+    """Perbaiki data absensi subuh yang salah tanggal (kemarin -> hari ini) untuk rentang jam 03.30–05.30 WIB.
+
+    Logika:
+    - Ambil `today` berdasarkan WIB.
+    - `yesterday` = today - 1 hari.
+    - Konversi jam 03:30–05:30 WIB (today) ke UTC untuk dipakai sebagai filter `waktu_absen`.
+    - Update semua dokumen `absensi` dengan:
+        * tanggal == yesterday
+        * waktu_sholat == 'subuh'
+        * waktu_absen di antara 03:30–05:30 WIB (dalam UTC)
+      menjadi tanggal == today.
+
+    Endpoint ini idempotent: jika dijalankan ulang setelah perbaikan, tidak ada dokumen tambahan yang terkena
+    karena filter selalu mencari tanggal == yesterday.
+    """
+    today_local = datetime.now(LOCAL_TZ).date()
+    yesterday_local = today_local - timedelta(days=1)
+
+    start_wib = datetime(
+        year=today_local.year,
+        month=today_local.month,
+        day=today_local.day,
+        hour=3,
+        minute=30,
+        tzinfo=LOCAL_TZ,
+    )
+    end_wib = datetime(
+        year=today_local.year,
+        month=today_local.month,
+        day=today_local.day,
+        hour=5,
+        minute=30,
+        tzinfo=LOCAL_TZ,
+    )
+
+    start_utc = start_wib.astimezone(timezone.utc).isoformat()
+    end_utc = end_wib.astimezone(timezone.utc).isoformat()
+
+    result = await db.absensi.update_many(
+        {
+            "tanggal": yesterday_local.isoformat(),
+            "waktu_sholat": "subuh",
+            "waktu_absen": {"$gte": start_utc, "$lte": end_utc},
+        },
+        {"$set": {"tanggal": today_local.isoformat()}},
+    )
+
+    return {
+        "from_date": yesterday_local.isoformat(),
+        "to_date": today_local.isoformat(),
+        "window_wib": {
+            "start": start_wib.isoformat(),
+            "end": end_wib.isoformat(),
+        },
+        "matched": result.matched_count,
+        "modified": result.modified_count,
+    }
+
+
 
 @api_router.get("/pengabsen/riwayat-detail")
 async def get_pengabsen_riwayat_detail(
