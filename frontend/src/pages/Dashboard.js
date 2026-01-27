@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
   const [totalSantri, setTotalSantri] = useState(0);
+  const [totalSiswaMadin, setTotalSiswaMadin] = useState(0);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
