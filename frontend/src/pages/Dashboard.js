@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { absensiAPI, santriAPI } from '@/lib/api';
+import { absensiAPI, santriAPI, madinAbsensiAPI } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, CheckCircle, XCircle, Activity, Clock } from 'lucide-react';
+import { Users, Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const Dashboard = () => {
