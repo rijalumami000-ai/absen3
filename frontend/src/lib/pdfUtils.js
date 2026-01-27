@@ -237,6 +237,76 @@ export const downloadMonitoringKelasPDF = (monitoringList, kelasList) => {
   doc.save(`Monitoring_Kelas_Madin_${new Date().getTime()}.pdf`);
 };
 
+// Function to download Riwayat Absensi Sholat as PDF (admin)
+export const downloadRiwayatAbsensiSholatPDF = (detailByWaktu, filters) => {
+  const doc = new jsPDF('p', 'mm', 'a4');
+
+  doc.setFontSize(16);
+  doc.text('Riwayat Absensi Sholat Santri', 14, 18);
+
+  doc.setFontSize(10);
+  const periodeText = filters.periodeLabel || '';
+  const tanggalText = `Periode: ${filters.tanggalStart} s.d. ${filters.tanggalEnd}`;
+  const asramaText = `Asrama: ${filters.asramaLabel || 'Semua'}`;
+  const genderText = filters.genderLabel ? `Gender: ${filters.genderLabel}` : 'Gender: Semua';
+
+  doc.text(periodeText, 14, 26);
+  doc.text(tanggalText, 14, 31);
+  doc.text(asramaText, 14, 36);
+  doc.text(genderText, 14, 41);
+
+  // Flatten detailByWaktu (structure: {waktu: {status: [..santri..]}}) into table rows
+  const tableData = [];
+  const waktuOrder = ['subuh', 'dzuhur', 'ashar', 'maghrib', 'isya'];
+  const statusOrder = ['hadir', 'alfa', 'sakit', 'izin', 'haid', 'istihadhoh'];
+
+  const humanWaktu = {
+    subuh: 'Subuh',
+    dzuhur: 'Dzuhur',
+    ashar: 'Ashar',
+    maghrib: 'Maghrib',
+    isya: 'Isya',
+  };
+
+  waktuOrder.forEach((wKey) => {
+    const byStatus = detailByWaktu[wKey] || {};
+    statusOrder.forEach((sKey) => {
+      const list = byStatus[sKey] || [];
+      list.forEach((row, idx) => {
+        tableData.push([
+          tableData.length + 1,
+          row.tanggal || '-',
+          humanWaktu[wKey] || wKey,
+          sKey,
+          row.nama || '-',
+          row.nis || '-',
+          row.pengabsen_nama || '-',
+        ]);
+      });
+    });
+  });
+
+  autoTable(doc, {
+    startY: 46,
+    head: [['No', 'Tanggal', 'Waktu Sholat', 'Status', 'Nama Santri', 'NIS', 'Pengabsen']],
+    body: tableData,
+    theme: 'grid',
+    headStyles: { fillColor: [37, 99, 235], fontStyle: 'bold' },
+    styles: { fontSize: 8 },
+    columnStyles: {
+      0: { cellWidth: 8 },
+      1: { cellWidth: 20 },
+      2: { cellWidth: 25 },
+      3: { cellWidth: 20 },
+      4: { cellWidth: 40 },
+      5: { cellWidth: 20 },
+      6: { cellWidth: 30 },
+    },
+  });
+
+  doc.save(`Riwayat_Absensi_Sholat_${new Date().getTime()}.pdf`);
+};
+
 // Function to download Riwayat Absensi Madin as PDF
 export const downloadRiwayatAbsensiMadinPDF = (detail, filters) => {
   const doc = new jsPDF('p', 'mm', 'a4');
