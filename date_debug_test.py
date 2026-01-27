@@ -390,21 +390,23 @@ class DateDebugTester:
             
             endpoints_to_test = [
                 {
-                    "name": "Pengabsen Hari Ini",
+                    "name": "Pengabsen Hari Ini (subuh)",
                     "url": f"{self.base_url}/pengabsen/santri-absensi-hari-ini",
                     "headers": self.pengabsen_headers,
-                    "date_field": "tanggal"
-                },
-                {
+                    "params": {"waktu_sholat": "subuh"},
+                    "date_field": None  # This endpoint doesn't return date directly
+                }
+            ]
+            
+            # Add wali endpoint if available
+            if self.wali_headers:
+                endpoints_to_test.append({
                     "name": "Wali Anak Hari Ini", 
                     "url": f"{self.base_url}/wali/anak-absensi-hari-ini",
                     "headers": self.wali_headers,
+                    "params": {},
                     "date_field": "tanggal"
-                } if self.wali_headers else None
-            ]
-            
-            # Filter out None values
-            endpoints_to_test = [ep for ep in endpoints_to_test if ep is not None]
+                })
             
             all_consistent = True
             
