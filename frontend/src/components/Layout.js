@@ -76,6 +76,7 @@ const Layout = ({ children }) => {
         { path: '/kelas', icon: GraduationCap, label: 'Kelas Madrasah Diniyah' },
         { path: '/pengabsen-kelas', icon: ClipboardCheck, label: 'Pengabsen Kelas Madin' },
         { path: '/monitoring-kelas', icon: Eye, label: 'Monitoring Kelas Madin' },
+        { path: '/riwayat-absensi-madin', icon: ClipboardList, label: 'Riwayat Absensi Madin' },
       ]
     },
     { 
