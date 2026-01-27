@@ -53,6 +53,9 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to="/login" replace />;
   }
 
+  // Guard berbasis role untuk URL sensitif akan di-handle di dalam halaman / layout.
+  // Jika dibutuhkan, di sini kita bisa tambahkan pengecekan global.
+
   return <Layout>{children}</Layout>;
 };
 
