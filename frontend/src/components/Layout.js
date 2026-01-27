@@ -30,6 +30,7 @@ const Layout = ({ children }) => {
   const role = user?.role || 'superadmin';
   const location = useLocation();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [openMenus, setOpenMenus] = useState({});
 
