@@ -173,6 +173,11 @@ export const absensiAPI = {
     if (gender) params.append('gender', gender);
     return axios.get(`${API}/absensi/detail?${params.toString()}`, { headers: getAuthHeader() });
   },
+  getRiwayat: (params) =>
+    axios.get(`${API}/absensi/riwayat`, {
+      params,
+      headers: getAuthHeader(),
+    }),
   delete: (id) => axios.delete(`${API}/absensi/${id}`, { headers: getAuthHeader() }),
 };
 
