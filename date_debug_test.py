@@ -279,9 +279,10 @@ class DateDebugTester:
                         self.log_test(f"Date Consistency {waktu_sholat}", False, f"Date mismatch! Expected: {today}, Saved: {saved_date}")
                         return False
                     
-                    # 2. Check via pengabsen "hari ini" endpoint
+                    # 2. Check via pengabsen "hari ini" endpoint for this specific waktu_sholat
                     hari_ini_response = requests.get(
                         f"{self.base_url}/pengabsen/santri-absensi-hari-ini",
+                        params={"waktu_sholat": waktu_sholat},
                         headers=self.pengabsen_headers,
                         timeout=30
                     )
