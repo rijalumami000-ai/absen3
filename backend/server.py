@@ -3484,6 +3484,84 @@ async def get_pembimbing_kelas_riwayat(
     
     return result
 
+
+@api_router.get("/madin/absensi/riwayat")
+async def get_madin_absensi_riwayat(
+    tanggal_start: str,
+    tanggal_end: Optional[str] = None,
+    kelas_id: Optional[str] = None,
+    gender: Optional[str] = None,
+    _: dict = Depends(get_current_admin),
+):
+    """Riwayat absensi Madrasah Diniyah untuk admin (ringkasan dan detail).
+
+    Data diambil dari koleksi absensi_kelas dan digabung dengan siswa_madrasah + kelas.
+    """
+    if not tanggal_end:
+        tanggal_end = tanggal_start
+
+    # Query utama ke absensi_kelas
+    query: Dict[str, Any] = {
+        "tanggal": {"$gte": tanggal_start, "$lte": tanggal_end},
+    }
+    if kelas_id:
+        query["kelas_id"] = kelas_id
+
+    absensi_list = await db.absensi_kelas.find(query, {"_id": 0}).to_list(10000)
+
+    if not absensi_list:
+        return {"summary": {"hadir": 0, "alfa": 0, "sakit": 0, "izin": 0, "telat": 0}, "detail": []}
+
+    # Ambil siswa & kelas untuk enrichment + filter gender
+    siswa_map: Dict[str, Dict[str, Any]] = {}
+    siswa_list = await db.siswa_madrasah.find({}, {"_id": 0}).to_list(10000)
+    for siswa in siswa_list:
+        siswa_map[siswa["id"]] = siswa
+
+    kelas_map: Dict[str, Dict[str, Any]] = {}
+    kelas_list = await db.kelas.find({}, {"_id": 0}).to_list(1000)
+    for kelas in kelas_list:
+        kelas_map[kelas["id"]] = kelas
+
+    detail: List[Dict[str, Any]] = []
+    summary = {"hadir": 0, "alfa": 0, "sakit": 0, "izin": 0, "telat": 0}
+
+    for absensi in absensi_list:
+        siswa = siswa_map.get(absensi["siswa_id"])
+        kelas = kelas_map.get(absensi["kelas_id"])
+
+        # Jika siswa tidak ditemukan, lewati (data tidak konsisten)
+        if not siswa:
+            continue
+
+        siswa_gender = siswa.get("gender") or siswa.get("jenis_kelamin") or ""
+        # Normalisasi: misal "putra" / "L" / "laki-laki" -> tetap kita simpan apa adanya
+
+        if gender and gender != "all":
+            # gender filter di frontend: "putra" atau "putri"
+            if siswa_gender != gender:
+                continue
+
+        status = absensi.get("status", "")
+        if status in summary:
+            summary[status] += 1
+
+        # Bangun record detail
+        row = {
+            "id": absensi.get("id"),
+            "siswa_id": absensi.get("siswa_id"),
+            "siswa_nama": siswa.get("nama") if siswa else "Unknown",
+            "kelas_id": absensi.get("kelas_id"),
+            "kelas_nama": kelas.get("nama") if kelas else "Unknown",
+            "tanggal": absensi.get("tanggal"),
+            "status": status,
+            "gender": siswa_gender,
+            "waktu_absen": absensi.get("waktu_absen"),
+        }
+        detail.append(row)
+
+    return {"summary": summary, "detail": detail}
+
 # Include router
 app.include_router(api_router)
 
