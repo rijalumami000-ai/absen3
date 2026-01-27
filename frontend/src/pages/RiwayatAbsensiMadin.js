@@ -4,7 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { ClipboardList, Users, CheckCircle, XCircle, AlertCircle, Clock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { downloadRiwayatAbsensiMadinPDF } from '@/lib/pdfUtils';
+import { ClipboardList, CheckCircle, XCircle, AlertCircle, Clock, FileDown } from 'lucide-react';
 
 const getTodayLocalYMD = () => {
   const now = new Date();
