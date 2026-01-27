@@ -105,6 +105,9 @@ const Dashboard = () => {
                   <div>
                     <p className="text-sm font-medium text-gray-600">{stat.title}</p>
                     <p className="text-3xl font-bold text-gray-800 mt-2">{stat.value}</p>
+                    {stat.subtitle && (
+                      <p className="text-xs text-gray-500 mt-1">{stat.subtitle}</p>
+                    )}
                   </div>
                   <div className={`${stat.bgColor} ${stat.color} p-3 rounded-lg transition-transform hover:scale-110 transition-smooth`}>
                     <Icon size={24} />
