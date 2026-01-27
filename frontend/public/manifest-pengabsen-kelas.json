@@ -1,0 +1,25 @@
+{
+  "name": "Pengabsen Kelas Madin",
+  "short_name": "Pengabsen Kelas",
+  "description": "Aplikasi pengabsen kelas Madrasah Diniyah untuk mencatat kehadiran siswa per kelas.",
+  "start_url": "/pengabsen-kelas-app/login",
+  "scope": "/pengabsen-kelas-app/",
+  "display": "standalone",
+  "background_color": "#F9FAFB",
+  "theme_color": "#0EA5E9",
+  "orientation": "portrait-primary",
+  "lang": "id",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/icons/pengabsen-kelas-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/pengabsen-kelas-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "name": "Wali Santri Al-Hamid",
+  "short_name": "Wali Santri",
+  "description": "Aplikasi wali santri untuk memantau absensi dan aktivitas anak di Ponpes Al-Hamid.",
+  "start_url": "/wali-app/login",
+  "scope": "/wali-app/",
+  "display": "standalone",
+  "background_color": "#F9FAFB",
+  "theme_color": "#047857",
+  "orientation": "portrait-primary",
+  "lang": "id",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/icons/wali-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/wali-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

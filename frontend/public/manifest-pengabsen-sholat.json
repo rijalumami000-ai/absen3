@@ -1,0 +1,25 @@
+{
+  "name": "Pengabsen Sholat Al-Hamid",
+  "short_name": "Pengabsen Sholat",
+  "description": "Aplikasi petugas pengabsen untuk mencatat kehadiran sholat santri Ponpes Al-Hamid dengan scan QR.",
+  "start_url": "/pengabsen-app/login",
+  "scope": "/pengabsen-app/",
+  "display": "standalone",
+  "background_color": "#F9FAFB",
+  "theme_color": "#047857",
+  "orientation": "portrait-primary",
+  "lang": "id",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/icons/pengabsen-sholat-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/pengabsen-sholat-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

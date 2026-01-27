@@ -1,0 +1,25 @@
+{
+  "name": "Monitoring Sholat Al-Hamid",
+  "short_name": "Monitoring Sholat",
+  "description": "Aplikasi pembimbing untuk memonitor kehadiran sholat santri Ponpes Al-Hamid secara real-time.",
+  "start_url": "/pembimbing-app/login",
+  "scope": "/pembimbing-app/",
+  "display": "standalone",
+  "background_color": "#F9FAFB",
+  "theme_color": "#1D4ED8",
+  "orientation": "portrait-primary",
+  "lang": "id",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/icons/monitoring-sholat-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/monitoring-sholat-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
