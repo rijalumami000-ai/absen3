@@ -16,6 +16,7 @@ import WaktuSholat from '@/pages/WaktuSholat';
 import Settings from '@/pages/Settings';
 import Kelas from '@/pages/Kelas';
 import MadrasahDiniyah from '@/pages/MadrasahDiniyah';
+import RiwayatAbsensiMadin from '@/pages/RiwayatAbsensiMadin';
 import PengabsenKelas from '@/pages/PengabsenKelas';
 import PembimbingKelas from '@/pages/PembimbingKelas';
 import PengabsenKelasAppLogin from '@/pages/PengabsenKelasAppLogin';
