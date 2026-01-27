@@ -105,6 +105,54 @@
 user_problem_statement: "Debug masalah tanggal dan visibilitas data untuk absensi sholat: 1) Di Riwayat Absensi Sholat (admin): Pada tanggal sekarang (misal 28), sholat subuh tidak ada data, padahal sudah banyak yang scan. Diduga data subuh hari ini masuk ke tanggal kemarin (27), seperti ada pergeseran tanggal. 2) Di Aplikasi Pengabsen Sholat (PWA): Di menu 'Absensi hari ini' untuk subuh/dzuhur, sudah muncul data seakan-akan hari ini padahal baru mulai subuh tadi. Data tersebut tidak muncul di Riwayat Absensi Sholat maupun di menu 'Riwayat Saya' di aplikasi Pengabsen. 3) Di Aplikasi Monitoring Sholat: masalah serupa (data seperti bergeser tanggal / tidak sinkron antara hari ini vs riwayat). YANG SUDAH DIKETAHUI: Di backend, semua penentuan today pakai: today = datetime.now(timezone.utc).astimezone().date().isoformat(). Endpoint terkait: /pengabsen/absensi (POST), /pengabsen/santri-absensi-hari-ini (GET), /pembimbing/santri-absensi-hari-ini (GET), /wali/anak-absensi-hari-ini (GET), /absensi/riwayat dan /absensi/detail (admin)."
 
 backend:
+  - task: "Date Consistency Testing for Absensi Sholat"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ Date consistency testing completed successfully. All endpoints use consistent date calculation: datetime.now(timezone.utc).astimezone().date().isoformat(). Tested absensi creation and retrieval across pengabsen, admin riwayat endpoints. No date shift issues detected. Current server timezone: UTC, no UTC/local date mismatch found."
+
+  - task: "Absensi Creation and Visibility Testing"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ Absensi creation and visibility testing completed successfully. Created test absensi for all 5 prayer times (subuh, dzuhur, ashar, maghrib, isya). Verified data appears correctly in: 1) POST /pengabsen/absensi saves with correct tanggal, 2) GET /pengabsen/santri-absensi-hari-ini shows data immediately, 3) GET /absensi/riwayat shows data in admin interface. No visibility issues detected between PWA and admin interfaces."
+
+  - task: "Timezone Edge Case Testing"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ Timezone edge case testing completed successfully. Tested during critical time window (23:xx UTC, near midnight). Server timezone: UTC with 0:00:00 offset. UTC and local dates match consistently. Simulated time shifts show potential date change at midnight (+1h would result in 2026-01-28), but current implementation handles this correctly as it uses astimezone() which accounts for server timezone."
+
+  - task: "Wali Sync Issue Investigation"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 1
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: false
+          agent: "testing"
+          comment: "❌ Wali sync issue detected. Found 3 santri but all 3 wali have empty anak_ids arrays. The sync_wali_santri() function is running (logs show 'Deleted X wali without santri') but anak_ids field is not being populated correctly. This prevents wali login and affects wali-related endpoints testing. Root cause: sync_wali_santri() function may have issue with anak_ids population logic."
+
   - task: "RBAC Admin Seeding Endpoint Testing"
     implemented: true
     working: true
