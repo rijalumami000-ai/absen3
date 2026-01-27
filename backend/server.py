@@ -65,6 +65,18 @@ security = HTTPBearer()
 app = FastAPI(title="Absensi Sholat API")
 api_router = APIRouter(prefix="/api")
 
+
+@api_router.get("/")
+async def root_health_get():
+    """Simple health-check endpoint for deployment probes (GET)."""
+    return {"status": "ok"}
+
+
+@api_router.post("/")
+async def root_health_post():
+    """Simple health-check endpoint for deployment probes (POST)."""
+    return {"status": "ok"}
+
 # ==================== MODELS ====================
 
 class Admin(BaseModel):
