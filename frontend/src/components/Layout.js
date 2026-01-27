@@ -26,6 +26,7 @@ import {
 
 const Layout = ({ children }) => {
   const { user, logout } = useAuth();
+  const role = user?.role || 'superadmin';
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
