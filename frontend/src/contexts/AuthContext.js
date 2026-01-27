@@ -11,6 +11,11 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem('token'));
 
+  const getUserRole = (data) => {
+    if (!data) return null;
+    return data.role || null;
+  };
+
   useEffect(() => {
     if (token) {
       checkAuth();
