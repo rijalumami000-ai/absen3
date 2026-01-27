@@ -400,7 +400,7 @@ class DateDebugTester:
                     "url": f"{self.base_url}/wali/anak-absensi-hari-ini",
                     "headers": self.wali_headers,
                     "date_field": "tanggal"
-                }
+                } if self.wali_headers else None
             ]
             
             all_consistent = True
