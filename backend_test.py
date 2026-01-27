@@ -612,43 +612,34 @@ class AbsensiSholatTester:
     
     def run_all_tests(self):
         """Run all tests in sequence"""
-        print("🚀 Starting Absensi Sholat Backend Tests")
+        print("🚀 Starting Absensi Sholat Backend Tests - Focus on New Changes")
         print(f"📍 Base URL: {self.base_url}")
         print("=" * 60)
         
-        print("\n🔐 Testing RBAC Admin Functionality:")
-        print("-" * 40)
-        
-        # Step 1: Test admin seeding
-        seeding_success = self.test_admin_seeding()
-        
-        # Step 2: Test RBAC login accounts
-        rbac_login_success = self.test_rbac_login_accounts()
-        
-        # Step 3: Test /me endpoint with RBAC accounts
-        rbac_me_success = self.test_rbac_me_endpoint()
-        
-        # Step 4: Login with default admin for other tests
+        # Login with default admin for tests
         if not self.login():
-            print("❌ Cannot proceed with remaining tests without authentication")
+            print("❌ Cannot proceed with tests without authentication")
             return False
         
-        print("\n📋 Testing Updated Endpoints:")
+        print("\n🆕 Testing New Absensi Riwayat Endpoint:")
         print("-" * 40)
         
-        # Step 5: Test asrama endpoint
-        asrama_success = self.test_asrama_endpoint()
+        # Step 1: Test new /api/absensi/riwayat endpoint
+        riwayat_success = self.test_absensi_riwayat_endpoint()
         
-        # Step 6: Test pengabsen endpoint  
-        pengabsen_success = self.test_pengabsen_endpoint()
+        # Step 2: Test legacy /api/absensi/detail consistency
+        detail_consistency_success = self.test_absensi_detail_legacy_consistency()
         
-        # Step 7: Test pembimbing endpoint
-        pembimbing_success = self.test_pembimbing_endpoint()
+        print("\n🔗 Testing Related Endpoints:")
+        print("-" * 40)
+        
+        # Step 3: Test related endpoints (waktu-sholat, absensi/stats)
+        related_success = self.test_related_endpoints()
         
         print("\n📋 Testing Legacy Endpoints (No 500 Errors):")
         print("-" * 40)
         
-        # Step 8: Test legacy endpoints
+        # Step 4: Test legacy endpoints
         legacy_success = self.test_legacy_endpoints()
         
         # Summary
