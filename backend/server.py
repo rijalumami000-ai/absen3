@@ -2401,55 +2401,15 @@ async def get_absensi_detail(
     gender: Optional[str] = None,
     _: dict = Depends(get_current_admin)
 ):
-    """Get detailed absensi per waktu sholat for specific date"""
-    # Get all santri with filters
-    santri_query = {}
-    if asrama_id:
-        santri_query['asrama_id'] = asrama_id
-    if gender:
-        santri_query['gender'] = gender
-    
-    all_santri = await db.santri.find(santri_query, {"_id": 0}).to_list(10000)
-    santri_dict = {s['id']: s for s in all_santri}
-    
-    # Get absensi for the date
-    absensi_list = await db.absensi.find({"tanggal": tanggal}, {"_id": 0}).to_list(10000)
-
-    # Map pengabsen_id -> nama
-    pengabsen_map = {
-        p["id"]: p.get("nama", "-")
-        for p in await db.pengabsen.find({}, {"_id": 0, "id": 1, "nama": 1}).to_list(1000)
-    }
-    
-    # Organize by waktu sholat and status
-    waktu_sholat_list = ["subuh", "dzuhur", "ashar", "maghrib", "isya"]
-    status_list = ["hadir", "alfa", "sakit", "izin", "haid", "istihadhoh"]
-    
-    result = {}
-    for waktu in waktu_sholat_list:
-        result[waktu] = {}
-        for st in status_list:
-            items = []
-            for a in absensi_list:
-                if (
-                    a.get("waktu_sholat") == waktu
-                    and a.get("status") == st
-                    and a.get("santri_id") in santri_dict
-                ):
-                    sid = a["santri_id"]
-                    pengabsen_id = a.get("pengabsen_id")
-                    items.append(
-                        {
-                            "santri_id": sid,
-                            "nama": santri_dict[sid]["nama"],
-                            "nis": santri_dict[sid]["nis"],
-                            "asrama_id": santri_dict[sid]["asrama_id"],
-                            "pengabsen_id": pengabsen_id,
-                            "pengabsen_nama": pengabsen_map.get(pengabsen_id, "-") if pengabsen_id else "-",
-                        }
-                    )
-            result[waktu][st] = items
-    
+    """Get detailed absensi per waktu sholat for specific date (legacy endpoint)."""
+    # Gunakan endpoint baru /absensi/riwayat di belakang layar untuk menjaga satu sumber logika
+    result = await get_absensi_riwayat(
+        tanggal_start=tanggal,
+        tanggal_end=tanggal,
+        asrama_id=asrama_id,
+        gender=gender,
+        _=_,
+    )
     return result
 @api_router.get("/absensi/riwayat")
 async def get_absensi_riwayat(
