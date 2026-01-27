@@ -18,6 +18,7 @@ import Kelas from '@/pages/Kelas';
 import MadrasahDiniyah from '@/pages/MadrasahDiniyah';
 import RiwayatAbsensiMadin from '@/pages/RiwayatAbsensiMadin';
 import PengabsenKelas from '@/pages/PengabsenKelas';
+import AksesDitolak from '@/pages/AksesDitolak';
 import PembimbingKelas from '@/pages/PembimbingKelas';
 import PengabsenKelasAppLogin from '@/pages/PengabsenKelasAppLogin';
 import PengabsenKelasApp from '@/pages/PengabsenKelasApp';
