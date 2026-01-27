@@ -163,14 +163,24 @@ const Layout = ({ children }) => {
               } else if (menu.type === 'group') {
                 const isOpen = openMenus[menu.id];
                 const hasActiveChild = menu.items.some(item => location.pathname === item.path);
+                const isAllowedGroup = !menu.allowedRoles || menu.allowedRoles.includes(role);
+                const handleGroupClick = () => {
+                  if (!isAllowedGroup) {
+                    alert('Anda tidak punya hak akses');
+                    return;
+                  }
+                  toggleMenu(menu.id);
+                };
                 return (
                   <li key={menu.id} className="animate-fade-in" style={{ animationDelay: `${index * 30}ms` }}>
                     <button
-                      onClick={() => toggleMenu(menu.id)}
+                      onClick={handleGroupClick}
                       className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 hover-lift ${
                         hasActiveChild
                           ? 'bg-primary-100 text-primary-700'
-                          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                          : isAllowedGroup
+                            ? 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                            : 'text-muted-foreground opacity-60 cursor-not-allowed'
                       }`}
                     >
                       <menu.icon className="w-5 h-5" />
