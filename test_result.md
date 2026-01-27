@@ -105,6 +105,42 @@
 user_problem_statement: "Test RBAC admin functionality for backend endpoints. Verify: 1) POST /api/init/admin endpoint (idempotent seeding), 2) Login with 4 admin accounts (admin/admin123->superadmin, alhamidcintamulya/alhamidku123->superadmin, alhamid/alhamidku123->pesantren, madin/madinku123->madin) and verify roles in response, 3) GET /api/auth/me with JWT tokens to verify role persistence, 4) Ensure JWT tokens contain correct role in payload."
 
 backend:
+  - task: "RBAC Admin Seeding Endpoint Testing"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ POST /api/init/admin endpoint tested successfully. Verified idempotent behavior - endpoint can be called multiple times safely and returns correct message 'Akun-akun admin berhasil diinisialisasi'."
+
+  - task: "RBAC Admin Login Testing"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ All 4 RBAC admin accounts tested successfully via POST /api/auth/login. Verified: admin/admin123->superadmin, alhamidcintamulya/alhamidku123->superadmin, alhamid/alhamidku123->pesantren, madin/madinku123->madin. All accounts return correct role in user.role field and JWT payload contains correct role."
+
+  - task: "RBAC Admin Profile Endpoint Testing"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ GET /api/auth/me endpoint tested successfully for all 4 admin accounts. Verified that JWT tokens work correctly and response contains correct role field matching login response. Role persistence confirmed across authentication flow."
+
   - task: "Backend testing completed in previous session"
     implemented: true
     working: true
