@@ -387,6 +387,14 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/akses-ditolak"
+        element={
+          <ProtectedRoute>
+            <AksesDitolak />
+          </ProtectedRoute>
+        }
+      />
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
