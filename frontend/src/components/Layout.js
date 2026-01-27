@@ -191,14 +191,24 @@ const Layout = ({ children }) => {
                       <ul className="mt-1 ml-4 space-y-1 animate-scale-in">
                         {menu.items.map((item) => {
                           const isActive = location.pathname === item.path;
+                          const isAllowedItem = isAllowedGroup; // item ikut aturan group
+                          const handleItemClick = (e) => {
+                            if (!isAllowedItem) {
+                              e.preventDefault();
+                              alert('Anda tidak punya hak akses');
+                            }
+                          };
                           return (
                             <li key={item.path}>
                               <Link
                                 to={item.path}
+                                onClick={handleItemClick}
                                 className={`flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                                   isActive
                                     ? 'bg-primary-700 text-white shadow-md'
-                                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                                    : isAllowedItem
+                                      ? 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                                      : 'text-muted-foreground opacity-60 cursor-not-allowed'
                                 }`}
                               >
                                 <item.icon className="w-4 h-4" />
