@@ -290,9 +290,12 @@ class DateDebugTester:
                     if hari_ini_response.status_code == 200:
                         hari_ini_data = hari_ini_response.json()
                         
+                        # The response has structure: {"tanggal": "...", "waktu_sholat": "...", "data": [...]}
+                        data_list = hari_ini_data.get("data", [])
+                        
                         # Find our santri in the data
                         found_santri = None
-                        for santri_data in hari_ini_data:
+                        for santri_data in data_list:
                             if santri_data.get("santri_id") == self.test_santri_id:
                                 found_santri = santri_data
                                 break
