@@ -8,6 +8,17 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional, Literal, Dict, Any
 from datetime import datetime, timezone, timedelta
+
+# Local timezone for Pondok Pesantren (WIB / Asia-Jakarta, UTC+7)
+LOCAL_TZ = timezone(timedelta(hours=7))
+
+
+def get_today_local_iso() -> str:
+    """Return today's date in local WIB timezone as YYYY-MM-DD string.
+
+    This avoids issues where server timezone is UTC but users operate in WIB.
+    """
+    return datetime.now(LOCAL_TZ).date().isoformat()
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 import os
