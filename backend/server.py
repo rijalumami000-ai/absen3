@@ -20,6 +20,7 @@ import aiohttp
 import pandas as pd
 from pathlib import Path
 import re
+import json
 
 import firebase_admin
 from firebase_admin import credentials, messaging
@@ -38,17 +39,26 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # Initialize Firebase Admin for FCM
+firebase_app = None
 firebase_cred_path = ROOT_DIR / 'firebase_config.json'
-if firebase_cred_path.exists():
-    try:
+firebase_config_json = os.environ.get('FIREBASE_SERVICE_ACCOUNT_JSON')
+
+try:
+    if firebase_config_json:
+        # Prefer service account JSON from environment variable in production
+        cred_info = json.loads(firebase_config_json)
+        firebase_cred = credentials.Certificate(cred_info)
+        if not firebase_admin._apps:
+            firebase_app = firebase_admin.initialize_app(firebase_cred)
+    elif firebase_cred_path.exists():
+        # Fallback to local file (e.g. in development/sandbox)
         firebase_cred = credentials.Certificate(str(firebase_cred_path))
         if not firebase_admin._apps:
             firebase_app = firebase_admin.initialize_app(firebase_cred)
-    except Exception as e:
-        logging.error(f"Failed to initialize Firebase Admin: {e}")
-else:
-    logging.warning("Firebase config file not found; FCM notifications will be disabled.")
-
+    else:
+        logging.warning("Firebase config not provided; FCM notifications will be disabled.")
+except Exception as e:
+    logging.error(f"Failed to initialize Firebase Admin: {e}")
 
 security = HTTPBearer()
 
