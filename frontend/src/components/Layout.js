@@ -133,14 +133,24 @@ const Layout = ({ children }) => {
             {menuStructure.map((menu, index) => {
               if (menu.type === 'single') {
                 const isActive = location.pathname === menu.path;
+                const isAllowed = !menu.allowedRoles || menu.allowedRoles.includes(role);
+                const handleClick = (e) => {
+                  if (!isAllowed) {
+                    e.preventDefault();
+                    alert('Anda tidak punya hak akses');
+                  }
+                };
                 return (
                   <li key={menu.id} className="animate-fade-in" style={{ animationDelay: `${index * 30}ms` }}>
                     <Link
                       to={menu.path}
+                      onClick={handleClick}
                       className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 group relative overflow-hidden hover-lift ${
                         isActive
                           ? 'bg-primary-700 text-white shadow-lg'
-                          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                          : isAllowed
+                            ? 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                            : 'text-muted-foreground opacity-60 cursor-not-allowed'
                       }`}
                     >
                       {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary-500 rounded-r-full animate-scale-in" />}
