@@ -423,27 +423,39 @@ class AbsensiSholatTester:
         print(f"📍 Base URL: {self.base_url}")
         print("=" * 60)
         
-        # Step 1: Login
+        print("\n🔐 Testing RBAC Admin Functionality:")
+        print("-" * 40)
+        
+        # Step 1: Test admin seeding
+        seeding_success = self.test_admin_seeding()
+        
+        # Step 2: Test RBAC login accounts
+        rbac_login_success = self.test_rbac_login_accounts()
+        
+        # Step 3: Test /me endpoint with RBAC accounts
+        rbac_me_success = self.test_rbac_me_endpoint()
+        
+        # Step 4: Login with default admin for other tests
         if not self.login():
-            print("❌ Cannot proceed without authentication")
+            print("❌ Cannot proceed with remaining tests without authentication")
             return False
         
         print("\n📋 Testing Updated Endpoints:")
         print("-" * 40)
         
-        # Step 2: Test asrama endpoint
+        # Step 5: Test asrama endpoint
         asrama_success = self.test_asrama_endpoint()
         
-        # Step 3: Test pengabsen endpoint  
+        # Step 6: Test pengabsen endpoint  
         pengabsen_success = self.test_pengabsen_endpoint()
         
-        # Step 4: Test pembimbing endpoint
+        # Step 7: Test pembimbing endpoint
         pembimbing_success = self.test_pembimbing_endpoint()
         
         print("\n📋 Testing Legacy Endpoints (No 500 Errors):")
         print("-" * 40)
         
-        # Step 5: Test legacy endpoints
+        # Step 8: Test legacy endpoints
         legacy_success = self.test_legacy_endpoints()
         
         # Summary
