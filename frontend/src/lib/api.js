@@ -144,6 +144,19 @@ export const waliAppAPI = {
     axios.post(`${API}/wali/fcm-token`, { token }, { headers: getWaliAuthHeader() }),
 };
 
+// Kelas API
+export const kelasAPI = {
+  getAll: () => axios.get(`${API}/kelas`, { headers: getAuthHeader() }),
+  create: (data) => axios.post(`${API}/kelas`, data, { headers: getAuthHeader() }),
+  update: (id, data) => axios.put(`${API}/kelas/${id}`, data, { headers: getAuthHeader() }),
+  delete: (id) => axios.delete(`${API}/kelas/${id}`, { headers: getAuthHeader() }),
+};
+
+// Madrasah Diniyah Kelas API (alias untuk kelas Madin)
+export const madinKelasAPI = {
+  getAll: () => axios.get(`${API}/kelas`, { headers: getAuthHeader() }),
+};
+
 // Absensi API
 export const absensiAPI = {
   getAll: (params) => {
