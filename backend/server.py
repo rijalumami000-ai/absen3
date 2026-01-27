@@ -1834,7 +1834,7 @@ async def get_santri_absensi_hari_ini(
     waktu_sholat: Literal["subuh", "dzuhur", "ashar", "maghrib", "isya"],
     current_pengabsen: dict = Depends(get_current_pengabsen)
 ):
-    today = datetime.now(timezone.utc).astimezone().date().isoformat()
+    today = get_today_local_iso()
 
     asrama_ids = current_pengabsen.get('asrama_ids', [])
     santri_list = await db.santri.find({"asrama_id": {"$in": asrama_ids}}, {"_id": 0}).to_list(10000)
@@ -2147,7 +2147,7 @@ async def get_pembimbing_santri_absensi_hari_ini(
     current_pembimbing: dict = Depends(get_current_pembimbing)
 ):
     """Get today's attendance for santri in pembimbing's asrama"""
-    today = datetime.now(timezone.utc).astimezone().date().isoformat()
+    today = get_today_local_iso()
     
     asrama_ids = current_pembimbing.get('asrama_ids', [])
     if not asrama_ids:
