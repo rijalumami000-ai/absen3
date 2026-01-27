@@ -289,19 +289,18 @@ class DateDebugTester:
                     
                     if hari_ini_response.status_code == 200:
                         hari_ini_data = hari_ini_response.json()
-                        hari_ini_date = hari_ini_data.get("tanggal")
                         
                         # Find our santri in the data
                         found_santri = None
-                        for santri_data in hari_ini_data.get("data", []):
+                        for santri_data in hari_ini_data:
                             if santri_data.get("santri_id") == self.test_santri_id:
                                 found_santri = santri_data
                                 break
                         
                         if found_santri:
-                            status = found_santri.get("status", {}).get(waktu_sholat)
+                            status = found_santri.get("status")
                             if status == "hadir":
-                                self.log_test(f"Pengabsen Hari Ini {waktu_sholat}", True, f"Found {waktu_sholat} data in hari ini (date: {hari_ini_date})")
+                                self.log_test(f"Pengabsen Hari Ini {waktu_sholat}", True, f"Found {waktu_sholat} data in hari ini")
                             else:
                                 self.log_test(f"Pengabsen Hari Ini {waktu_sholat}", False, f"Status mismatch in hari ini. Expected: hadir, Got: {status}")
                                 return False
