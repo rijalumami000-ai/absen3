@@ -287,3 +287,66 @@ export const downloadRiwayatAbsensiMadinPDF = (detail, filters) => {
 
   doc.save(`Riwayat_Absensi_Madin_${new Date().getTime()}.pdf`);
 };
+
+// Function to download Riwayat Absensi Sholat as PDF
+export const downloadRiwayatAbsensiSholatPDF = (detailData, filters) => {
+  const doc = new jsPDF('p', 'mm', 'a4');
+
+  doc.setFontSize(16);
+  doc.text('Riwayat Absensi Sholat', 14, 18);
+
+  doc.setFontSize(10);
+  const periodeText = filters.periodeLabel || '';
+  const tanggalText = `Periode: ${filters.tanggalStart} s.d. ${filters.tanggalEnd}`;
+  const asramaText = filters.asramaLabel ? `Asrama: ${filters.asramaLabel}` : 'Asrama: Semua';
+  const genderText = filters.genderLabel ? `Gender: ${filters.genderLabel}` : 'Gender: Semua';
+
+  doc.text(periodeText, 14, 26);
+  doc.text(tanggalText, 14, 31);
+  doc.text(asramaText, 14, 36);
+  doc.text(genderText, 14, 41);
+
+  // Flatten the grouped data into table rows
+  const tableData = [];
+  const waktuSholatList = ['subuh', 'dzuhur', 'ashar', 'maghrib', 'isya'];
+  const statusList = ['hadir', 'alfa', 'sakit', 'izin', 'haid', 'istihadhoh'];
+
+  waktuSholatList.forEach(waktu => {
+    statusList.forEach(status => {
+      const santriList = detailData[waktu]?.[status] || [];
+      santriList.forEach((santri, index) => {
+        tableData.push([
+          tableData.length + 1,
+          santri.tanggal || '-',
+          waktu.charAt(0).toUpperCase() + waktu.slice(1),
+          santri.nama || '-',
+          santri.nis || '-',
+          santri.asrama_id || '-',
+          status.charAt(0).toUpperCase() + status.slice(1),
+          santri.pengabsen_nama || '-',
+        ]);
+      });
+    });
+  });
+
+  autoTable(doc, {
+    startY: 46,
+    head: [['No', 'Tanggal', 'Waktu Sholat', 'Nama Santri', 'NIS', 'Asrama', 'Status', 'Pengabsen']],
+    body: tableData,
+    theme: 'grid',
+    headStyles: { fillColor: [79, 70, 229], fontStyle: 'bold' },
+    styles: { fontSize: 8 },
+    columnStyles: {
+      0: { cellWidth: 8 },
+      1: { cellWidth: 20 },
+      2: { cellWidth: 22 },
+      3: { cellWidth: 40 },
+      4: { cellWidth: 18 },
+      5: { cellWidth: 20 },
+      6: { cellWidth: 18 },
+      7: { cellWidth: 30 },
+    },
+  });
+
+  doc.save(`Riwayat_Absensi_Sholat_${new Date().getTime()}.pdf`);
+};
