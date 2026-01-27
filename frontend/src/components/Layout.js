@@ -173,7 +173,11 @@ const Layout = ({ children }) => {
                 const isAllowedGroup = !menu.allowedRoles || menu.allowedRoles.includes(role);
                 const handleGroupClick = () => {
                   if (!isAllowedGroup) {
-                    alert('Anda tidak punya hak akses');
+                    toast({
+                      title: 'Akses Ditolak',
+                      description: 'Anda tidak punya hak akses',
+                      variant: 'destructive',
+                    });
                     return;
                   }
                   toggleMenu(menu.id);
