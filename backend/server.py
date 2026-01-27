@@ -2607,6 +2607,12 @@ async def update_app_settings(data: AppSettingsUpdate, _: dict = Depends(get_cur
     update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
     
     await db.settings.update_one(
+        {"id": "app_settings"},
+        {"$set": update_data},
+        upsert=True
+    )
+    
+    return {"message": "App settings berhasil diupdate"}
 
 
 async def ensure_admin_account(username: str, nama: str, password: str, role: str) -> None:
