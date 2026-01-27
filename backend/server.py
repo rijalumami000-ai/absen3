@@ -85,6 +85,7 @@ class Admin(BaseModel):
     username: str
     nama: str
     password_hash: str
+    role: str = "superadmin"
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class AdminCreate(BaseModel):
@@ -96,6 +97,7 @@ class AdminResponse(BaseModel):
     id: str
     username: str
     nama: str
+    role: str = "superadmin"
     created_at: datetime
 
 class LoginRequest(BaseModel):
@@ -847,18 +849,26 @@ async def get_pengabsen_me(current_pengabsen: dict = Depends(get_current_pengabs
 async def login(request: LoginRequest):
     admin = await db.admins.find_one({"username": request.username}, {"_id": 0})
     
-    if not admin or not verify_password(request.password, admin['password_hash']):
+    if not admin or not verify_password(request.password, admin.get('password_hash', '')):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Username atau password salah"
         )
     
-    access_token = create_access_token(data={"sub": admin['id']})
+    # Pastikan setiap admin memiliki role (default superadmin jika belum ada)
+    role = admin.get("role", "superadmin")
+    if "role" not in admin:
+        await db.admins.update_one({"id": admin["id"]}, {"$set": {"role": role}})
+    
+    access_token = create_access_token(data={"sub": admin['id'], "role": role})
+    
+    user_data = dict(admin)
+    user_data.setdefault("role", role)
     
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "user": AdminResponse(**admin)
+        "user": AdminResponse(**user_data)
     }
 
 @api_router.get("/auth/me", response_model=AdminResponse)
@@ -2593,6 +2603,51 @@ async def update_app_settings(data: AppSettingsUpdate, _: dict = Depends(get_cur
     update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
     
     await db.settings.update_one(
+
+
+async def ensure_admin_account(username: str, nama: str, password: str, role: str) -> None:
+    """Ensure an admin account exists with given username and role.
+
+    - If not exists: create new admin with given password and role.
+    - If exists: ensure it has the correct role and a valid password hash.
+    """
+    admin = await db.admins.find_one({"username": username})
+    password_hash = hash_password(password)
+
+    if not admin:
+        admin_obj = Admin(
+            username=username,
+            nama=nama,
+            password_hash=password_hash,
+            role=role,
+        )
+        doc = admin_obj.model_dump()
+        # Store datetime as ISO string for MongoDB
+        doc["created_at"] = doc["created_at"].isoformat()
+        await db.admins.insert_one(doc)
+        return
+
+    updates: Dict[str, Any] = {}
+
+    # Pastikan role sesuai
+    if admin.get("role") != role:
+        updates["role"] = role
+
+    # Pastikan password hash valid untuk password yang diinginkan
+    existing_hash = admin.get("password_hash")
+    if existing_hash:
+        try:
+            if not verify_password(password, existing_hash):
+                updates["password_hash"] = password_hash
+        except Exception:
+            # Jika hash lama tidak valid, ganti dengan hash baru
+            updates["password_hash"] = password_hash
+    else:
+        updates["password_hash"] = password_hash
+
+    if updates:
+        await db.admins.update_one({"id": admin["id"]}, {"$set": updates})
+
         {"id": "app_settings"},
         {"$set": update_data},
         upsert=True
@@ -2610,22 +2665,52 @@ async def root():
 
 @api_router.post("/init/admin")
 async def initialize_admin():
-    existing = await db.admins.find_one({})
-    if existing:
-        raise HTTPException(status_code=400, detail="Admin sudah ada")
-    
-    admin = Admin(
-        username="admin",
-        nama="Administrator",
-        password_hash=hash_password("admin123")
+    """Inisialisasi akun-akun admin utama.
+
+    Endpoint ini aman dipanggil berulang kali (idempotent). Ia akan:
+    - Memastikan akun lama `admin/admin123` tetap ada sebagai superadmin.
+    - Membuat / mengupdate 3 akun baru sesuai permintaan:
+      * alhamidcintamulya / alhamidku123 -> superadmin
+      * alhamid / alhamidku123 -> pesantren
+      * madin / madinku123 -> madin
+    """
+    # Pastikan akun default lama tetap ada, tapi jangan paksa ganti password jika sudah diubah
+    existing_default = await db.admins.find_one({"username": "admin"})
+    if not existing_default:
+        await ensure_admin_account(
+            username="admin",
+            nama="Administrator",
+            password="admin123",
+            role="superadmin",
+        )
+    else:
+        if existing_default.get("role") != "superadmin":
+            await db.admins.update_one(
+                {"id": existing_default["id"]},
+                {"$set": {"role": "superadmin"}},
+            )
+
+    # Akun-akun baru sesuai requirement
+    await ensure_admin_account(
+        username="alhamidcintamulya",
+        nama="Super Admin Pesantren",
+        password="alhamidku123",
+        role="superadmin",
     )
-    
-    doc = admin.model_dump()
-    doc['created_at'] = doc['created_at'].isoformat()
-    
-    await db.admins.insert_one(doc)
-    
-    return {"message": "Admin default berhasil dibuat", "username": "admin", "password": "admin123"}
+    await ensure_admin_account(
+        username="alhamid",
+        nama="Admin Pesantren",
+        password="alhamidku123",
+        role="pesantren",
+    )
+    await ensure_admin_account(
+        username="madin",
+        nama="Admin Madrasah Diniyah",
+        password="madinku123",
+        role="madin",
+    )
+
+    return {"message": "Akun-akun admin berhasil diinisialisasi"}
 
 
 # ==================== KELAS ENDPOINTS ====================
