@@ -397,7 +397,7 @@ class DateDebugTester:
                     "url": f"{self.base_url}/pengabsen/santri-absensi-hari-ini",
                     "headers": self.pengabsen_headers,
                     "params": {"waktu_sholat": "subuh"},
-                    "date_field": None  # This endpoint doesn't return date directly
+                    "date_field": "tanggal"  # This endpoint does return date
                 }
             ]
             
