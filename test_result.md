@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test RBAC admin functionality for backend endpoints. Verify: 1) POST /api/init/admin endpoint (idempotent seeding), 2) Login with 4 admin accounts (admin/admin123->superadmin, alhamidcintamulya/alhamidku123->superadmin, alhamid/alhamidku123->pesantren, madin/madinku123->madin) and verify roles in response, 3) GET /api/auth/me with JWT tokens to verify role persistence, 4) Ensure JWT tokens contain correct role in payload."
+user_problem_statement: "Debug masalah tanggal dan visibilitas data untuk absensi sholat: 1) Di Riwayat Absensi Sholat (admin): Pada tanggal sekarang (misal 28), sholat subuh tidak ada data, padahal sudah banyak yang scan. Diduga data subuh hari ini masuk ke tanggal kemarin (27), seperti ada pergeseran tanggal. 2) Di Aplikasi Pengabsen Sholat (PWA): Di menu 'Absensi hari ini' untuk subuh/dzuhur, sudah muncul data seakan-akan hari ini padahal baru mulai subuh tadi. Data tersebut tidak muncul di Riwayat Absensi Sholat maupun di menu 'Riwayat Saya' di aplikasi Pengabsen. 3) Di Aplikasi Monitoring Sholat: masalah serupa (data seperti bergeser tanggal / tidak sinkron antara hari ini vs riwayat). YANG SUDAH DIKETAHUI: Di backend, semua penentuan today pakai: today = datetime.now(timezone.utc).astimezone().date().isoformat(). Endpoint terkait: /pengabsen/absensi (POST), /pengabsen/santri-absensi-hari-ini (GET), /pembimbing/santri-absensi-hari-ini (GET), /wali/anak-absensi-hari-ini (GET), /absensi/riwayat dan /absensi/detail (admin)."
 
 backend:
   - task: "RBAC Admin Seeding Endpoint Testing"
