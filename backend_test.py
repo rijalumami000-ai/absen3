@@ -385,13 +385,206 @@ class AbsensiSholatTester:
         
         return all_success
 
+    def test_absensi_riwayat_endpoint(self) -> bool:
+        """Test new /api/absensi/riwayat endpoint with various parameter combinations"""
+        from datetime import datetime, timedelta
+        
+        today = datetime.now().strftime("%Y-%m-%d")
+        yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+        week_ago = (datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d")
+        
+        test_cases = [
+            {
+                "name": "tanggal_start only (today)",
+                "params": {"tanggal_start": today},
+                "description": "Backend should treat tanggal_end = tanggal_start"
+            },
+            {
+                "name": "tanggal_start and tanggal_end range",
+                "params": {"tanggal_start": week_ago, "tanggal_end": today},
+                "description": "7-day range test"
+            },
+            {
+                "name": "tanggal_start with asrama_id filter",
+                "params": {"tanggal_start": today, "asrama_id": "test_asrama"},
+                "description": "Filter by asrama_id"
+            },
+            {
+                "name": "tanggal_start with gender filter",
+                "params": {"tanggal_start": today, "gender": "putra"},
+                "description": "Filter by gender"
+            }
+        ]
+        
+        all_success = True
+        
+        for test_case in test_cases:
+            try:
+                response = requests.get(
+                    f"{self.base_url}/absensi/riwayat",
+                    params=test_case["params"],
+                    headers=self.headers,
+                    timeout=30
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Verify response structure
+                    required_fields = ["summary", "detail"]
+                    missing_fields = [f for f in required_fields if f not in data]
+                    
+                    if missing_fields:
+                        self.log_test(f"Riwayat {test_case['name']}", False, f"Missing fields: {missing_fields}", data)
+                        all_success = False
+                        continue
+                    
+                    # Verify summary structure
+                    summary = data.get("summary", {})
+                    if "total_records" not in summary or "by_waktu" not in summary:
+                        self.log_test(f"Riwayat {test_case['name']}", False, "Invalid summary structure", summary)
+                        all_success = False
+                        continue
+                    
+                    # Verify detail structure
+                    detail = data.get("detail", {})
+                    waktu_sholat_list = ["subuh", "dzuhur", "ashar", "maghrib", "isya"]
+                    status_list = ["hadir", "alfa", "sakit", "izin", "haid", "istihadhoh"]
+                    
+                    for waktu in waktu_sholat_list:
+                        if waktu not in detail:
+                            self.log_test(f"Riwayat {test_case['name']}", False, f"Missing waktu {waktu} in detail", detail)
+                            all_success = False
+                            break
+                        
+                        for status in status_list:
+                            if status not in detail[waktu]:
+                                self.log_test(f"Riwayat {test_case['name']}", False, f"Missing status {status} for {waktu}", detail[waktu])
+                                all_success = False
+                                break
+                    
+                    if all_success:
+                        self.log_test(f"Riwayat {test_case['name']}", True, f"Valid structure - {test_case['description']}")
+                
+                elif response.status_code == 500:
+                    self.log_test(f"Riwayat {test_case['name']}", False, "Server error 500", response.json())
+                    all_success = False
+                else:
+                    self.log_test(f"Riwayat {test_case['name']}", True, f"No server error (status: {response.status_code})")
+                    
+            except Exception as e:
+                self.log_test(f"Riwayat {test_case['name']}", False, f"Request error: {str(e)}")
+                all_success = False
+        
+        return all_success
+
+    def test_absensi_detail_legacy_consistency(self) -> bool:
+        """Test /api/absensi/detail consistency with /api/absensi/riwayat"""
+        from datetime import datetime
+        
+        today = datetime.now().strftime("%Y-%m-%d")
+        
+        try:
+            # Test legacy endpoint
+            detail_response = requests.get(
+                f"{self.base_url}/absensi/detail",
+                params={"tanggal": today},
+                headers=self.headers,
+                timeout=30
+            )
+            
+            # Test new endpoint with equivalent parameters
+            riwayat_response = requests.get(
+                f"{self.base_url}/absensi/riwayat",
+                params={"tanggal_start": today, "tanggal_end": today},
+                headers=self.headers,
+                timeout=30
+            )
+            
+            if detail_response.status_code == 200 and riwayat_response.status_code == 200:
+                detail_data = detail_response.json()
+                riwayat_data = riwayat_response.json()
+                
+                # Compare structure
+                if detail_data.keys() != riwayat_data.keys():
+                    self.log_test("Legacy Detail Consistency", False, "Different top-level keys", {
+                        "detail_keys": list(detail_data.keys()),
+                        "riwayat_keys": list(riwayat_data.keys())
+                    })
+                    return False
+                
+                # Compare summary
+                if detail_data.get("summary") != riwayat_data.get("summary"):
+                    self.log_test("Legacy Detail Consistency", False, "Summary data mismatch", {
+                        "detail_summary": detail_data.get("summary"),
+                        "riwayat_summary": riwayat_data.get("summary")
+                    })
+                    return False
+                
+                self.log_test("Legacy Detail Consistency", True, "Both endpoints return consistent data")
+                return True
+            
+            elif detail_response.status_code == 500 or riwayat_response.status_code == 500:
+                self.log_test("Legacy Detail Consistency", False, "One or both endpoints returned 500 error")
+                return False
+            else:
+                self.log_test("Legacy Detail Consistency", True, f"Both endpoints accessible (detail: {detail_response.status_code}, riwayat: {riwayat_response.status_code})")
+                return True
+                
+        except Exception as e:
+            self.log_test("Legacy Detail Consistency", False, f"Request error: {str(e)}")
+            return False
+
+    def test_related_endpoints(self) -> bool:
+        """Test related endpoints to ensure they still work"""
+        from datetime import datetime
+        
+        today = datetime.now().strftime("%Y-%m-%d")
+        
+        endpoints_to_test = [
+            {
+                "endpoint": "/waktu-sholat",
+                "params": {"tanggal": today},
+                "name": "Waktu Sholat"
+            },
+            {
+                "endpoint": "/absensi/stats",
+                "params": {"tanggal_start": today},
+                "name": "Absensi Stats"
+            }
+        ]
+        
+        all_success = True
+        
+        for test in endpoints_to_test:
+            try:
+                response = requests.get(
+                    f"{self.base_url}{test['endpoint']}",
+                    params=test["params"],
+                    headers=self.headers,
+                    timeout=30
+                )
+                
+                if response.status_code == 500:
+                    self.log_test(f"{test['name']} Endpoint", False, f"Server error 500", response.json())
+                    all_success = False
+                elif response.status_code == 200:
+                    self.log_test(f"{test['name']} Endpoint", True, f"Working correctly (status: {response.status_code})")
+                else:
+                    self.log_test(f"{test['name']} Endpoint", True, f"No server error (status: {response.status_code})")
+                    
+            except Exception as e:
+                self.log_test(f"{test['name']} Endpoint", False, f"Request error: {str(e)}")
+                all_success = False
+        
+        return all_success
+
     def test_legacy_endpoints(self) -> bool:
         """Test legacy endpoints to ensure no 500 errors"""
         legacy_endpoints = [
             "/absensi",
             "/santri", 
-            "/wali",
-            "/waktu-sholat?tanggal=01-01-2025"
+            "/wali"
         ]
         
         all_success = True
