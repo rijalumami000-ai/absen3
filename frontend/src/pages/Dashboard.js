@@ -52,32 +52,34 @@ const Dashboard = () => {
 
   const statCards = [
     {
-      title: 'Total Santri',
+      title: 'Total Santri Pesantren',
       value: totalSantri,
       icon: Users,
       color: 'text-blue-600',
-      bgColor: 'bg-blue-50'
+      bgColor: 'bg-blue-50',
     },
     {
-      title: 'Hadir Hari Ini',
-      value: stats?.hadir || 0,
-      icon: CheckCircle,
-      color: 'text-green-600',
-      bgColor: 'bg-green-50'
+      title: 'Total Siswa Madrasah Diniyah',
+      value: totalSiswaMadin,
+      icon: Users,
+      color: 'text-emerald-600',
+      bgColor: 'bg-emerald-50',
     },
     {
-      title: 'Alfa Hari Ini',
-      value: stats?.alfa || 0,
-      icon: XCircle,
-      color: 'text-red-600',
-      bgColor: 'bg-red-50'
+      title: 'Kartu 3',
+      value: '-',
+      icon: Users,
+      color: 'text-gray-500',
+      bgColor: 'bg-gray-50',
+      subtitle: 'Belum digunakan',
     },
     {
-      title: 'Total Absensi Hari Ini',
-      value: stats?.total || 0,
-      icon: Activity,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50'
+      title: 'Kartu 4',
+      value: '-',
+      icon: Users,
+      color: 'text-gray-500',
+      bgColor: 'bg-gray-50',
+      subtitle: 'Belum digunakan',
     },
   ];
 
