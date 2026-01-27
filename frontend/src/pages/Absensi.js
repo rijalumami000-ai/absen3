@@ -101,51 +101,61 @@ const Absensi = () => {
     const date = new Date(filterTanggal);
     let start, end;
 
-    switch(filterPeriode) {
+    switch (filterPeriode) {
       case 'hari':
         start = filterTanggal;
         end = filterTanggal;
         break;
-      case 'minggu':
-        const weekStart = new Date(date);
-        weekStart.setDate(date.getDate() - date.getDay());
-        const weekEnd = new Date(weekStart);
-        weekEnd.setDate(weekStart.getDate() + 6);
-        start = weekStart.toISOString().split('T')[0];
-        end = weekEnd.toISOString().split('T')[0];
-        break;
-      case '2minggu':
-        const twoWeekStart = new Date(date);
-        twoWeekStart.setDate(date.getDate() - 13);
-        start = twoWeekStart.toISOString().split('T')[0];
-        end = filterTanggal;
-        break;
-      case 'bulan':
+      case 'minggu1':
+      case 'minggu2':
+      case 'minggu3':
+      case 'minggu4': {
+        const weekIndex = parseInt(filterPeriode.replace('minggu', ''), 10) - 1; // 0-3
         const monthStart = new Date(date.getFullYear(), date.getMonth(), 1);
-        const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-        start = monthStart.toISOString().split('T')[0];
-        end = monthEnd.toISOString().split('T')[0];
+        const startDay = weekIndex * 7 + 1;
+        const startDate = new Date(date.getFullYear(), date.getMonth(), startDay);
+        const endDay = startDay + 6;
+        const endDate = new Date(date.getFullYear(), date.getMonth(), endDay);
+        start = startDate.toISOString().split('T')[0];
+        end = endDate.toISOString().split('T')[0];
         break;
-      case 'semester1':
-        // Semester 1: Jan - Jun
+      }
+      case '2minggu1': {
+        const monthStart = new Date(date.getFullYear(), date.getMonth(), 1);
+        const startDate = monthStart;
+        const endDate = new Date(date.getFullYear(), date.getMonth(), 14);
+        start = startDate.toISOString().split('T')[0];
+        end = endDate.toISOString().split('T')[0];
+        break;
+      }
+      case '2minggu2': {
+        const startDate = new Date(date.getFullYear(), date.getMonth(), 15);
+        const endDate = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+        start = startDate.toISOString().split('T')[0];
+        end = endDate.toISOString().split('T')[0];
+        break;
+      }
+      case 'semester1': {
         const sem1Start = new Date(date.getFullYear(), 0, 1); // Jan 1
         const sem1End = new Date(date.getFullYear(), 5, 30); // Jun 30
         start = sem1Start.toISOString().split('T')[0];
         end = sem1End.toISOString().split('T')[0];
         break;
-      case 'semester2':
-        // Semester 2: Jul - Dec
+      }
+      case 'semester2': {
         const sem2Start = new Date(date.getFullYear(), 6, 1); // Jul 1
         const sem2End = new Date(date.getFullYear(), 11, 31); // Dec 31
         start = sem2Start.toISOString().split('T')[0];
         end = sem2End.toISOString().split('T')[0];
         break;
-      case 'tahun':
+      }
+      case 'tahun': {
         const yearStart = new Date(date.getFullYear(), 0, 1);
         const yearEnd = new Date(date.getFullYear(), 11, 31);
         start = yearStart.toISOString().split('T')[0];
         end = yearEnd.toISOString().split('T')[0];
         break;
+      }
       default:
         start = filterTanggal;
         end = filterTanggal;
