@@ -1716,7 +1716,8 @@ async def upsert_absensi_pengabsen(
     status_absen: Literal["hadir", "alfa", "sakit", "izin", "haid", "istihadhoh"] = "hadir",
     current_pengabsen: dict = Depends(get_current_pengabsen)
 ):
-    today = datetime.now(timezone.utc).astimezone().date().isoformat()
+    # Gunakan tanggal lokal (WIB) agar konsisten dengan persepsi pengguna
+    today = get_today_local_iso()
 
     santri = await db.santri.find_one({"id": santri_id}, {"_id": 0})
     if not santri:
@@ -1807,7 +1808,7 @@ async def delete_absensi_pengabsen(
     waktu_sholat: Literal["subuh", "dzuhur", "ashar", "maghrib", "isya"],
     current_pengabsen: dict = Depends(get_current_pengabsen)
 ):
-    today = datetime.now(timezone.utc).astimezone().date().isoformat()
+    today = get_today_local_iso()
 
     santri = await db.santri.find_one({"id": santri_id}, {"_id": 0})
     if not santri:
