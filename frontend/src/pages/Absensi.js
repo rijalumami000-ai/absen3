@@ -187,15 +187,6 @@ const Absensi = () => {
     { key: 'istihadhoh', name: 'Istihadhoh', icon: Users, color: 'pink' }
   ];
 
-  const statusInfo = [
-    { key: 'hadir', name: 'Hadir', icon: CheckCircle, color: 'green' },
-    { key: 'alfa', name: 'Alfa', icon: XCircle, color: 'red' },
-    { key: 'sakit', name: 'Sakit', icon: AlertCircle, color: 'yellow' },
-    { key: 'izin', name: 'Izin', icon: AlertCircle, color: 'blue' },
-    { key: 'haid', name: 'Haid', icon: Users, color: 'purple' },
-    { key: 'istihadhoh', name: 'Istihadhoh', icon: Users, color: 'pink' }
-  ];
-
   const getStatusColor = (status) => {
     const colors = {
       hadir: 'bg-green-100 text-green-700 border-green-200',
