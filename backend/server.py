@@ -1398,7 +1398,7 @@ async def login_wali(request: WaliLoginRequest):
 
 @api_router.get("/wali/anak-absensi-hari-ini")
 async def get_wali_anak_absensi_hari_ini(current_wali: dict = Depends(get_current_wali)):
-    today = datetime.now(timezone.utc).astimezone().date().isoformat()
+    today = get_today_local_iso()
     anak_ids: List[str] = current_wali.get("anak_ids", [])
     if not anak_ids:
         return {"tanggal": today, "data": []}
