@@ -4,8 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { ClipboardList, Users, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { downloadRiwayatAbsensiSholatPDF } from '@/lib/pdfUtils';
+import { ClipboardList, Users, CheckCircle, XCircle, AlertCircle, FileDown } from 'lucide-react';
 
 const getTodayLocalYMD = () => {
   const now = new Date();
@@ -26,6 +28,46 @@ const Absensi = () => {
   const [tanggalStart, setTanggalStart] = useState(getTodayLocalYMD());
   const [tanggalEnd, setTanggalEnd] = useState(getTodayLocalYMD());
   const { toast } = useToast();
+
+  const getPeriodeLabel = () => {
+    switch (filterPeriode) {
+      case 'hari':
+        return 'Periode: Per Hari';
+      case 'minggu1':
+        return 'Periode: Minggu 1';
+      case 'minggu2':
+        return 'Periode: Minggu 2';
+      case 'minggu3':
+        return 'Periode: Minggu 3';
+      case 'minggu4':
+        return 'Periode: Minggu 4';
+      case '2minggu1':
+        return 'Periode: 2 Minggu Pertama';
+      case '2minggu2':
+        return 'Periode: 2 Minggu Kedua';
+      case 'semester1':
+        return 'Periode: Semester 1 (Jan-Jun)';
+      case 'semester2':
+        return 'Periode: Semester 2 (Jul-Des)';
+      case 'tahun':
+        return 'Periode: Per Tahun';
+      default:
+        return '';
+    }
+  };
+
+  const getGenderLabel = () => {
+    if (!filterGender || filterGender === 'all') return '';
+    if (filterGender === 'putra') return 'Laki-laki';
+    if (filterGender === 'putri') return 'Perempuan';
+    return '';
+  };
+
+  const getAsramaLabel = () => {
+    if (!filterAsrama) return 'Semua';
+    const asrama = asramaList.find((a) => a.id === filterAsrama);
+    return asrama ? asrama.nama : 'Semua';
+  };
 
   useEffect(() => {
     loadData();
