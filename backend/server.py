@@ -1713,7 +1713,7 @@ async def regenerate_pengabsen_kode_akses(pengabsen_id: str, _: dict = Depends(g
 async def upsert_absensi_pengabsen(
     santri_id: str,
     waktu_sholat: Literal["subuh", "dzuhur", "ashar", "maghrib", "isya"],
-    status_absen: Literal["hadir", "alfa", "sakit", "izin", "haid", "istihadhoh"] = "hadir",
+    status_absen: Literal["hadir", "alfa", "sakit", "izin", "haid", "istihadhoh", "masbuq"] = "hadir",
     current_pengabsen: dict = Depends(get_current_pengabsen)
 ):
     # Gunakan tanggal lokal (WIB) agar konsisten dengan persepsi pengguna
@@ -2519,7 +2519,7 @@ async def get_absensi_riwayat(
 
     # Organize by waktu sholat and status
     waktu_sholat_list = ["subuh", "dzuhur", "ashar", "maghrib", "isya"]
-    status_list = ["hadir", "alfa", "sakit", "izin", "haid", "istihadhoh"]
+    status_list = ["hadir", "alfa", "sakit", "izin", "haid", "istihadhoh", "masbuq"]
 
     # Initialize summary
     summary = {
