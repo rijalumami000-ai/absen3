@@ -41,6 +41,7 @@ const PengabsenApp = () => {
   const [showScanSuccess, setShowScanSuccess] = useState(false);
   const [historyItems, setHistoryItems] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
+  const [historyWaktuFilter, setHistoryWaktuFilter] = useState('all'); // all | subuh | dzuhur | ashar | maghrib | isya
   const getTodayLocalYMD = () => {
     const now = new Date();
     const y = now.getFullYear();
