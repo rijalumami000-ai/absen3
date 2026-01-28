@@ -498,20 +498,12 @@ const PengabsenApp = () => {
                       <span className="px-2 py-0.5 rounded-full bg-pink-100 text-pink-700">
                         Istihadhoh: {item.istihadhoh}
                       </span>
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="xs"
-                      className="self-start mt-1"
-                      onClick={() => loadHistoryDetail(item)}
-                    >
-                      {loadingHistoryDetail && historyDetail?.tanggal === item.tanggal &&
-                      historyDetail?.waktu_sholat === item.waktu_sholat ? (
-                        'Memuat...'
-                      ) : (
-                        'Lihat nama santri'
+                      {'masbuq' in item && (
+                        <span className="px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700">
+                          Masbuq: {item.masbuq}
+                        </span>
                       )}
-                    </Button>
+                    </div>
                   </div>
                 ))}
               </div>
