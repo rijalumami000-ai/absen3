@@ -527,6 +527,7 @@ const PembimbingApp = () => {
                     <option value="izin">Izin</option>
                     <option value="haid">Haid</option>
                     <option value="istihadhoh">Istihadhoh</option>
+                    <option value="masbuq">Masbuq</option>
                   </select>
                 </div>
               </div>
