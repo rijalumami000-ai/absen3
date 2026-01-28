@@ -2044,10 +2044,11 @@ async def get_pengabsen_riwayat(
                 "izin": 0,
                 "haid": 0,
                 "istihadhoh": 0,
+                "masbuq": 0,
             }
 
         status_val = a.get("status")
-        if status_val in ["hadir", "alfa", "sakit", "izin", "haid", "istihadhoh"]:
+        if status_val in ["hadir", "alfa", "sakit", "izin", "haid", "istihadhoh", "masbuq"]:
             groups[key][status_val] += 1
 
     items = list(groups.values())
