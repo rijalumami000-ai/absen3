@@ -676,10 +676,11 @@ class AbsensiSholatTester:
                 riwayat_data = riwayat_response.json()
                 
                 # Check if response has the expected structure
-                if isinstance(riwayat_data, list) and len(riwayat_data) > 0:
+                items = riwayat_data.get("items", [])
+                if isinstance(items, list) and len(items) > 0:
                     # Check each summary item for masbuq field
                     masbuq_found = False
-                    for item in riwayat_data:
+                    for item in items:
                         if "masbuq" in item:
                             masbuq_found = True
                             masbuq_value = item["masbuq"]
@@ -688,7 +689,7 @@ class AbsensiSholatTester:
                     
                     if not masbuq_found:
                         # Check if masbuq field exists with default value 0
-                        sample_item = riwayat_data[0]
+                        sample_item = items[0]
                         if "masbuq" not in sample_item:
                             self.log_test("Pengabsen Riwayat masbuq field", False, "masbuq field missing from response", sample_item)
                             all_success = False
