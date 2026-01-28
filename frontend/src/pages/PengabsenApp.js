@@ -24,6 +24,7 @@ const STATUS_OPTIONS = [
   { value: 'izin', label: 'Izin' },
   { value: 'haid', label: 'Haid' },
   { value: 'istihadhoh', label: 'Istihadhoh' },
+  { value: 'masbuq', label: 'Masbuq' },
 ];
 
 const PengabsenApp = () => {
