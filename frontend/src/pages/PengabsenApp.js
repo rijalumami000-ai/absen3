@@ -427,6 +427,21 @@ const PengabsenApp = () => {
 
         {activeTab === 'history' && (
           <section className="bg-white rounded-lg shadow p-4">
+            <div className="flex flex-col md:flex-row md:items-end gap-2">
+              <div className="flex flex-wrap gap-2 mb-2">
+                {['all','subuh','dzuhur','ashar','maghrib','isya'].map((w) => (
+                  <Button
+                    key={w}
+                    type="button"
+                    size="xs"
+                    variant={historyWaktuFilter === w ? 'default' : 'outline'}
+                    onClick={() => setHistoryWaktuFilter(w)}
+                  >
+                    {w === 'all' ? 'Semua Waktu' : w.charAt(0).toUpperCase() + w.slice(1)}
+                  </Button>
+                ))}
+              </div>
+              <div className="flex-1 grid grid-cols-2 gap-2">
             <div className="flex items-center justify-between mb-3">
               <div>
                 <h2 className="text-sm font-semibold text-gray-700">Riwayat Absensi Saya</h2>
