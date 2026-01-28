@@ -427,8 +427,42 @@ const PengabsenApp = () => {
 
         {activeTab === 'history' && (
           <section className="bg-white rounded-lg shadow p-4">
-            <div className="flex flex-col md:flex-row md:items-end gap-2">
-              <div className="flex flex-wrap gap-2 mb-2">
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <h2 className="text-sm font-semibold text-gray-700">Riwayat Absensi Saya</h2>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Ringkasan absensi berdasarkan tanggal dan asrama yang Anda kelola.
+                  </p>
+                </div>
+                <div className="flex flex-col items-end gap-2 text-xs">
+                  <div className="flex gap-2">
+                    <div>
+                      <span className="block mb-1 text-[11px] text-gray-500">Tanggal Mulai</span>
+                      <input
+                        type="date"
+                        value={historyStart}
+                        onChange={(e) => setHistoryStart(e.target.value)}
+                        className="border rounded px-2 py-1 text-xs"
+                      />
+                    </div>
+                    <div>
+                      <span className="block mb-1 text-[11px] text-gray-500">Tanggal Akhir</span>
+                      <input
+                        type="date"
+                        value={historyEnd}
+                        onChange={(e) => setHistoryEnd(e.target.value)}
+                        className="border rounded px-2 py-1 text-xs"
+                      />
+                    </div>
+                  </div>
+                  <Button variant="outline" size="xs" onClick={loadHistory} disabled={loadingHistory}>
+                    {loadingHistory ? 'Memuat...' : 'Terapkan Filter'}
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="flex flex-wrap gap-2 mb-3">
                 {['all','subuh','dzuhur','ashar','maghrib','isya'].map((w) => (
                   <Button
                     key={w}
@@ -440,39 +474,6 @@ const PengabsenApp = () => {
                     {w === 'all' ? 'Semua Waktu' : w.charAt(0).toUpperCase() + w.slice(1)}
                   </Button>
                 ))}
-              </div>
-              <div className="flex-1 grid grid-cols-2 gap-2">
-            <div className="flex items-center justify-between mb-3">
-              <div>
-                <h2 className="text-sm font-semibold text-gray-700">Riwayat Absensi Saya</h2>
-                <p className="text-xs text-gray-500 mt-1">
-                  Ringkasan absensi berdasarkan tanggal dan asrama yang Anda kelola.
-                </p>
-              </div>
-              <div className="flex flex-col items-end gap-2 text-xs">
-                <div className="flex gap-2">
-                  <div>
-                    <span className="block mb-1 text-[11px] text-gray-500">Tanggal Mulai</span>
-                    <input
-                      type="date"
-                      value={historyStart}
-                      onChange={(e) => setHistoryStart(e.target.value)}
-                      className="border rounded px-2 py-1 text-xs"
-                    />
-                  </div>
-                  <div>
-                    <span className="block mb-1 text-[11px] text-gray-500">Tanggal Akhir</span>
-                    <input
-                      type="date"
-                      value={historyEnd}
-                      onChange={(e) => setHistoryEnd(e.target.value)}
-                      className="border rounded px-2 py-1 text-xs"
-                    />
-                  </div>
-                </div>
-                <Button variant="outline" size="xs" onClick={loadHistory} disabled={loadingHistory}>
-                  {loadingHistory ? 'Memuat...' : 'Terapkan Filter'}
-                </Button>
               </div>
             </div>
 
