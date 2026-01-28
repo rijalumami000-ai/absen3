@@ -1076,7 +1076,7 @@ class AbsensiSholatTester:
     
     def run_all_tests(self):
         """Run all tests in sequence"""
-        print("🚀 Starting Absensi Sholat Backend Tests - Focus on New Changes")
+        print("🚀 Starting Absensi Sholat Backend Tests - Focus on Latest Changes")
         print(f"📍 Base URL: {self.base_url}")
         print("=" * 60)
         
@@ -1085,25 +1085,28 @@ class AbsensiSholatTester:
             print("❌ Cannot proceed with tests without authentication")
             return False
         
-        print("\n🆕 Testing New Absensi Riwayat Endpoint:")
+        print("\n🆕 Testing Latest Backend Changes:")
         print("-" * 40)
         
-        # Step 1: Test new /api/absensi/riwayat endpoint
-        riwayat_success = self.test_absensi_riwayat_endpoint()
+        # Step 1: Test masbuq field in riwayat endpoints
+        masbuq_riwayat_success = self.test_masbuq_field_in_riwayat_endpoints()
         
-        # Step 2: Test legacy /api/absensi/detail consistency
-        detail_consistency_success = self.test_absensi_detail_legacy_consistency()
+        # Step 2: Test masbuq field in stats endpoint
+        masbuq_stats_success = self.test_absensi_stats_masbuq_field()
+        
+        # Step 3: Test absensi-kelas delete endpoint
+        delete_absensi_kelas_success = self.test_absensi_kelas_delete_endpoint()
         
         print("\n🔗 Testing Related Endpoints:")
         print("-" * 40)
         
-        # Step 3: Test related endpoints (waktu-sholat, absensi/stats)
+        # Step 4: Test related endpoints
         related_success = self.test_related_endpoints()
         
         print("\n📋 Testing Legacy Endpoints (No 500 Errors):")
         print("-" * 40)
         
-        # Step 4: Test legacy endpoints
+        # Step 5: Test legacy endpoints
         legacy_success = self.test_legacy_endpoints()
         
         # Summary
