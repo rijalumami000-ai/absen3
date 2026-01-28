@@ -502,7 +502,14 @@ const PengabsenApp = () => {
                   <div
                     key={idx}
                     onClick={() => loadHistoryDetail(item)}
-                    className="border rounded-lg p-3 bg-slate-50 text-xs flex flex-col gap-1 cursor-pointer hover:bg-slate-100"
+                    className={`border rounded-lg p-3 text-xs flex flex-col gap-1 cursor-pointer transition-colors ${
+                      historyDetail &&
+                      item.tanggal === historyDetail.tanggal &&
+                      item.waktu_sholat === historyDetail.waktu_sholat &&
+                      item.asrama_id === historyDetail.asrama_id
+                        ? 'bg-emerald-50 border-emerald-400'
+                        : 'bg-slate-50 hover:bg-slate-100'
+                    }`}
                   >
                     <div className="flex items-center justify-between mb-1">
                       <span className="font-semibold text-gray-800">{item.tanggal}</span>
@@ -542,75 +549,86 @@ const PengabsenApp = () => {
             )}
 
             {historyDetail && (
-              <div className="mt-4 border-t pt-3 text-xs">
-                <h3 className="font-semibold text-gray-800 mb-2">
-                  Detail {historyDetail.tanggal} -{' '}
-                  {historyDetail.waktu_sholat.charAt(0).toUpperCase() +
-                    historyDetail.waktu_sholat.slice(1)}
-                </h3>
-                {historyDetail.data.length === 0 ? (
-                  <p className="text-gray-500">Tidak ada data santri.</p>
-                ) : (
-                  <div className="max-h-64 overflow-y-auto space-y-1 border rounded-md p-2 bg-slate-50">
-                    {historyDetail.data.map((s) => (
-                      <div
-                        key={s.santri_id}
-                        className="p-2 bg-white rounded border flex items-center justify-between gap-3"
-                      >
-                        <div>
-                          <div className="font-medium text-gray-800">{s.nama}</div>
-                          <div className="text-gray-500">NIS: {s.nis}</div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <select
-                            value={s.status || ''}
-                            onChange={async (e) => {
-                              const newStatus = e.target.value || null;
-                              try {
-                                if (!newStatus) {
-                                  await pengabsenAppAPI.deleteAbsensi({
-                                    santri_id: s.santri_id,
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                <div className="bg-white rounded-lg shadow-lg max-w-md w-full max-h-[80vh] overflow-hidden p-4 text-xs">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-semibold text-gray-800">
+                      Detail {historyDetail.tanggal} -{' '}
+                      {historyDetail.waktu_sholat.charAt(0).toUpperCase() +
+                        historyDetail.waktu_sholat.slice(1)}
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => setHistoryDetail(null)}
+                      className="text-[11px] text-gray-500 hover:text-gray-700"
+                    >
+                      Tutup
+                    </button>
+                  </div>
+                  {historyDetail.data.length === 0 ? (
+                    <p className="text-gray-500">Tidak ada data santri.</p>
+                  ) : (
+                    <div className="max-h-[60vh] overflow-y-auto space-y-1 border rounded-md p-2 bg-slate-50">
+                      {historyDetail.data.map((s) => (
+                        <div
+                          key={s.santri_id}
+                          className="p-2 bg-white rounded border flex items-center justify-between gap-3"
+                        >
+                          <div>
+                            <div className="font-medium text-gray-800">{s.nama}</div>
+                            <div className="text-gray-500">NIS: {s.nis}</div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <select
+                              value={s.status || ''}
+                              onChange={async (e) => {
+                                const newStatus = e.target.value || null;
+                                try {
+                                  if (!newStatus) {
+                                    await pengabsenAppAPI.deleteAbsensi({
+                                      santri_id: s.santri_id,
+                                      waktu_sholat: historyDetail.waktu_sholat,
+                                    });
+                                  } else {
+                                    await pengabsenAppAPI.upsertAbsensi({
+                                      santri_id: s.santri_id,
+                                      waktu_sholat: historyDetail.waktu_sholat,
+                                      status_absen: newStatus,
+                                    });
+                                  }
+                                  // refresh detail dan ringkasan
+                                  await loadHistory();
+                                  await loadHistoryDetail({
+                                    tanggal: historyDetail.tanggal,
                                     waktu_sholat: historyDetail.waktu_sholat,
+                                    asrama_id: historyDetail.asrama_id,
                                   });
-                                } else {
-                                  await pengabsenAppAPI.upsertAbsensi({
-                                    santri_id: s.santri_id,
-                                    waktu_sholat: historyDetail.waktu_sholat,
-                                    status_absen: newStatus,
+                                } catch (error) {
+                                  toast({
+                                    title: 'Error',
+                                    description:
+                                      error.response?.data?.detail || 'Gagal mengubah status absensi',
+                                    variant: 'destructive',
                                   });
                                 }
-                                // refresh detail dan ringkasan
-                                await loadHistory();
-                                await loadHistoryDetail({
-                                  tanggal: historyDetail.tanggal,
-                                  waktu_sholat: historyDetail.waktu_sholat,
-                                  asrama_id: historyDetail.asrama_id,
-                                });
-                              } catch (error) {
-                                toast({
-                                  title: 'Error',
-                                  description:
-                                    error.response?.data?.detail || 'Gagal mengubah status absensi',
-                                  variant: 'destructive',
-                                });
-                              }
-                            }}
-                            className="border border-gray-300 rounded-md px-2 py-1 text-[11px] bg-white"
-                          >
-                            <option value="">-</option>
-                            <option value="hadir">Hadir</option>
-                            <option value="alfa">Alfa</option>
-                            <option value="sakit">Sakit</option>
-                            <option value="izin">Izin</option>
-                            <option value="haid">Haid</option>
-                            <option value="istihadhoh">Istihadhoh</option>
-                            <option value="masbuq">Masbuq</option>
-                          </select>
+                              }}
+                              className="border border-gray-300 rounded-md px-2 py-1 text-[11px] bg-white"
+                            >
+                              <option value="">-</option>
+                              <option value="hadir">Hadir</option>
+                              <option value="alfa">Alfa</option>
+                              <option value="sakit">Sakit</option>
+                              <option value="izin">Izin</option>
+                              <option value="haid">Haid</option>
+                              <option value="istihadhoh">Istihadhoh</option>
+                              <option value="masbuq">Masbuq</option>
+                            </select>
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </section>
