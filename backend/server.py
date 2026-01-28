@@ -2458,6 +2458,7 @@ async def get_absensi_stats(
     izin = await db.absensi.count_documents({**query, "status": "izin"})
     haid = await db.absensi.count_documents({**query, "status": "haid"})
     istihadhoh = await db.absensi.count_documents({**query, "status": "istihadhoh"})
+    masbuq = await db.absensi.count_documents({**query, "status": "masbuq"})
     
     return {
         "total": total,
@@ -2466,7 +2467,8 @@ async def get_absensi_stats(
         "sakit": sakit,
         "izin": izin,
         "haid": haid,
-        "istihadhoh": istihadhoh
+        "istihadhoh": istihadhoh,
+        "masbuq": masbuq,
     }
 
 @api_router.get("/absensi/detail")
