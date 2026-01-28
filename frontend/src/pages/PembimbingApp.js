@@ -180,6 +180,7 @@ const PembimbingApp = () => {
       izin: 'bg-amber-100 text-amber-700',
       haid: 'bg-pink-100 text-pink-700',
       istihadhoh: 'bg-violet-100 text-violet-700',
+      masbuq: 'bg-yellow-100 text-yellow-700',
     };
     const labelMap = {
       hadir: 'Hadir',
@@ -188,6 +189,7 @@ const PembimbingApp = () => {
       izin: 'Izin',
       haid: 'Haid',
       istihadhoh: 'Istihadhoh',
+      masbuq: 'Masbuq',
     };
     const cls = map[status] || 'bg-gray-100 text-gray-700';
     return (
