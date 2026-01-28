@@ -397,6 +397,7 @@ const PembimbingApp = () => {
                     <span className="text-red-600">A:{dayStats.alfa}</span>
                     <span className="text-sky-600">S:{dayStats.sakit}</span>
                     <span className="text-amber-600">I:{dayStats.izin}</span>
+                    <span className="text-yellow-600">M:{dayStats.masbuq || 0}</span>
                   </div>
                 </div>
               );
