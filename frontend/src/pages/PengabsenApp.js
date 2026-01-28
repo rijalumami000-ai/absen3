@@ -119,7 +119,14 @@ const PengabsenApp = () => {
     try {
       setLoadingHistory(true);
       const resp = await pengabsenAppAPI.riwayat({ tanggal_start: historyStart, tanggal_end: historyEnd });
-      setHistoryItems(resp.data.items || []);
+      const items = resp.data.items || [];
+      setHistoryItems(items);
+      if (items.length > 0) {
+        // otomatis tampilkan detail kartu pertama
+        await loadHistoryDetail(items[0]);
+      } else {
+        setHistoryDetail(null);
+      }
     } catch (error) {
       toast({
         title: 'Error',

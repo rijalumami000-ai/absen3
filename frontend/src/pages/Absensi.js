@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { downloadRiwayatAbsensiSholatPDF } from '@/lib/pdfUtils';
-import { ClipboardList, Users, CheckCircle, XCircle, AlertCircle, FileDown } from 'lucide-react';
+import { ClipboardList, Users, CheckCircle, XCircle, AlertCircle, FileDown, Clock } from 'lucide-react';
 
 const getTodayLocalYMD = () => {
   const now = new Date();
