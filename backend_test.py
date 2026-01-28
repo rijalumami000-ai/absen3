@@ -921,7 +921,7 @@ class AbsensiSholatTester:
             
             if create_response.status_code == 200:
                 create_data = create_response.json()
-                absensi_id = create_data.get("id")
+                absensi_id = create_data.get("absensi_id") or create_data.get("id")
                 
                 if absensi_id:
                     self.log_test("Create Absensi Kelas", True, f"Created absensi_kelas with ID: {absensi_id}")
