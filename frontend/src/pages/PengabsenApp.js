@@ -485,7 +485,13 @@ const PengabsenApp = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {historyItems.map((item, idx) => (
+                {historyItems
+                  .filter((item) =>
+                    historyWaktuFilter === 'all'
+                      ? true
+                      : item.waktu_sholat === historyWaktuFilter
+                  )
+                  .map((item, idx) => (
                   <div
                     key={idx}
                     className="border rounded-lg p-3 bg-slate-50 text-xs flex flex-col gap-1"
