@@ -372,30 +372,56 @@ const PengabsenKelasApp = () => {
 
             {/* Manual attendance list */}
             <div className="mt-8 max-w-5xl mx-auto w-full">
-            <div className="bg-card rounded-xl border border-border p-4 mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div className="bg-card rounded-xl border border-border p-4 mb-4 flex flex-col gap-3">
               <div>
                 <h3 className="text-sm font-semibold">Absensi Manual</h3>
                 <p className="text-xs text-muted-foreground mt-1">
+                  Pilih kelas terlebih dahulu, kemudian atur status kehadiran siswa di kelas tersebut.
                   Gunakan untuk mencatat Alfa (a), Izin (i), Sakit (s), atau Telat (t) jika tidak melalui scan QR.
                 </p>
               </div>
-              <div className="w-full md:w-64">
-                <input
-                  type="text"
-                  value={manualSearch}
-                  onChange={(e) => setManualSearch(e.target.value)}
-                  placeholder="Cari nama siswa..."
-                  className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-                />
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <div className="w-full md:w-64">
+                  <label className="text-xs font-medium mb-1 block">Kelas</label>
+                  {kelasList.length === 0 ? (
+                    <div className="px-3 py-2 border border-border rounded-lg bg-muted text-muted-foreground text-sm">
+                      Tidak ada kelas tersedia
+                    </div>
+                  ) : (
+                    <Select value={selectedKelas} onValueChange={setSelectedKelas}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih kelas" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {kelasList.map((kelas) => (
+                          <SelectItem key={kelas.id} value={kelas.id}>
+                            {kelas.nama}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+                <div className="w-full md:w-64">
+                  <label className="text-xs font-medium mb-1 block">Cari Siswa</label>
+                  <input
+                    type="text"
+                    value={manualSearch}
+                    onChange={(e) => setManualSearch(e.target.value)}
+                    placeholder="Cari nama siswa..."
+                    className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  />
+                </div>
               </div>
             </div>
 
             <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1">
               {manualStudents
                 .filter((s) =>
-                  manualSearch
+                  (selectedKelas ? s.kelas_id === selectedKelas : true) &&
+                  (manualSearch
                     ? s.siswa_nama.toLowerCase().includes(manualSearch.toLowerCase())
-                    : true
+                    : true)
                 )
                 .map((s) => (
                   <div
