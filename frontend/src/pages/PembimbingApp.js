@@ -328,7 +328,7 @@ const PembimbingApp = () => {
 
     // Calculate summary stats
     const summary = {
-      hadir: 0, alfa: 0, sakit: 0, izin: 0, haid: 0, istihadhoh: 0, total: 0
+      hadir: 0, alfa: 0, sakit: 0, izin: 0, haid: 0, istihadhoh: 0, masbuq: 0, total: 0
     };
 
     historyData.data.forEach(({ data }) => {
