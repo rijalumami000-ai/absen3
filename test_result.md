@@ -342,16 +342,15 @@ frontend:
 
 metadata:
   created_by: "testing_agent"
-  version: "2.0"
-  test_sequence: 2
+  version: "3.0"
+  test_sequence: 3
   run_ui: true
 
 test_plan:
   current_focus:
-    - "Date Consistency Testing for Absensi Sholat"
-    - "Absensi Creation and Visibility Testing"
-    - "Timezone Edge Case Testing"
-    - "Wali Sync Issue Investigation"
+    - "Masbuq Field Testing in Riwayat Endpoints"
+    - "Absensi Stats Masbuq Field Testing"
+    - "Absensi Kelas Delete Endpoint Testing"
   stuck_tasks:
     - "Wali Sync Issue Investigation"
   test_all: false
@@ -368,3 +367,5 @@ agent_communication:
       message: "✅ FRONTEND TESTING FOR LATEST CHANGES COMPLETED! Tested Dashboard, Riwayat Absensi Sholat, and Riwayat Absensi Madin pages. DASHBOARD: All 4 cards working correctly - 'Total Santri Pesantren' (2), 'Total Siswa Madrasah Diniyah' (8), 'Kartu 3' (-/Belum digunakan), 'Kartu 4' (-/Belum digunakan). 'Statistik Kehadiran Hari Ini' card successfully removed, 'Informasi Sistem' card still present. ABSENSI SHOLAT: All filter elements working (Periode dropdown with 8/10 options, date inputs, summary display), Waktu Sholat cards displaying correctly (5/5), Download PDF button functional. MINOR ISSUES: Page titles show 'Absensi Sholat' instead of expected 'Riwayat Absensi Sholat'/'Riwayat Absensi Madin', missing 'Semester 1'/'Semester 2' options in dropdown. REGRESSION: Madin page filters and download working correctly. No console errors detected. Core functionality working as expected."
     - agent: "testing"
       message: "✅ DATE DEBUGGING TESTING COMPLETED! Comprehensive testing of date consistency and visibility issues for absensi sholat. KEY FINDINGS: 1) NO DATE SHIFT ISSUES DETECTED - All endpoints use consistent date calculation: datetime.now(timezone.utc).astimezone().date().isoformat(), 2) ABSENSI VISIBILITY WORKING CORRECTLY - Created test absensi appears immediately in pengabsen hari ini and admin riwayat endpoints, 3) TIMEZONE HANDLING CORRECT - Server runs in UTC timezone with proper astimezone() conversion, tested during critical time window (23:xx near midnight), 4) WALI SYNC ISSUE IDENTIFIED - Major issue with sync_wali_santri() function: all wali have empty anak_ids arrays despite santri existing, preventing wali login functionality. RECOMMENDATION: The user's reported date shift issues may be related to the wali sync problem rather than actual date calculation issues. The backend date logic is working correctly."
+    - agent: "testing"
+      message: "✅ LATEST BACKEND CHANGES TESTING COMPLETED SUCCESSFULLY! Comprehensive testing of recent backend updates: 1) MASBUQ FIELD IN RIWAYAT ENDPOINTS - Both GET /api/pengabsen/riwayat and GET /api/absensi/riwayat properly include masbuq field with accurate counts. Created test absensi with 'masbuq' status and verified correct aggregation in both pengabsen and admin interfaces. 2) ABSENSI STATS MASBUQ FIELD - GET /api/absensi/stats endpoint correctly returns masbuq field with numeric value representing total masbuq absensi count for specified date range. 3) ABSENSI KELAS DELETE ENDPOINT - DELETE /api/absensi-kelas/{absensi_id} working correctly with proper pengabsen_kelas authorization, returns success message, and actually removes document from database. All 26 tests passed with no critical issues detected. Backend implementation is solid and working as expected."
