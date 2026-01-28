@@ -194,7 +194,8 @@ const Absensi = () => {
     { key: 'sakit', name: 'Sakit', icon: AlertCircle, color: 'yellow' },
     { key: 'izin', name: 'Izin', icon: AlertCircle, color: 'blue' },
     { key: 'haid', name: 'Haid', icon: Users, color: 'purple' },
-    { key: 'istihadhoh', name: 'Istihadhoh', icon: Users, color: 'pink' }
+    { key: 'istihadhoh', name: 'Istihadhoh', icon: Users, color: 'pink' },
+    { key: 'masbuq', name: 'Masbuq', icon: Clock, color: 'amber' },
   ];
 
   const getStatusColor = (status) => {
@@ -204,7 +205,8 @@ const Absensi = () => {
       sakit: 'bg-yellow-100 text-yellow-700 border-yellow-200',
       izin: 'bg-blue-100 text-blue-700 border-blue-200',
       haid: 'bg-purple-100 text-purple-700 border-purple-200',
-      istihadhoh: 'bg-pink-100 text-pink-700 border-pink-200'
+      istihadhoh: 'bg-pink-100 text-pink-700 border-pink-200',
+      masbuq: 'bg-amber-100 text-amber-700 border-amber-200',
     };
     return colors[status] || 'bg-gray-100 text-gray-700';
   };
