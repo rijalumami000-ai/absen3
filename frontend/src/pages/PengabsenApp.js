@@ -501,7 +501,8 @@ const PengabsenApp = () => {
                   .map((item, idx) => (
                   <div
                     key={idx}
-                    className="border rounded-lg p-3 bg-slate-50 text-xs flex flex-col gap-1"
+                    onClick={() => loadHistoryDetail(item)}
+                    className="border rounded-lg p-3 bg-slate-50 text-xs flex flex-col gap-1 cursor-pointer hover:bg-slate-100"
                   >
                     <div className="flex items-center justify-between mb-1">
                       <span className="font-semibold text-gray-800">{item.tanggal}</span>
