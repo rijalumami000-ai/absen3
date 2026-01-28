@@ -321,7 +321,7 @@ class Absensi(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     santri_id: str
     waktu_sholat: Literal["subuh", "dzuhur", "ashar", "maghrib", "isya"]
-    status: Literal["hadir", "alfa", "sakit", "izin", "haid", "istihadhoh"]
+    status: Literal["hadir", "alfa", "sakit", "izin", "haid", "istihadhoh", "masbuq"]
     tanggal: str
     waktu_absen: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     pengabsen_id: Optional[str] = None
