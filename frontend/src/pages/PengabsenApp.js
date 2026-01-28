@@ -519,15 +519,61 @@ const PengabsenApp = () => {
                 {historyDetail.data.length === 0 ? (
                   <p className="text-gray-500">Tidak ada data santri.</p>
                 ) : (
-                  <div className="max-h-48 overflow-y-auto space-y-1">
+                  <div className="max-h-64 overflow-y-auto space-y-1 border rounded-md p-2 bg-slate-50">
                     {historyDetail.data.map((s) => (
-                      <div key={s.santri_id} className="p-2 bg-white rounded border flex justify-between">
+                      <div
+                        key={s.santri_id}
+                        className="p-2 bg-white rounded border flex items-center justify-between gap-3"
+                      >
                         <div>
                           <div className="font-medium text-gray-800">{s.nama}</div>
                           <div className="text-gray-500">NIS: {s.nis}</div>
                         </div>
-                        <div className="text-[11px] text-gray-500 flex items-center">
-                          Status: <span className="ml-1 font-semibold capitalize">{s.status}</span>
+                        <div className="flex items-center gap-2">
+                          <select
+                            value={s.status || ''}
+                            onChange={async (e) => {
+                              const newStatus = e.target.value || null;
+                              try {
+                                if (!newStatus) {
+                                  await pengabsenAppAPI.deleteAbsensi({
+                                    santri_id: s.santri_id,
+                                    waktu_sholat: historyDetail.waktu_sholat,
+                                  });
+                                } else {
+                                  await pengabsenAppAPI.upsertAbsensi({
+                                    santri_id: s.santri_id,
+                                    waktu_sholat: historyDetail.waktu_sholat,
+                                    status_absen: newStatus,
+                                  });
+                                }
+                                // refresh detail dan ringkasan
+                                await loadHistory();
+                                await loadHistoryDetail({
+                                  tanggal: historyDetail.tanggal,
+                                  waktu_sholat: historyDetail.waktu_sholat,
+                                  asrama_id: historyDetail.asrama_id,
+                                });
+                              } catch (error) {
+                                toast({
+                                  title: 'Error',
+                                  description:
+                                    error.response?.data?.detail || 'Gagal mengubah status absensi',
+                                  variant: 'destructive',
+                                });
+                              }
+                            }}
+                            className="border border-gray-300 rounded-md px-2 py-1 text-[11px] bg-white"
+                          >
+                            <option value="">-</option>
+                            <option value="hadir">Hadir</option>
+                            <option value="alfa">Alfa</option>
+                            <option value="sakit">Sakit</option>
+                            <option value="izin">Izin</option>
+                            <option value="haid">Haid</option>
+                            <option value="istihadhoh">Istihadhoh</option>
+                            <option value="masbuq">Masbuq</option>
+                          </select>
                         </div>
                       </div>
                     ))}
