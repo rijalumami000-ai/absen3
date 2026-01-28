@@ -2370,6 +2370,7 @@ async def get_pembimbing_statistik(
             "izin": len([a for a in waktu_absensi if a['status'] == 'izin']),
             "haid": len([a for a in waktu_absensi if a['status'] == 'haid']),
             "istihadhoh": len([a for a in waktu_absensi if a['status'] == 'istihadhoh']),
+            "masbuq": len([a for a in waktu_absensi if a['status'] == 'masbuq']),
             "belum": total_santri - len(waktu_absensi)
         }
     
