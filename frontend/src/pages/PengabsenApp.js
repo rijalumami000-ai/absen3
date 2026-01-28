@@ -603,6 +603,8 @@ const PengabsenApp = () => {
                                     waktu_sholat: historyDetail.waktu_sholat,
                                     asrama_id: historyDetail.asrama_id,
                                   });
+                                  // sinkronkan juga tampilan "Absensi Hari Ini" jika waktunya sama
+                                  await loadData(waktu);
                                 } catch (error) {
                                   toast({
                                     title: 'Error',
