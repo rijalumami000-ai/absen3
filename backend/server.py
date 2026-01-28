@@ -3376,6 +3376,14 @@ async def create_absensi_kelas_manual(
     return {"message": "Absensi berhasil dicatat", "absensi_id": absensi.id}
 
 @api_router.delete("/absensi-kelas/{absensi_id}")
+async def delete_absensi_kelas_route(
+    absensi_id: str,
+    current_pengabsen: dict = Depends(get_current_pengabsen_kelas),
+):
+    """Endpoint publik untuk hapus absensi_kelas (dipakai Pengabsen Kelas)."""
+    return await delete_absensi_kelas(absensi_id, current_pengabsen)
+
+
 @api_router.get("/pembimbing-kelas/kelas-saya", response_model=List[KelasResponse])
 async def get_pembimbing_kelas_kelas_saya(current_pembimbing: dict = Depends(get_current_pembimbing_kelas)):
     """Daftar kelas yang dapat diakses oleh Pembimbing Kelas (berdasarkan kelas_ids)."""
