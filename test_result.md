@@ -189,6 +189,42 @@ backend:
           agent: "testing"
           comment: "✅ GET /api/auth/me endpoint tested successfully for all 4 admin accounts. Verified that JWT tokens work correctly and response contains correct role field matching login response. Role persistence confirmed across authentication flow."
 
+  - task: "Masbuq Field Testing in Riwayat Endpoints"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ Masbuq field testing completed successfully. Tested endpoints: 1) GET /api/pengabsen/riwayat - masbuq field present in each item with correct values, 2) GET /api/absensi/riwayat - masbuq field present in summary.by_waktu for each prayer time with accurate counts. Created test absensi with 'masbuq' status and verified proper aggregation in both pengabsen and admin riwayat endpoints."
+
+  - task: "Absensi Stats Masbuq Field Testing"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ Absensi stats masbuq field testing completed successfully. GET /api/absensi/stats endpoint returns masbuq field with correct numeric value representing total count of absensi documents with status='masbuq' for the specified date range. Verified field exists and contains accurate count."
+
+  - task: "Absensi Kelas Delete Endpoint Testing"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ Absensi kelas delete endpoint testing completed successfully. Tested DELETE /api/absensi-kelas/{absensi_id} with valid pengabsen_kelas token: 1) Successfully created absensi_kelas via POST /api/absensi-kelas/manual, 2) DELETE request returned success message 'Absensi berhasil dihapus', 3) Verified document removal from database. No 403/404 errors encountered with proper authorization."
+
   - task: "Backend testing completed in previous session"
     implemented: true
     working: true
