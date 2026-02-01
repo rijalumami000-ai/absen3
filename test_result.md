@@ -107,15 +107,18 @@ user_problem_statement: "Debug masalah tanggal dan visibilitas data untuk absens
 backend:
   - task: "Pengabsen & Monitoring Aliyah Endpoints"
     implemented: true
-    working: false
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Endpoint admin untuk pengelolaan Pengabsen Aliyah dan Monitoring Aliyah telah dibuat: /api/aliyah/pengabsen* dan /api/aliyah/monitoring*. CRUD, validasi kelas_aliyah, dan regenerate kode_akses perlu dites oleh testing agent."
+        - working: true
+          agent: "testing"
+          comment: "✅ Pengabsen & Monitoring Aliyah endpoints tested successfully. PENGABSEN ALIYAH: All CRUD operations working - POST creates with auto-generated 9-digit kode_akses, GET lists correctly, PUT updates nama/username, POST regenerate-kode-akses changes access code, DELETE removes successfully. MONITORING ALIYAH: Identical functionality working correctly - all CRUD operations, kode_akses generation/regeneration, proper validation of kelas_aliyah references. Both endpoints properly validate kelas_ids against existing kelas_aliyah records and enforce username uniqueness."
 
   - task: "Riwayat Absensi Aliyah Endpoint"
     implemented: true
