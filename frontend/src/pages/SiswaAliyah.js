@@ -537,6 +537,18 @@ const SiswaAliyah = () => {
                     <td className="px-6 py-4 text-sm text-muted-foreground capitalize">{siswa.gender}</td>
                     <td className="px-6 py-4 text-sm text-muted-foreground">{siswa.kelas_nama || '-'}</td>
                     <td className="px-6 py-4 text-sm text-muted-foreground">
+                      {siswa.wali_nama ? (
+                        <div className="flex flex-col text-xs">
+                          <span className="font-medium text-foreground">{siswa.wali_nama}</span>
+                          {siswa.wali_wa && (
+                            <span className="text-muted-foreground">WA: {siswa.wali_wa}</span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">-</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-muted-foreground">
                       {siswa.has_qr ? (
                         <Button
                           variant="outline"
