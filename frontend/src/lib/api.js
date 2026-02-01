@@ -204,6 +204,44 @@ export const settingsAPI = {
   updateAppSettings: (data) => axios.put(`${API}/settings/app`, data, { headers: getAuthHeader() }),
 };
 
+// PWA Pengabsen Aliyah API
+export const pengabsenAliyahAppAPI = {
+  login: (username, kode_akses) =>
+    axios.post(`${API}/aliyah/pengabsen/login`, { username, kode_akses }),
+  me: () => axios.get(`${API}/aliyah/pengabsen/me`, { headers: getAuthHeader() }),
+  absensiHariIni: (params) =>
+    axios.get(`${API}/aliyah/pengabsen/absensi-hari-ini`, {
+      params,
+      headers: getAuthHeader(),
+    }),
+  upsertAbsensi: (data) =>
+    axios.post(`${API}/aliyah/pengabsen/absensi`, data, {
+      headers: getAuthHeader(),
+    }),
+  scanAbsensi: (data, params) =>
+    axios.post(`${API}/aliyah/pengabsen/absensi/scan`, data, {
+      params,
+      headers: getAuthHeader(),
+    }),
+};
+
+// PWA Monitoring Aliyah API
+export const monitoringAliyahAppAPI = {
+  login: (username, kode_akses) =>
+    axios.post(`${API}/aliyah/monitoring/login`, { username, kode_akses }),
+  me: () => axios.get(`${API}/aliyah/monitoring/me`, { headers: getAuthHeader() }),
+  absensiHariIni: (params) =>
+    axios.get(`${API}/aliyah/monitoring/absensi-hari-ini`, {
+      params,
+      headers: getAuthHeader(),
+    }),
+  absensiRiwayat: (params) =>
+    axios.get(`${API}/aliyah/monitoring/absensi-riwayat`, {
+      params,
+      headers: getAuthHeader(),
+    }),
+};
+
 // Pembimbing PWA API
 export const pembimbingAppAPI = {
   login: (username, kode_akses) =>
