@@ -173,6 +173,20 @@ const SiswaAliyah = () => {
     setSelectedSiswa(null);
   };
 
+  const fetchQrPreview = async (siswa) => {
+    try {
+      const response = await api.get(`/aliyah/siswa/${siswa.id}/qr-code`, {
+        responseType: 'blob',
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      setQrPreviewUrl(url);
+      setQrPreviewSiswa(siswa);
+      setIsQrPreviewOpen(true);
+    } catch (error) {
+      toast.error('Gagal memuat QR Code');
+    }
+  };
+
   const downloadQRCode = async (siswaId, namaSiswa) => {
     try {
       const response = await api.get(`/aliyah/siswa/${siswaId}/qr-code`, {
