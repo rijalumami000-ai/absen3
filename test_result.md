@@ -390,9 +390,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Masbuq Field Testing in Riwayat Endpoints"
-    - "Absensi Stats Masbuq Field Testing"
-    - "Absensi Kelas Delete Endpoint Testing"
+    - "Pengabsen & Monitoring Aliyah Endpoints"
+    - "Riwayat Absensi Aliyah Endpoint"
   stuck_tasks:
     - "Wali Sync Issue Investigation"
   test_all: false
