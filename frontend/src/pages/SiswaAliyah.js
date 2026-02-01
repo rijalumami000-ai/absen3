@@ -164,6 +164,8 @@ const SiswaAliyah = () => {
       gender: 'putra',
       kelas_id: '',
       santri_id: '',
+      wali_nama: '',
+      wali_wa: '',
     });
     setSelectedSiswa(null);
   };
