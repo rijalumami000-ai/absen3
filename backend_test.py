@@ -1074,6 +1074,822 @@ class AbsensiSholatTester:
                 all_success = False
         
         return all_success
+
+    def test_aliyah_pengabsen_endpoints(self) -> bool:
+        """Test Pengabsen Aliyah CRUD endpoints"""
+        all_success = True
+        created_pengabsen_id = None
+        created_kelas_id = None
+        
+        # Step 1: Create a test kelas aliyah if needed
+        try:
+            # Check if there are existing kelas aliyah
+            kelas_response = requests.get(
+                f"{self.base_url}/aliyah/kelas",
+                headers=self.headers,
+                timeout=30
+            )
+            
+            if kelas_response.status_code == 200:
+                kelas_list = kelas_response.json()
+                if kelas_list:
+                    # Use existing kelas
+                    test_kelas_id = kelas_list[0]["id"]
+                    self.log_test("Get Existing Kelas Aliyah", True, f"Using existing kelas: {kelas_list[0]['nama']}")
+                else:
+                    # Create new kelas aliyah
+                    kelas_data = {
+                        "nama": "XII IPA Test",
+                        "tingkat": "XII"
+                    }
+                    
+                    create_kelas_response = requests.post(
+                        f"{self.base_url}/aliyah/kelas",
+                        json=kelas_data,
+                        headers=self.headers,
+                        timeout=30
+                    )
+                    
+                    if create_kelas_response.status_code == 200:
+                        created_kelas = create_kelas_response.json()
+                        test_kelas_id = created_kelas["id"]
+                        created_kelas_id = test_kelas_id
+                        self.log_test("Create Kelas Aliyah", True, f"Created test kelas: {created_kelas['nama']}")
+                    else:
+                        self.log_test("Create Kelas Aliyah", False, f"Failed to create kelas", create_kelas_response.json())
+                        return False
+            else:
+                self.log_test("Get Kelas Aliyah", False, f"Failed to get kelas list", kelas_response.json())
+                return False
+                
+        except Exception as e:
+            self.log_test("Kelas Aliyah Setup", False, f"Error setting up kelas: {str(e)}")
+            return False
+        
+        # Step 2: Test POST /api/aliyah/pengabsen (Create)
+        try:
+            pengabsen_data = {
+                "nama": "Ahmad Pengabsen Aliyah",
+                "email_atau_hp": "ahmad.pengabsen@test.com",
+                "username": f"pengabsen_aliyah_test_{datetime.now().strftime('%H%M%S')}",
+                "kelas_ids": [test_kelas_id]
+            }
+            
+            create_response = requests.post(
+                f"{self.base_url}/aliyah/pengabsen",
+                json=pengabsen_data,
+                headers=self.headers,
+                timeout=30
+            )
+            
+            if create_response.status_code == 200:
+                created_pengabsen = create_response.json()
+                created_pengabsen_id = created_pengabsen["id"]
+                
+                # Verify required fields
+                required_fields = ["id", "nama", "email_atau_hp", "username", "kode_akses", "kelas_ids", "created_at"]
+                missing_fields = [f for f in required_fields if f not in created_pengabsen]
+                
+                if missing_fields:
+                    self.log_test("POST /aliyah/pengabsen", False, f"Missing fields: {missing_fields}", created_pengabsen)
+                    all_success = False
+                else:
+                    # Verify kode_akses is generated
+                    if created_pengabsen["kode_akses"] and len(created_pengabsen["kode_akses"]) == 9:
+                        self.log_test("POST /aliyah/pengabsen", True, f"Created pengabsen with kode_akses: {created_pengabsen['kode_akses']}")
+                    else:
+                        self.log_test("POST /aliyah/pengabsen", False, f"Invalid kode_akses: {created_pengabsen['kode_akses']}")
+                        all_success = False
+            else:
+                self.log_test("POST /aliyah/pengabsen", False, f"Create failed with status {create_response.status_code}", create_response.json())
+                all_success = False
+                
+        except Exception as e:
+            self.log_test("POST /aliyah/pengabsen", False, f"Request error: {str(e)}")
+            all_success = False
+        
+        # Step 3: Test GET /api/aliyah/pengabsen (List)
+        try:
+            list_response = requests.get(
+                f"{self.base_url}/aliyah/pengabsen",
+                headers=self.headers,
+                timeout=30
+            )
+            
+            if list_response.status_code == 200:
+                pengabsen_list = list_response.json()
+                
+                if isinstance(pengabsen_list, list):
+                    # Find our created pengabsen
+                    found_pengabsen = None
+                    for p in pengabsen_list:
+                        if p.get("id") == created_pengabsen_id:
+                            found_pengabsen = p
+                            break
+                    
+                    if found_pengabsen:
+                        self.log_test("GET /aliyah/pengabsen", True, f"Found created pengabsen in list: {found_pengabsen['nama']}")
+                    else:
+                        self.log_test("GET /aliyah/pengabsen", False, f"Created pengabsen not found in list")
+                        all_success = False
+                else:
+                    self.log_test("GET /aliyah/pengabsen", False, "Response is not a list", pengabsen_list)
+                    all_success = False
+            else:
+                self.log_test("GET /aliyah/pengabsen", False, f"List failed with status {list_response.status_code}", list_response.json())
+                all_success = False
+                
+        except Exception as e:
+            self.log_test("GET /aliyah/pengabsen", False, f"Request error: {str(e)}")
+            all_success = False
+        
+        # Step 4: Test PUT /api/aliyah/pengabsen/{id} (Update)
+        if created_pengabsen_id:
+            try:
+                update_data = {
+                    "nama": "Ahmad Pengabsen Aliyah Updated",
+                    "username": f"pengabsen_aliyah_updated_{datetime.now().strftime('%H%M%S')}"
+                }
+                
+                update_response = requests.put(
+                    f"{self.base_url}/aliyah/pengabsen/{created_pengabsen_id}",
+                    json=update_data,
+                    headers=self.headers,
+                    timeout=30
+                )
+                
+                if update_response.status_code == 200:
+                    updated_pengabsen = update_response.json()
+                    
+                    if updated_pengabsen["nama"] == update_data["nama"] and updated_pengabsen["username"] == update_data["username"]:
+                        self.log_test("PUT /aliyah/pengabsen", True, f"Successfully updated pengabsen: {updated_pengabsen['nama']}")
+                    else:
+                        self.log_test("PUT /aliyah/pengabsen", False, "Update data not reflected", updated_pengabsen)
+                        all_success = False
+                else:
+                    self.log_test("PUT /aliyah/pengabsen", False, f"Update failed with status {update_response.status_code}", update_response.json())
+                    all_success = False
+                    
+            except Exception as e:
+                self.log_test("PUT /aliyah/pengabsen", False, f"Request error: {str(e)}")
+                all_success = False
+        
+        # Step 5: Test POST /api/aliyah/pengabsen/{id}/regenerate-kode-akses
+        if created_pengabsen_id:
+            try:
+                # Get current kode_akses
+                current_response = requests.get(
+                    f"{self.base_url}/aliyah/pengabsen",
+                    headers=self.headers,
+                    timeout=30
+                )
+                
+                current_kode = None
+                if current_response.status_code == 200:
+                    pengabsen_list = current_response.json()
+                    for p in pengabsen_list:
+                        if p.get("id") == created_pengabsen_id:
+                            current_kode = p.get("kode_akses")
+                            break
+                
+                # Regenerate kode_akses
+                regenerate_response = requests.post(
+                    f"{self.base_url}/aliyah/pengabsen/{created_pengabsen_id}/regenerate-kode-akses",
+                    headers=self.headers,
+                    timeout=30
+                )
+                
+                if regenerate_response.status_code == 200:
+                    regenerated_pengabsen = regenerate_response.json()
+                    new_kode = regenerated_pengabsen.get("kode_akses")
+                    
+                    if new_kode and new_kode != current_kode and len(new_kode) == 9:
+                        self.log_test("POST /aliyah/pengabsen/regenerate-kode-akses", True, f"Kode changed from {current_kode} to {new_kode}")
+                    else:
+                        self.log_test("POST /aliyah/pengabsen/regenerate-kode-akses", False, f"Kode not changed properly: {current_kode} -> {new_kode}")
+                        all_success = False
+                else:
+                    self.log_test("POST /aliyah/pengabsen/regenerate-kode-akses", False, f"Regenerate failed with status {regenerate_response.status_code}", regenerate_response.json())
+                    all_success = False
+                    
+            except Exception as e:
+                self.log_test("POST /aliyah/pengabsen/regenerate-kode-akses", False, f"Request error: {str(e)}")
+                all_success = False
+        
+        # Step 6: Test DELETE /api/aliyah/pengabsen/{id}
+        if created_pengabsen_id:
+            try:
+                delete_response = requests.delete(
+                    f"{self.base_url}/aliyah/pengabsen/{created_pengabsen_id}",
+                    headers=self.headers,
+                    timeout=30
+                )
+                
+                if delete_response.status_code == 200:
+                    delete_data = delete_response.json()
+                    
+                    if "message" in delete_data and "berhasil dihapus" in delete_data["message"]:
+                        self.log_test("DELETE /aliyah/pengabsen", True, f"Successfully deleted pengabsen: {delete_data['message']}")
+                        
+                        # Verify deletion by checking list
+                        verify_response = requests.get(
+                            f"{self.base_url}/aliyah/pengabsen",
+                            headers=self.headers,
+                            timeout=30
+                        )
+                        
+                        if verify_response.status_code == 200:
+                            pengabsen_list = verify_response.json()
+                            found_deleted = any(p.get("id") == created_pengabsen_id for p in pengabsen_list)
+                            
+                            if not found_deleted:
+                                self.log_test("DELETE /aliyah/pengabsen verification", True, "Pengabsen successfully removed from list")
+                            else:
+                                self.log_test("DELETE /aliyah/pengabsen verification", False, "Deleted pengabsen still in list")
+                                all_success = False
+                    else:
+                        self.log_test("DELETE /aliyah/pengabsen", False, f"Unexpected response: {delete_data}")
+                        all_success = False
+                else:
+                    self.log_test("DELETE /aliyah/pengabsen", False, f"Delete failed with status {delete_response.status_code}", delete_response.json())
+                    all_success = False
+                    
+            except Exception as e:
+                self.log_test("DELETE /aliyah/pengabsen", False, f"Request error: {str(e)}")
+                all_success = False
+        
+        # Cleanup: Delete created kelas if we created one
+        if created_kelas_id:
+            try:
+                cleanup_response = requests.delete(
+                    f"{self.base_url}/aliyah/kelas/{created_kelas_id}",
+                    headers=self.headers,
+                    timeout=30
+                )
+                if cleanup_response.status_code == 200:
+                    self.log_test("Cleanup Kelas Aliyah", True, "Test kelas cleaned up")
+            except Exception as e:
+                self.log_test("Cleanup Kelas Aliyah", False, f"Cleanup error: {str(e)}")
+        
+        return all_success
+
+    def test_aliyah_monitoring_endpoints(self) -> bool:
+        """Test Monitoring Aliyah CRUD endpoints"""
+        all_success = True
+        created_monitoring_id = None
+        created_kelas_id = None
+        
+        # Step 1: Create a test kelas aliyah if needed
+        try:
+            # Check if there are existing kelas aliyah
+            kelas_response = requests.get(
+                f"{self.base_url}/aliyah/kelas",
+                headers=self.headers,
+                timeout=30
+            )
+            
+            if kelas_response.status_code == 200:
+                kelas_list = kelas_response.json()
+                if kelas_list:
+                    # Use existing kelas
+                    test_kelas_id = kelas_list[0]["id"]
+                    self.log_test("Get Existing Kelas Aliyah (Monitoring)", True, f"Using existing kelas: {kelas_list[0]['nama']}")
+                else:
+                    # Create new kelas aliyah
+                    kelas_data = {
+                        "nama": "XI IPS Test Monitoring",
+                        "tingkat": "XI"
+                    }
+                    
+                    create_kelas_response = requests.post(
+                        f"{self.base_url}/aliyah/kelas",
+                        json=kelas_data,
+                        headers=self.headers,
+                        timeout=30
+                    )
+                    
+                    if create_kelas_response.status_code == 200:
+                        created_kelas = create_kelas_response.json()
+                        test_kelas_id = created_kelas["id"]
+                        created_kelas_id = test_kelas_id
+                        self.log_test("Create Kelas Aliyah (Monitoring)", True, f"Created test kelas: {created_kelas['nama']}")
+                    else:
+                        self.log_test("Create Kelas Aliyah (Monitoring)", False, f"Failed to create kelas", create_kelas_response.json())
+                        return False
+            else:
+                self.log_test("Get Kelas Aliyah (Monitoring)", False, f"Failed to get kelas list", kelas_response.json())
+                return False
+                
+        except Exception as e:
+            self.log_test("Kelas Aliyah Setup (Monitoring)", False, f"Error setting up kelas: {str(e)}")
+            return False
+        
+        # Step 2: Test POST /api/aliyah/monitoring (Create)
+        try:
+            monitoring_data = {
+                "nama": "Fatimah Monitoring Aliyah",
+                "email_atau_hp": "fatimah.monitoring@test.com",
+                "username": f"monitoring_aliyah_test_{datetime.now().strftime('%H%M%S')}",
+                "kelas_ids": [test_kelas_id]
+            }
+            
+            create_response = requests.post(
+                f"{self.base_url}/aliyah/monitoring",
+                json=monitoring_data,
+                headers=self.headers,
+                timeout=30
+            )
+            
+            if create_response.status_code == 200:
+                created_monitoring = create_response.json()
+                created_monitoring_id = created_monitoring["id"]
+                
+                # Verify required fields
+                required_fields = ["id", "nama", "email_atau_hp", "username", "kode_akses", "kelas_ids", "created_at"]
+                missing_fields = [f for f in required_fields if f not in created_monitoring]
+                
+                if missing_fields:
+                    self.log_test("POST /aliyah/monitoring", False, f"Missing fields: {missing_fields}", created_monitoring)
+                    all_success = False
+                else:
+                    # Verify kode_akses is generated
+                    if created_monitoring["kode_akses"] and len(created_monitoring["kode_akses"]) == 9:
+                        self.log_test("POST /aliyah/monitoring", True, f"Created monitoring with kode_akses: {created_monitoring['kode_akses']}")
+                    else:
+                        self.log_test("POST /aliyah/monitoring", False, f"Invalid kode_akses: {created_monitoring['kode_akses']}")
+                        all_success = False
+            else:
+                self.log_test("POST /aliyah/monitoring", False, f"Create failed with status {create_response.status_code}", create_response.json())
+                all_success = False
+                
+        except Exception as e:
+            self.log_test("POST /aliyah/monitoring", False, f"Request error: {str(e)}")
+            all_success = False
+        
+        # Step 3: Test GET /api/aliyah/monitoring (List)
+        try:
+            list_response = requests.get(
+                f"{self.base_url}/aliyah/monitoring",
+                headers=self.headers,
+                timeout=30
+            )
+            
+            if list_response.status_code == 200:
+                monitoring_list = list_response.json()
+                
+                if isinstance(monitoring_list, list):
+                    # Find our created monitoring
+                    found_monitoring = None
+                    for m in monitoring_list:
+                        if m.get("id") == created_monitoring_id:
+                            found_monitoring = m
+                            break
+                    
+                    if found_monitoring:
+                        self.log_test("GET /aliyah/monitoring", True, f"Found created monitoring in list: {found_monitoring['nama']}")
+                    else:
+                        self.log_test("GET /aliyah/monitoring", False, f"Created monitoring not found in list")
+                        all_success = False
+                else:
+                    self.log_test("GET /aliyah/monitoring", False, "Response is not a list", monitoring_list)
+                    all_success = False
+            else:
+                self.log_test("GET /aliyah/monitoring", False, f"List failed with status {list_response.status_code}", list_response.json())
+                all_success = False
+                
+        except Exception as e:
+            self.log_test("GET /aliyah/monitoring", False, f"Request error: {str(e)}")
+            all_success = False
+        
+        # Step 4: Test PUT /api/aliyah/monitoring/{id} (Update)
+        if created_monitoring_id:
+            try:
+                update_data = {
+                    "nama": "Fatimah Monitoring Aliyah Updated",
+                    "username": f"monitoring_aliyah_updated_{datetime.now().strftime('%H%M%S')}"
+                }
+                
+                update_response = requests.put(
+                    f"{self.base_url}/aliyah/monitoring/{created_monitoring_id}",
+                    json=update_data,
+                    headers=self.headers,
+                    timeout=30
+                )
+                
+                if update_response.status_code == 200:
+                    updated_monitoring = update_response.json()
+                    
+                    if updated_monitoring["nama"] == update_data["nama"] and updated_monitoring["username"] == update_data["username"]:
+                        self.log_test("PUT /aliyah/monitoring", True, f"Successfully updated monitoring: {updated_monitoring['nama']}")
+                    else:
+                        self.log_test("PUT /aliyah/monitoring", False, "Update data not reflected", updated_monitoring)
+                        all_success = False
+                else:
+                    self.log_test("PUT /aliyah/monitoring", False, f"Update failed with status {update_response.status_code}", update_response.json())
+                    all_success = False
+                    
+            except Exception as e:
+                self.log_test("PUT /aliyah/monitoring", False, f"Request error: {str(e)}")
+                all_success = False
+        
+        # Step 5: Test POST /api/aliyah/monitoring/{id}/regenerate-kode-akses
+        if created_monitoring_id:
+            try:
+                # Get current kode_akses
+                current_response = requests.get(
+                    f"{self.base_url}/aliyah/monitoring",
+                    headers=self.headers,
+                    timeout=30
+                )
+                
+                current_kode = None
+                if current_response.status_code == 200:
+                    monitoring_list = current_response.json()
+                    for m in monitoring_list:
+                        if m.get("id") == created_monitoring_id:
+                            current_kode = m.get("kode_akses")
+                            break
+                
+                # Regenerate kode_akses
+                regenerate_response = requests.post(
+                    f"{self.base_url}/aliyah/monitoring/{created_monitoring_id}/regenerate-kode-akses",
+                    headers=self.headers,
+                    timeout=30
+                )
+                
+                if regenerate_response.status_code == 200:
+                    regenerated_monitoring = regenerate_response.json()
+                    new_kode = regenerated_monitoring.get("kode_akses")
+                    
+                    if new_kode and new_kode != current_kode and len(new_kode) == 9:
+                        self.log_test("POST /aliyah/monitoring/regenerate-kode-akses", True, f"Kode changed from {current_kode} to {new_kode}")
+                    else:
+                        self.log_test("POST /aliyah/monitoring/regenerate-kode-akses", False, f"Kode not changed properly: {current_kode} -> {new_kode}")
+                        all_success = False
+                else:
+                    self.log_test("POST /aliyah/monitoring/regenerate-kode-akses", False, f"Regenerate failed with status {regenerate_response.status_code}", regenerate_response.json())
+                    all_success = False
+                    
+            except Exception as e:
+                self.log_test("POST /aliyah/monitoring/regenerate-kode-akses", False, f"Request error: {str(e)}")
+                all_success = False
+        
+        # Step 6: Test DELETE /api/aliyah/monitoring/{id}
+        if created_monitoring_id:
+            try:
+                delete_response = requests.delete(
+                    f"{self.base_url}/aliyah/monitoring/{created_monitoring_id}",
+                    headers=self.headers,
+                    timeout=30
+                )
+                
+                if delete_response.status_code == 200:
+                    delete_data = delete_response.json()
+                    
+                    if "message" in delete_data and "berhasil dihapus" in delete_data["message"]:
+                        self.log_test("DELETE /aliyah/monitoring", True, f"Successfully deleted monitoring: {delete_data['message']}")
+                        
+                        # Verify deletion by checking list
+                        verify_response = requests.get(
+                            f"{self.base_url}/aliyah/monitoring",
+                            headers=self.headers,
+                            timeout=30
+                        )
+                        
+                        if verify_response.status_code == 200:
+                            monitoring_list = verify_response.json()
+                            found_deleted = any(m.get("id") == created_monitoring_id for m in monitoring_list)
+                            
+                            if not found_deleted:
+                                self.log_test("DELETE /aliyah/monitoring verification", True, "Monitoring successfully removed from list")
+                            else:
+                                self.log_test("DELETE /aliyah/monitoring verification", False, "Deleted monitoring still in list")
+                                all_success = False
+                    else:
+                        self.log_test("DELETE /aliyah/monitoring", False, f"Unexpected response: {delete_data}")
+                        all_success = False
+                else:
+                    self.log_test("DELETE /aliyah/monitoring", False, f"Delete failed with status {delete_response.status_code}", delete_response.json())
+                    all_success = False
+                    
+            except Exception as e:
+                self.log_test("DELETE /aliyah/monitoring", False, f"Request error: {str(e)}")
+                all_success = False
+        
+        # Cleanup: Delete created kelas if we created one
+        if created_kelas_id:
+            try:
+                cleanup_response = requests.delete(
+                    f"{self.base_url}/aliyah/kelas/{created_kelas_id}",
+                    headers=self.headers,
+                    timeout=30
+                )
+                if cleanup_response.status_code == 200:
+                    self.log_test("Cleanup Kelas Aliyah (Monitoring)", True, "Test kelas cleaned up")
+            except Exception as e:
+                self.log_test("Cleanup Kelas Aliyah (Monitoring)", False, f"Cleanup error: {str(e)}")
+        
+        return all_success
+
+    def test_aliyah_absensi_riwayat_endpoint(self) -> bool:
+        """Test Riwayat Absensi Aliyah endpoint with filters and dummy data"""
+        from datetime import datetime, timezone, timedelta
+        import pymongo
+        
+        # Use WIB timezone (UTC+7) for today's date
+        wib_tz = timezone(timedelta(hours=7))
+        today = datetime.now(wib_tz).date().isoformat()
+        
+        all_success = True
+        
+        # Step 1: Setup test data - create kelas, siswa, and absensi dummy data
+        test_kelas_id = None
+        test_siswa_ids = []
+        
+        try:
+            # Create test kelas aliyah
+            kelas_data = {
+                "nama": "XII Test Riwayat",
+                "tingkat": "XII"
+            }
+            
+            kelas_response = requests.post(
+                f"{self.base_url}/aliyah/kelas",
+                json=kelas_data,
+                headers=self.headers,
+                timeout=30
+            )
+            
+            if kelas_response.status_code == 200:
+                test_kelas = kelas_response.json()
+                test_kelas_id = test_kelas["id"]
+                self.log_test("Setup Test Kelas Aliyah", True, f"Created test kelas: {test_kelas['nama']}")
+            else:
+                self.log_test("Setup Test Kelas Aliyah", False, f"Failed to create test kelas", kelas_response.json())
+                return False
+                
+        except Exception as e:
+            self.log_test("Setup Test Kelas Aliyah", False, f"Error creating test kelas: {str(e)}")
+            return False
+        
+        try:
+            # Create test siswa aliyah
+            siswa_data_list = [
+                {
+                    "nama": "Ahmad Siswa Putra",
+                    "nis": f"ALY001{datetime.now().strftime('%H%M%S')}",
+                    "gender": "putra",
+                    "kelas_id": test_kelas_id,
+                    "wali_nama": "Bapak Ahmad",
+                    "wali_wa": "081234567890"
+                },
+                {
+                    "nama": "Fatimah Siswa Putri",
+                    "nis": f"ALY002{datetime.now().strftime('%H%M%S')}",
+                    "gender": "putri",
+                    "kelas_id": test_kelas_id,
+                    "wali_nama": "Ibu Fatimah",
+                    "wali_wa": "081234567891"
+                }
+            ]
+            
+            for siswa_data in siswa_data_list:
+                siswa_response = requests.post(
+                    f"{self.base_url}/aliyah/siswa",
+                    json=siswa_data,
+                    headers=self.headers,
+                    timeout=30
+                )
+                
+                if siswa_response.status_code == 200:
+                    created_siswa = siswa_response.json()
+                    test_siswa_ids.append(created_siswa["id"])
+                    self.log_test(f"Setup Test Siswa {siswa_data['nama']}", True, f"Created siswa: {created_siswa['nama']}")
+                else:
+                    self.log_test(f"Setup Test Siswa {siswa_data['nama']}", False, f"Failed to create siswa", siswa_response.json())
+                    all_success = False
+                    
+        except Exception as e:
+            self.log_test("Setup Test Siswa Aliyah", False, f"Error creating test siswa: {str(e)}")
+            all_success = False
+        
+        # Step 2: Insert dummy absensi data directly to MongoDB
+        try:
+            # Connect to MongoDB to insert dummy data
+            from motor.motor_asyncio import AsyncIOMotorClient
+            import asyncio
+            
+            async def insert_dummy_absensi():
+                mongo_url = "mongodb://localhost:27017"
+                client = AsyncIOMotorClient(mongo_url)
+                db = client["absensi_sholat"]
+                
+                # Status combinations for testing
+                status_combinations = ["hadir", "alfa", "sakit", "izin", "dispensasi", "bolos"]
+                
+                dummy_absensi = []
+                for i, siswa_id in enumerate(test_siswa_ids):
+                    for j, status in enumerate(status_combinations):
+                        absensi_doc = {
+                            "id": f"absensi_aliyah_test_{i}_{j}_{datetime.now().strftime('%H%M%S')}",
+                            "siswa_id": siswa_id,
+                            "kelas_id": test_kelas_id,
+                            "tanggal": today,
+                            "status": status,
+                            "waktu_absen": datetime.now(timezone.utc),
+                            "created_at": datetime.now(timezone.utc)
+                        }
+                        dummy_absensi.append(absensi_doc)
+                
+                if dummy_absensi:
+                    await db.absensi_aliyah.insert_many(dummy_absensi)
+                    return len(dummy_absensi)
+                return 0
+            
+            # Run async function
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            inserted_count = loop.run_until_complete(insert_dummy_absensi())
+            loop.close()
+            
+            if inserted_count > 0:
+                self.log_test("Insert Dummy Absensi Aliyah", True, f"Inserted {inserted_count} dummy absensi records")
+            else:
+                self.log_test("Insert Dummy Absensi Aliyah", False, "No dummy absensi records inserted")
+                all_success = False
+                
+        except Exception as e:
+            self.log_test("Insert Dummy Absensi Aliyah", False, f"Error inserting dummy data: {str(e)}")
+            all_success = False
+        
+        # Step 3: Test GET /api/aliyah/absensi/riwayat without filters
+        try:
+            riwayat_params = {
+                "tanggal_start": today,
+                "tanggal_end": today
+            }
+            
+            riwayat_response = requests.get(
+                f"{self.base_url}/aliyah/absensi/riwayat",
+                params=riwayat_params,
+                headers=self.headers,
+                timeout=30
+            )
+            
+            if riwayat_response.status_code == 200:
+                riwayat_data = riwayat_response.json()
+                
+                # Verify response structure
+                required_fields = ["summary", "detail"]
+                missing_fields = [f for f in required_fields if f not in riwayat_data]
+                
+                if missing_fields:
+                    self.log_test("GET /aliyah/absensi/riwayat (basic)", False, f"Missing fields: {missing_fields}", riwayat_data)
+                    all_success = False
+                else:
+                    # Verify summary structure
+                    summary = riwayat_data.get("summary", {})
+                    expected_status = ["hadir", "alfa", "sakit", "izin", "dispensasi", "bolos"]
+                    
+                    missing_status = [s for s in expected_status if s not in summary]
+                    if missing_status:
+                        self.log_test("GET /aliyah/absensi/riwayat (summary)", False, f"Missing status in summary: {missing_status}", summary)
+                        all_success = False
+                    else:
+                        self.log_test("GET /aliyah/absensi/riwayat (summary)", True, f"Summary contains all expected status: {summary}")
+                    
+                    # Verify detail structure
+                    detail = riwayat_data.get("detail", [])
+                    if isinstance(detail, list) and len(detail) > 0:
+                        sample_detail = detail[0]
+                        expected_detail_fields = ["id", "siswa_id", "siswa_nama", "kelas_id", "kelas_nama", "tanggal", "status", "gender", "waktu_absen"]
+                        
+                        missing_detail_fields = [f for f in expected_detail_fields if f not in sample_detail]
+                        if missing_detail_fields:
+                            self.log_test("GET /aliyah/absensi/riwayat (detail)", False, f"Missing detail fields: {missing_detail_fields}", sample_detail)
+                            all_success = False
+                        else:
+                            self.log_test("GET /aliyah/absensi/riwayat (detail)", True, f"Detail contains all expected fields, {len(detail)} records")
+                    else:
+                        self.log_test("GET /aliyah/absensi/riwayat (detail)", True, "No detail records (empty response)")
+            else:
+                self.log_test("GET /aliyah/absensi/riwayat (basic)", False, f"Request failed with status {riwayat_response.status_code}", riwayat_response.json())
+                all_success = False
+                
+        except Exception as e:
+            self.log_test("GET /aliyah/absensi/riwayat (basic)", False, f"Request error: {str(e)}")
+            all_success = False
+        
+        # Step 4: Test with kelas_id filter
+        if test_kelas_id:
+            try:
+                riwayat_params = {
+                    "tanggal_start": today,
+                    "tanggal_end": today,
+                    "kelas_id": test_kelas_id
+                }
+                
+                riwayat_response = requests.get(
+                    f"{self.base_url}/aliyah/absensi/riwayat",
+                    params=riwayat_params,
+                    headers=self.headers,
+                    timeout=30
+                )
+                
+                if riwayat_response.status_code == 200:
+                    riwayat_data = riwayat_response.json()
+                    
+                    # Verify that all detail records have the correct kelas_id
+                    detail = riwayat_data.get("detail", [])
+                    if detail:
+                        wrong_kelas = [d for d in detail if d.get("kelas_id") != test_kelas_id]
+                        if wrong_kelas:
+                            self.log_test("GET /aliyah/absensi/riwayat (kelas filter)", False, f"Found records with wrong kelas_id: {len(wrong_kelas)}")
+                            all_success = False
+                        else:
+                            self.log_test("GET /aliyah/absensi/riwayat (kelas filter)", True, f"All {len(detail)} records have correct kelas_id")
+                    else:
+                        self.log_test("GET /aliyah/absensi/riwayat (kelas filter)", True, "No records returned (filter working)")
+                else:
+                    self.log_test("GET /aliyah/absensi/riwayat (kelas filter)", False, f"Request failed with status {riwayat_response.status_code}", riwayat_response.json())
+                    all_success = False
+                    
+            except Exception as e:
+                self.log_test("GET /aliyah/absensi/riwayat (kelas filter)", False, f"Request error: {str(e)}")
+                all_success = False
+        
+        # Step 5: Test with gender filter
+        for gender in ["putra", "putri"]:
+            try:
+                riwayat_params = {
+                    "tanggal_start": today,
+                    "tanggal_end": today,
+                    "gender": gender
+                }
+                
+                riwayat_response = requests.get(
+                    f"{self.base_url}/aliyah/absensi/riwayat",
+                    params=riwayat_params,
+                    headers=self.headers,
+                    timeout=30
+                )
+                
+                if riwayat_response.status_code == 200:
+                    riwayat_data = riwayat_response.json()
+                    
+                    # Verify that all detail records have the correct gender
+                    detail = riwayat_data.get("detail", [])
+                    if detail:
+                        wrong_gender = [d for d in detail if d.get("gender") != gender]
+                        if wrong_gender:
+                            self.log_test(f"GET /aliyah/absensi/riwayat (gender {gender})", False, f"Found records with wrong gender: {len(wrong_gender)}")
+                            all_success = False
+                        else:
+                            self.log_test(f"GET /aliyah/absensi/riwayat (gender {gender})", True, f"All {len(detail)} records have correct gender")
+                    else:
+                        self.log_test(f"GET /aliyah/absensi/riwayat (gender {gender})", True, "No records returned (filter working)")
+                else:
+                    self.log_test(f"GET /aliyah/absensi/riwayat (gender {gender})", False, f"Request failed with status {riwayat_response.status_code}", riwayat_response.json())
+                    all_success = False
+                    
+            except Exception as e:
+                self.log_test(f"GET /aliyah/absensi/riwayat (gender {gender})", False, f"Request error: {str(e)}")
+                all_success = False
+        
+        # Cleanup: Delete test data
+        try:
+            # Delete test siswa
+            for siswa_id in test_siswa_ids:
+                requests.delete(f"{self.base_url}/aliyah/siswa/{siswa_id}", headers=self.headers, timeout=30)
+            
+            # Delete test kelas
+            if test_kelas_id:
+                requests.delete(f"{self.base_url}/aliyah/kelas/{test_kelas_id}", headers=self.headers, timeout=30)
+            
+            # Delete dummy absensi data
+            async def cleanup_absensi():
+                mongo_url = "mongodb://localhost:27017"
+                client = AsyncIOMotorClient(mongo_url)
+                db = client["absensi_sholat"]
+                
+                # Delete test absensi records
+                result = await db.absensi_aliyah.delete_many({
+                    "tanggal": today,
+                    "kelas_id": test_kelas_id
+                })
+                return result.deleted_count
+            
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            deleted_count = loop.run_until_complete(cleanup_absensi())
+            loop.close()
+            
+            self.log_test("Cleanup Test Data", True, f"Cleaned up {deleted_count} absensi records and test entities")
+            
+        except Exception as e:
+            self.log_test("Cleanup Test Data", False, f"Cleanup error: {str(e)}")
+        
+        return all_success
     
     def run_all_tests(self):
         """Run all tests in sequence"""
