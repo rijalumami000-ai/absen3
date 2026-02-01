@@ -44,6 +44,8 @@ import PembimbingApp from '@/pages/PembimbingApp';
 import { PembimbingAuthProvider, usePembimbingAuth } from '@/contexts/PembimbingAuthContext';
 import { PengabsenKelasAuthProvider, usePengabsenKelasAuth } from '@/contexts/PengabsenKelasAuthContext';
 import { PembimbingKelasAuthProvider, usePembimbingKelasAuth } from '@/contexts/PembimbingKelasAuthContext';
+import { PengabsenAliyahAuthProvider, usePengabsenAliyahAuth } from '@/contexts/PengabsenAliyahAuthContext';
+import { MonitoringAliyahAuthProvider, useMonitoringAliyahAuth } from '@/contexts/MonitoringAliyahAuthContext';
 import '@/App.css';
 
 const ProtectedRoute = ({ children }) => {
