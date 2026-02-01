@@ -106,6 +106,18 @@ const Layout = ({ children }) => {
         { path: '/riwayat-absensi-madin', icon: ClipboardList, label: 'Riwayat Absensi Madin' },
       ],
     },
+    {
+      id: 'absensi-aliyah',
+      type: 'group',
+      icon: ClipboardCheck,
+      label: 'Absensi Madrasah Aliyah',
+      allowedRoles: ['superadmin'],
+      items: [
+        { path: '/aliyah/pengabsen', icon: ClipboardCheck, label: 'Pengabsen Aliyah' },
+        { path: '/aliyah/monitoring', icon: Eye, label: 'Monitoring Aliyah' },
+        { path: '/aliyah/riwayat', icon: ClipboardList, label: 'Riwayat Absensi Aliyah' },
+      ],
+    },
     { 
       id: 'settings',
       type: 'single', 
