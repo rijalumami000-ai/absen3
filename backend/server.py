@@ -4319,6 +4319,131 @@ async def get_aliyah_absensi_riwayat(
         if not siswa:
             continue
 
+# ==================== MONITORING ALIYAH PWA ABSENSI & RIWAYAT ====================
+
+@api_router.get("/aliyah/monitoring/absensi-hari-ini")
+async def get_aliyah_monitoring_absensi_hari_ini(
+    jenis: Literal["pagi", "dzuhur"],
+    tanggal: Optional[str] = None,
+    kelas_id: Optional[str] = None,
+    current_monitoring: dict = Depends(get_current_monitoring_aliyah),
+):
+    if not tanggal:
+        tanggal = get_today_local_iso()
+
+    kelas_ids = current_monitoring.get("kelas_ids", []) or []
+    if not kelas_ids:
+        return {"tanggal": tanggal, "jenis": jenis, "data": []}
+
+    if kelas_id and kelas_id not in kelas_ids:
+        raise HTTPException(status_code=403, detail="Tidak boleh melihat kelas ini")
+
+    target_kelas_ids = [kelas_id] if kelas_id else kelas_ids
+
+    siswa_list = await db.siswa_aliyah.find({"kelas_id": {"$in": target_kelas_ids}}, {"_id": 0}).to_list(5000)
+    siswa_by_id = {s["id"]: s for s in siswa_list}
+
+    absensi_list = await db.absensi_aliyah.find(
+        {"tanggal": tanggal, "jenis": jenis, "siswa_id": {"$in": list(siswa_by_id.keys())}},
+        {"_id": 0},
+    ).to_list(10000)
+
+    status_map: Dict[str, str] = {a["siswa_id"]: a.get("status", "") for a in absensi_list}
+
+    kelas_docs = await db.kelas_aliyah.find({"id": {"$in": target_kelas_ids}}, {"_id": 0}).to_list(1000)
+    kelas_map = {k["id"]: k["nama"] for k in kelas_docs}
+
+    data = []
+    for siswa in siswa_list:
+        data.append(
+            {
+                "siswa_id": siswa["id"],
+                "nama": siswa["nama"],
+                "nis": siswa.get("nis"),
+                "kelas_id": siswa.get("kelas_id"),
+                "kelas_nama": kelas_map.get(siswa.get("kelas_id"), "-"),
+                "gender": siswa.get("gender"),
+                "status": status_map.get(siswa["id"]),
+            }
+        )
+
+    data.sort(key=lambda x: (x["kelas_nama"], x["nama"]))
+
+    return {"tanggal": tanggal, "jenis": jenis, "data": data}
+
+
+@api_router.get("/aliyah/monitoring/absensi-riwayat")
+async def get_aliyah_monitoring_absensi_riwayat(
+    jenis: Literal["pagi", "dzuhur"],
+    tanggal_start: str,
+    tanggal_end: Optional[str] = None,
+    kelas_id: Optional[str] = None,
+    current_monitoring: dict = Depends(get_current_monitoring_aliyah),
+):
+    if not tanggal_end:
+        tanggal_end = tanggal_start
+
+    kelas_ids = current_monitoring.get("kelas_ids", []) or []
+    if not kelas_ids:
+        return {"summary": {}, "detail": []}
+
+    if kelas_id and kelas_id not in kelas_ids:
+        raise HTTPException(status_code=403, detail="Tidak boleh melihat kelas ini")
+
+    target_kelas_ids = [kelas_id] if kelas_id else kelas_ids
+
+    query = {
+        "tanggal": {"$gte": tanggal_start, "$lte": tanggal_end},
+        "jenis": jenis,
+        "kelas_id": {"$in": target_kelas_ids},
+    }
+
+    absensi_list = await db.absensi_aliyah.find(query, {"_id": 0}).to_list(20000)
+
+    if not absensi_list:
+        return {
+            "summary": {"hadir": 0, "alfa": 0, "sakit": 0, "izin": 0, "dispensasi": 0, "bolos": 0},
+            "detail": [],
+        }
+
+    siswa_ids = list({a["siswa_id"] for a in absensi_list})
+    siswa_list = await db.siswa_aliyah.find({"id": {"$in": siswa_ids}}, {"_id": 0}).to_list(10000)
+    siswa_map = {s["id"]: s for s in siswa_list}
+
+    kelas_docs = await db.kelas_aliyah.find({"id": {"$in": target_kelas_ids}}, {"_id": 0}).to_list(1000)
+    kelas_map = {k["id"]: k["nama"] for k in kelas_docs}
+
+    summary = {"hadir": 0, "alfa": 0, "sakit": 0, "izin": 0, "dispensasi": 0, "bolos": 0}
+    detail: List[Dict[str, Any]] = []
+
+    for a in absensi_list:
+        status = a.get("status", "")
+        if status in summary:
+            summary[status] += 1
+
+        siswa = siswa_map.get(a["siswa_id"])
+        kelas_nama = kelas_map.get(a.get("kelas_id"), "-")
+
+        row = {
+            "id": a.get("id"),
+            "siswa_id": a.get("siswa_id"),
+            "siswa_nama": siswa.get("nama") if siswa else "Unknown",
+            "kelas_id": a.get("kelas_id"),
+            "kelas_nama": kelas_nama,
+            "tanggal": a.get("tanggal"),
+            "status": status,
+            "gender": siswa.get("gender") if siswa else None,
+            "waktu_absen": a.get("waktu_absen"),
+        }
+        detail.append(row)
+
+    # Sort by tanggal, kelas, nama
+    detail.sort(key=lambda x: (x["tanggal"], x["kelas_nama"], x["siswa_nama"]))
+
+    return {"summary": summary, "detail": detail}
+
+
+
         siswa_gender = siswa.get("gender") or ""
 
         if gender and gender != "all":
