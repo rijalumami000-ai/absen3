@@ -529,40 +529,7 @@ const SiswaAliyah = () => {
                         >
                           <Edit2 className="w-4 h-4" />
                         </Button>
-                        <Dialog open={isLinkToSantriOpen && selectedSiswa?.id === siswa.id} onOpenChange={setIsLinkToSantriOpen}>
-                          <DialogTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              className="h-8 w-8"
-                              onClick={() => openLinkToSantriDialog(siswa)}
-                            >
-                              <Users className="w-4 h-4" />
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="max-w-md max-h-[600px] overflow-y-auto">
-                            <DialogHeader>
-                              <DialogTitle>Link ke Santri</DialogTitle>
-                            </DialogHeader>
-                            <div className="space-y-4">
-                              <p className="text-sm text-muted-foreground">
-                                Pilih santri yang akan di-link dengan siswa Aliyah <strong>{siswa.nama}</strong>.
-                              </p>
-                              <div className="space-y-2 max-h-64 overflow-y-auto">
-                                {santriList.map((santri) => (
-                                  <button
-                                    key={santri.id}
-                                    className="w-full text-left p-2 rounded border border-border hover:bg-muted text-sm"
-                                    onClick={() => handleLinkToSantri(santri.id)}
-                                  >
-                                    <div className="font-medium">{santri.nama}</div>
-                                    <div className="text-xs text-muted-foreground">NIS: {santri.nis}</div>
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
+{/* Aksi link ke santri dihapus sesuai permintaan */}
                         <Button
                           variant="outline"
                           size="icon"
