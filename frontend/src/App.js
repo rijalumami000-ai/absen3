@@ -272,6 +272,42 @@ function AppRoutes() {
           </PembimbingKelasAuthProvider>
         }
       />
+      <Route
+        path="/pengabsen-aliyah-app/login"
+        element={
+          <PengabsenAliyahAuthProvider>
+            <PengabsenAliyahAppLogin />
+          </PengabsenAliyahAuthProvider>
+        }
+      />
+      <Route
+        path="/pengabsen-aliyah-app"
+        element={
+          <PengabsenAliyahAuthProvider>
+            <PengabsenAliyahProtectedRoute>
+              <PengabsenAliyahApp />
+            </PengabsenAliyahProtectedRoute>
+          </PengabsenAliyahAuthProvider>
+        }
+      />
+      <Route
+        path="/monitoring-aliyah-app/login"
+        element={
+          <MonitoringAliyahAuthProvider>
+            <MonitoringAliyahAppLogin />
+          </MonitoringAliyahAuthProvider>
+        }
+      />
+      <Route
+        path="/monitoring-aliyah-app"
+        element={
+          <MonitoringAliyahAuthProvider>
+            <MonitoringAliyahProtectedRoute>
+              <MonitoringAliyahApp />
+            </MonitoringAliyahProtectedRoute>
+          </MonitoringAliyahAuthProvider>
+        }
+      />
       
       {/* Admin Routes */}
       <Route
