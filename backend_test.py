@@ -1893,7 +1893,7 @@ class AbsensiSholatTester:
     
     def run_all_tests(self):
         """Run all tests in sequence"""
-        print("🚀 Starting Absensi Sholat Backend Tests - Focus on Latest Changes")
+        print("🚀 Starting Absensi Sholat Backend Tests - Focus on Aliyah Endpoints")
         print(f"📍 Base URL: {self.base_url}")
         print("=" * 60)
         
@@ -1902,17 +1902,17 @@ class AbsensiSholatTester:
             print("❌ Cannot proceed with tests without authentication")
             return False
         
-        print("\n🆕 Testing Latest Backend Changes:")
+        print("\n🏫 Testing Madrasah Aliyah Endpoints:")
         print("-" * 40)
         
-        # Step 1: Test masbuq field in riwayat endpoints
-        masbuq_riwayat_success = self.test_masbuq_field_in_riwayat_endpoints()
+        # Step 1: Test Pengabsen Aliyah endpoints
+        pengabsen_aliyah_success = self.test_aliyah_pengabsen_endpoints()
         
-        # Step 2: Test masbuq field in stats endpoint
-        masbuq_stats_success = self.test_absensi_stats_masbuq_field()
+        # Step 2: Test Monitoring Aliyah endpoints
+        monitoring_aliyah_success = self.test_aliyah_monitoring_endpoints()
         
-        # Step 3: Test absensi-kelas delete endpoint
-        delete_absensi_kelas_success = self.test_absensi_kelas_delete_endpoint()
+        # Step 3: Test Riwayat Absensi Aliyah endpoint
+        riwayat_aliyah_success = self.test_aliyah_absensi_riwayat_endpoint()
         
         print("\n🔗 Testing Related Endpoints:")
         print("-" * 40)
