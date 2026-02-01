@@ -278,6 +278,57 @@ export const downloadMonitoringKelasPDF = (monitoringList, kelasList) => {
   doc.save(`Monitoring_Kelas_Madin_${new Date().getTime()}.pdf`);
 };
 
+// Function to download Riwayat Absensi Aliyah as PDF
+export const downloadRiwayatAbsensiAliyahPDF = (detail, filters) => {
+  const doc = new jsPDF('p', 'mm', 'a4');
+
+  doc.setFontSize(16);
+  doc.text('Riwayat Absensi Madrasah Aliyah', 14, 18);
+
+  doc.setFontSize(10);
+  const periodeText = filters.periodeLabel || '';
+  const tanggalText = `Periode: ${filters.tanggalStart} s.d. ${filters.tanggalEnd}`;
+  const kelasText = filters.kelasLabel ? `Kelas: ${filters.kelasLabel}` : 'Kelas: Semua';
+  const genderText = filters.genderLabel ? `Gender: ${filters.genderLabel}` : 'Gender: Semua';
+
+  doc.text(periodeText, 14, 26);
+  doc.text(tanggalText, 14, 31);
+  doc.text(kelasText, 14, 36);
+  doc.text(genderText, 14, 41);
+
+  const tableData = detail.map((row, index) => [
+    index + 1,
+    row.tanggal || '-',
+    row.siswa_nama || '-',
+    row.kelas_nama || '-',
+    row.gender || '-',
+    row.status || '-',
+    row.waktu_absen
+      ? new Date(row.waktu_absen).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+      : '-',
+  ]);
+
+  autoTable(doc, {
+    startY: 46,
+    head: [['No', 'Tanggal', 'Nama Siswa', 'Kelas', 'Gender', 'Status', 'Waktu Absen']],
+    body: tableData,
+    theme: 'grid',
+    headStyles: { fillColor: [79, 70, 229], fontStyle: 'bold' },
+    styles: { fontSize: 8 },
+    columnStyles: {
+      0: { cellWidth: 8 },
+      1: { cellWidth: 20 },
+      2: { cellWidth: 45 },
+      3: { cellWidth: 30 },
+      4: { cellWidth: 20 },
+      5: { cellWidth: 18 },
+      6: { cellWidth: 25 },
+    },
+  });
+
+  doc.save(`Riwayat_Absensi_Aliyah_${new Date().getTime()}.pdf`);
+};
+
 // Function to download Riwayat Absensi Madin as PDF
 export const downloadRiwayatAbsensiMadinPDF = (detail, filters) => {
   const doc = new jsPDF('p', 'mm', 'a4');
