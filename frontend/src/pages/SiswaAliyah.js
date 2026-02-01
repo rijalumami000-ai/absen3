@@ -215,6 +215,9 @@ const SiswaAliyah = () => {
     return matchKelas && matchSearch;
   });
 
+  const totalFiltered = filteredSiswa.length;
+  const totalBelumAdaKelas = filteredSiswa.filter((siswa) => !siswa.kelas_id).length;
+
   // Filter santri yang belum di-link ke Aliyah
   const availableSantri = santriList.filter(
     (santri) => !siswaList.some((siswa) => siswa.santri_id === santri.id)
