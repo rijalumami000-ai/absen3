@@ -725,7 +725,7 @@ class MonitoringAliyahCreate(BaseModel):
 async def get_aliyah_pengabsen_absensi_hari_ini(
     jenis: Literal["pagi", "dzuhur"],
     tanggal: Optional[str] = None,
-    current_pengabsen: dict = Depends(get_current_pengabsen_aliyah),
+    current_pengabsen: dict = Depends(get_current_pengabsen_aliyah),  # noqa: F821
 ):
     if not tanggal:
         tanggal = get_today_local_iso()
