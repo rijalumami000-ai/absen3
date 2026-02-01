@@ -1118,6 +1118,67 @@ async def login(request: LoginRequest):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Username atau password salah"
+
+# ==================== AUTH PENGABSEN & MONITORING ALIYAH (PWA) ====================
+
+@api_router.post("/aliyah/pengabsen/login", response_model=PengabsenAliyahTokenResponse)
+async def login_pengabsen_aliyah(request: PengabsenAliyahLoginRequest):
+    pengabsen = await db.pengabsen_aliyah.find_one({"username": request.username}, {"_id": 0})
+
+    if not pengabsen or pengabsen.get("kode_akses") != request.kode_akses:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Username atau kode akses salah",
+        )
+
+    access_token = create_access_token(data={"sub": pengabsen["id"], "role": "pengabsen_aliyah"})
+
+    user_data = PengabsenAliyahMeResponse(
+        id=pengabsen["id"],
+        nama=pengabsen["nama"],
+        username=pengabsen["username"],
+        email_atau_hp=pengabsen.get("email_atau_hp", ""),
+        kelas_ids=pengabsen.get("kelas_ids", []),
+        created_at=pengabsen["created_at"],
+    )
+
+    return PengabsenAliyahTokenResponse(access_token=access_token, user=user_data)
+
+
+@api_router.get("/aliyah/pengabsen/me", response_model=PengabsenAliyahMeResponse)
+async def get_pengabsen_aliyah_me(current_pengabsen: dict = Depends(get_current_pengabsen_aliyah)):
+    return PengabsenAliyahMeResponse(**current_pengabsen)
+
+
+@api_router.post("/aliyah/monitoring/login", response_model=MonitoringAliyahTokenResponse)
+async def login_monitoring_aliyah(request: MonitoringAliyahLoginRequest):
+    pembimbing = await db.pembimbing_aliyah.find_one({"username": request.username}, {"_id": 0})
+
+    if not pembimbing or pembimbing.get("kode_akses") != request.kode_akses:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Username atau kode akses salah",
+        )
+
+    access_token = create_access_token(data={"sub": pembimbing["id"], "role": "monitoring_aliyah"})
+
+    user_data = MonitoringAliyahMeResponse(
+        id=pembimbing["id"],
+        nama=pembimbing["nama"],
+        username=pembimbing["username"],
+        email_atau_hp=pembimbing.get("email_atau_hp", ""),
+        kelas_ids=pembimbing.get("kelas_ids", []),
+        created_at=pembimbing["created_at"],
+    )
+
+    return MonitoringAliyahTokenResponse(access_token=access_token, user=user_data)
+
+
+@api_router.get("/aliyah/monitoring/me", response_model=MonitoringAliyahMeResponse)
+async def get_monitoring_aliyah_me(current_monitoring: dict = Depends(get_current_monitoring_aliyah)):
+    return MonitoringAliyahMeResponse(**current_monitoring)
+
+
         )
     
     # Pastikan setiap admin memiliki role (default superadmin jika belum ada)
@@ -2880,6 +2941,35 @@ async def sync_waktu_sholat(tanggal: str, _: dict = Depends(get_current_admin)):
     await db.waktu_sholat.insert_one(doc)
     
     return WaktuSholatResponse(**waktu_obj.model_dump())
+
+
+
+
+# ==================== PENGATURAN ABSENSI PAGI ALIYAH ====================
+
+class AliyahAbsensiPagiSettings(BaseModel):
+    id: str = Field(default="aliyah_absensi_pagi")
+    start_time: str = Field(default="06:30")  # HH:MM
+    end_time: str = Field(default="07:15")  # HH:MM
+    updated_at: Optional[str] = None
+
+
+@api_router.get("/aliyah/settings/absensi-pagi")
+async def get_aliyah_absensi_pagi_settings():
+    settings = await db.settings.find_one({"id": "aliyah_absensi_pagi"}, {"_id": 0})
+    if not settings:
+        return AliyahAbsensiPagiSettings().model_dump()
+    return settings
+
+
+@api_router.put("/aliyah/settings/absensi-pagi")
+async def update_aliyah_absensi_pagi_settings(data: AliyahAbsensiPagiSettings, _: dict = Depends(get_current_admin)):
+    payload = data.model_dump()
+    payload["id"] = "aliyah_absensi_pagi"
+    payload["updated_at"] = datetime.now(timezone.utc).isoformat()
+
+    await db.settings.update_one({"id": "aliyah_absensi_pagi"}, {"$set": payload}, upsert=True)
+    return {"message": "Pengaturan absensi pagi Aliyah berhasil disimpan"}
 
 
 # ==================== SETTINGS ENDPOINTS ====================
