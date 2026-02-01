@@ -1292,6 +1292,32 @@ async def login(request: LoginRequest):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Username atau password salah"
+        )
+    
+    # Pastikan setiap admin memiliki role (default superadmin jika belum ada)
+    role = admin.get("role", "superadmin")
+    if "role" not in admin:
+        await db.admins.update_one({"id": admin["id"]}, {"$set": {"role": role}})
+    
+    access_token = create_access_token(data={"sub": admin['id'], "role": role})
+    
+    user_data = dict(admin)
+    user_data.setdefault("role", role)
+    
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": AdminResponse(**user_data)
+    }
+
+@api_router.get("/auth/me", response_model=AdminResponse)
+async def get_me(current_admin: dict = Depends(get_current_admin)):
+    return AdminResponse(**current_admin)
+
+@api_router.post("/auth/logout")
+async def logout(current_admin: dict = Depends(get_current_admin)):
+    return {"message": "Logout berhasil"}
+
 
 # ==================== AUTH PENGABSEN & MONITORING ALIYAH (PWA) ====================
 
@@ -1352,32 +1378,6 @@ async def login_monitoring_aliyah(request: MonitoringAliyahLoginRequest):
 async def get_monitoring_aliyah_me(current_monitoring: dict = Depends(get_current_monitoring_aliyah)):
     return MonitoringAliyahMeResponse(**current_monitoring)
 
-
-        )
-    
-    # Pastikan setiap admin memiliki role (default superadmin jika belum ada)
-    role = admin.get("role", "superadmin")
-    if "role" not in admin:
-        await db.admins.update_one({"id": admin["id"]}, {"$set": {"role": role}})
-    
-    access_token = create_access_token(data={"sub": admin['id'], "role": role})
-    
-    user_data = dict(admin)
-    user_data.setdefault("role", role)
-    
-    return {
-        "access_token": access_token,
-        "token_type": "bearer",
-        "user": AdminResponse(**user_data)
-    }
-
-@api_router.get("/auth/me", response_model=AdminResponse)
-async def get_me(current_admin: dict = Depends(get_current_admin)):
-    return AdminResponse(**current_admin)
-
-@api_router.post("/auth/logout")
-async def logout(current_admin: dict = Depends(get_current_admin)):
-    return {"message": "Logout berhasil"}
 
 # ==================== ASRAMA ENDPOINTS ====================
 
