@@ -777,7 +777,7 @@ class AliyahAbsensiUpsertRequest(BaseModel):
 @api_router.post("/aliyah/pengabsen/absensi")
 async def upsert_aliyah_absensi(
     payload: AliyahAbsensiUpsertRequest,
-    current_pengabsen: dict = Depends(get_current_pengabsen_aliyah),
+    current_pengabsen: dict = Depends(get_current_pengabsen_aliyah),  # noqa: F821
 ):
     # Pastikan siswa ada dan termasuk kelas yang bisa diakses pengabsen
     siswa = await db.siswa_aliyah.find_one({"id": payload.siswa_id}, {"_id": 0})
@@ -839,7 +839,7 @@ class AliyahAbsensiScanPayload(BaseModel):
 async def scan_aliyah_absensi(
     payload: AliyahAbsensiScanPayload,
     jenis: Literal["pagi", "dzuhur"],
-    current_pengabsen: dict = Depends(get_current_pengabsen_aliyah),
+    current_pengabsen: dict = Depends(get_current_pengabsen_aliyah),  # noqa: F821
 ):
     siswa: Optional[Dict[str, Any]] = None
 
