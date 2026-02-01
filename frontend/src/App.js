@@ -373,6 +373,30 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/aliyah/pengabsen"
+        element={
+          <ProtectedRoute>
+            <PengabsenAliyah />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/aliyah/monitoring"
+        element={
+          <ProtectedRoute>
+            <MonitoringAliyah />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/aliyah/riwayat"
+        element={
+          <ProtectedRoute>
+            <RiwayatAbsensiAliyah />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/pengabsen-kelas"
         element={
           <ProtectedRoute>
