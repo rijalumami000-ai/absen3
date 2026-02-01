@@ -525,44 +525,14 @@ const SiswaAliyah = () => {
                     <td className="px-6 py-4 text-sm text-muted-foreground">{siswa.kelas_nama || '-'}</td>
                     <td className="px-6 py-4 text-sm text-muted-foreground">
                       {siswa.has_qr ? (
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              className="h-8 w-8"
-                              onClick={async (e) => {
-                                e.preventDefault();
-                                try {
-                                  const response = await api.get(`/aliyah/siswa/${siswa.id}/qr-code`, {
-                                    responseType: 'blob',
-                                  });
-                                  const url = window.URL.createObjectURL(new Blob([response.data]));
-                                  const img = document.getElementById(`qr-preview-${siswa.id}`);
-                                  if (img) {
-                                    img.src = url;
-                                  }
-                                } catch (error) {
-                                  toast.error('Gagal memuat QR Code');
-                                }
-                              }}
-                            >
-                              <QrCode className="w-4 h-4" />
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="max-w-xs">
-                            <DialogHeader>
-                              <DialogTitle>QR Siswa Aliyah</DialogTitle>
-                            </DialogHeader>
-                            <div className="flex justify-center items-center py-4">
-                              <img
-                                id={`qr-preview-${siswa.id}`}
-                                alt={`QR ${siswa.nama}`}
-                                className="w-40 h-40 object-contain border border-border rounded-lg"
-                              />
-                            </div>
-                          </DialogContent>
-                        </Dialog>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => fetchQrPreview(siswa)}
+                        >
+                          <QrCode className="w-4 h-4" />
+                        </Button>
                       ) : (
                         <span className="text-xs text-muted-foreground">Tidak ada</span>
                       )}
