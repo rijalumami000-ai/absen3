@@ -1077,6 +1077,8 @@ class AbsensiSholatTester:
 
     def test_aliyah_pengabsen_endpoints(self) -> bool:
         """Test Pengabsen Aliyah CRUD endpoints"""
+        from datetime import datetime
+        
         all_success = True
         created_pengabsen_id = None
         created_kelas_id = None
