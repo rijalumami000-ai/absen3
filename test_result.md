@@ -105,6 +105,18 @@
 user_problem_statement: "Debug masalah tanggal dan visibilitas data untuk absensi sholat: 1) Di Riwayat Absensi Sholat (admin): Pada tanggal sekarang (misal 28), sholat subuh tidak ada data, padahal sudah banyak yang scan. Diduga data subuh hari ini masuk ke tanggal kemarin (27), seperti ada pergeseran tanggal. 2) Di Aplikasi Pengabsen Sholat (PWA): Di menu 'Absensi hari ini' untuk subuh/dzuhur, sudah muncul data seakan-akan hari ini padahal baru mulai subuh tadi. Data tersebut tidak muncul di Riwayat Absensi Sholat maupun di menu 'Riwayat Saya' di aplikasi Pengabsen. 3) Di Aplikasi Monitoring Sholat: masalah serupa (data seperti bergeser tanggal / tidak sinkron antara hari ini vs riwayat). YANG SUDAH DIKETAHUI: Di backend, semua penentuan today pakai: today = datetime.now(timezone.utc).astimezone().date().isoformat(). Endpoint terkait: /pengabsen/absensi (POST), /pengabsen/santri-absensi-hari-ini (GET), /pembimbing/santri-absensi-hari-ini (GET), /wali/anak-absensi-hari-ini (GET), /absensi/riwayat dan /absensi/detail (admin)."
 
 backend:
+  - task: "PWA Pengabsen & Monitoring Aliyah Backend Endpoints"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Endpoint login/me PWA Pengabsen Aliyah & Monitoring Aliyah, absensi-hari-ini, upsert, scan, dan monitoring riwayat sudah dibuat di /api/aliyah/pengabsen/* dan /api/aliyah/monitoring/*. Perlu diuji alur penuh dengan token pengabsen_aliyah dan monitoring_aliyah."
+
   - task: "Pengabsen & Monitoring Aliyah Endpoints"
     implemented: true
     working: true
@@ -268,6 +280,18 @@ backend:
           comment: "All backend endpoints tested successfully in previous session. Authentication, asrama, pengabsen, pembimbing endpoints working correctly with proper model structure."
 
 frontend:
+  - task: "PWA Pengabsen & Monitoring Aliyah Frontend"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/pages/PengabsenAliyahApp.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Halaman PWA Pengabsen Aliyah (login + app) dan Monitoring Aliyah (login + app) sudah dibuat dengan dua jenis absensi (pagi & dzuhur), tab Absensi Hari Ini dan Riwayat, scan QR, dan edit status. Perlu diuji flow login, pengisian absensi (manual + scan), serta sinkronisasi ke riwayat."
+
   - task: "Admin Aliyah Pengabsen/Monitoring/Riwayat Pages"
     implemented: true
     working: false
