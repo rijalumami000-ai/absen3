@@ -315,6 +315,48 @@ class PengabsenTokenResponse(BaseModel):
 
 
 
+class PengabsenAliyahLoginRequest(BaseModel):
+    username: str
+    kode_akses: str
+
+
+class PengabsenAliyahMeResponse(BaseModel):
+    id: str
+    nama: str
+    username: str
+    email_atau_hp: Optional[str] = ""
+    kelas_ids: List[str] = []
+    created_at: datetime
+
+
+class PengabsenAliyahTokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: PengabsenAliyahMeResponse
+
+
+class MonitoringAliyahLoginRequest(BaseModel):
+    username: str
+    kode_akses: str
+
+
+class MonitoringAliyahMeResponse(BaseModel):
+    id: str
+    nama: str
+    username: str
+    email_atau_hp: Optional[str] = ""
+    kelas_ids: List[str] = []
+    created_at: datetime
+
+
+class MonitoringAliyahTokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: MonitoringAliyahMeResponse
+
+
+
+
 # Absensi Models
 class Absensi(BaseModel):
     model_config = ConfigDict(extra="ignore")
