@@ -418,6 +418,31 @@ class SiswaMadrasahCreate(BaseModel):
     santri_id: Optional[str] = None
 
 class SiswaMadrasahUpdate(BaseModel):
+
+# ==================== KELAS ALIYAH MODELS ====================
+
+class KelasAliyah(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    nama: str
+    tingkat: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class KelasAliyahCreate(BaseModel):
+    nama: str
+    tingkat: Optional[str] = None
+
+class KelasAliyahUpdate(BaseModel):
+    nama: Optional[str] = None
+    tingkat: Optional[str] = None
+
+class KelasAliyahResponse(BaseModel):
+    id: str
+    nama: str
+    tingkat: Optional[str] = None
+    created_at: datetime
+    jumlah_siswa: int = 0
+
     nama: Optional[str] = None
     nis: Optional[str] = None
     gender: Optional[Literal["putra", "putri"]] = None
@@ -2918,6 +2943,71 @@ async def get_kelas_siswa(kelas_id: str, _: dict = Depends(get_current_admin)):
             # Linked to santri, has QR
             has_qr = True
         elif siswa.get("qr_code"):
+
+
+# ==================== KELAS ALIYAH ENDPOINTS ====================
+
+@api_router.get("/aliyah/kelas", response_model=List[KelasAliyahResponse])
+async def get_kelas_aliyah_list(_: dict = Depends(get_current_admin)):
+    kelas_list = await db.kelas_aliyah.find({}, {"_id": 0}).to_list(1000)
+
+    result: List[KelasAliyahResponse] = []
+    for kelas in kelas_list:
+        jumlah_siswa = await db.siswa_aliyah.count_documents({"kelas_id": kelas["id"]})
+        result.append(KelasAliyahResponse(**kelas, jumlah_siswa=jumlah_siswa))
+
+    return result
+
+
+@api_router.post("/aliyah/kelas", response_model=KelasAliyahResponse)
+async def create_kelas_aliyah(data: KelasAliyahCreate, _: dict = Depends(get_current_admin)):
+    kelas = KelasAliyah(**data.model_dump())
+    doc = kelas.model_dump()
+    doc["created_at"] = doc["created_at"].isoformat()
+    await db.kelas_aliyah.insert_one(doc)
+
+    return KelasAliyahResponse(**kelas.model_dump(), jumlah_siswa=0)
+
+
+@api_router.get("/aliyah/kelas/{kelas_id}", response_model=KelasAliyahResponse)
+async def get_kelas_aliyah_detail(kelas_id: str, _: dict = Depends(get_current_admin)):
+    kelas = await db.kelas_aliyah.find_one({"id": kelas_id}, {"_id": 0})
+    if not kelas:
+        raise HTTPException(status_code=404, detail="Kelas tidak ditemukan")
+
+    jumlah_siswa = await db.siswa_aliyah.count_documents({"kelas_id": kelas_id})
+    return KelasAliyahResponse(**kelas, jumlah_siswa=jumlah_siswa)
+
+
+@api_router.put("/aliyah/kelas/{kelas_id}", response_model=KelasAliyahResponse)
+async def update_kelas_aliyah(kelas_id: str, data: KelasAliyahUpdate, _: dict = Depends(get_current_admin)):
+    kelas = await db.kelas_aliyah.find_one({"id": kelas_id}, {"_id": 0})
+    if not kelas:
+        raise HTTPException(status_code=404, detail="Kelas tidak ditemukan")
+
+    update_data = {k: v for k, v in data.model_dump().items() if v is not None}
+    if update_data:
+        await db.kelas_aliyah.update_one({"id": kelas_id}, {"$set": update_data})
+
+    updated_kelas = await db.kelas_aliyah.find_one({"id": kelas_id}, {"_id": 0})
+    jumlah_siswa = await db.siswa_aliyah.count_documents({"kelas_id": kelas_id})
+    return KelasAliyahResponse(**updated_kelas, jumlah_siswa=jumlah_siswa)
+
+
+@api_router.delete("/aliyah/kelas/{kelas_id}")
+async def delete_kelas_aliyah(kelas_id: str, _: dict = Depends(get_current_admin)):
+    # Set siswa aliyah yang ada di kelas ini menjadi kelas_id = None
+    await db.siswa_aliyah.update_many(
+        {"kelas_id": kelas_id},
+        {"$set": {"kelas_id": None}},
+    )
+
+    result = await db.kelas_aliyah.delete_one({"id": kelas_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Kelas tidak ditemukan")
+
+    return {"message": "Kelas Aliyah berhasil dihapus"}
+
             # Standalone with QR
             has_qr = True
         
