@@ -110,6 +110,8 @@ class AdminResponse(BaseModel):
     nama: str
     role: str = "superadmin"
     created_at: datetime
+from typing import Literal
+
 
 class LoginRequest(BaseModel):
     username: str
