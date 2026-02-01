@@ -16,6 +16,7 @@ import WaktuSholat from '@/pages/WaktuSholat';
 import Settings from '@/pages/Settings';
 import Kelas from '@/pages/Kelas';
 import MadrasahDiniyah from '@/pages/MadrasahDiniyah';
+import KelasAliyah from '@/pages/KelasAliyah';
 import RiwayatAbsensiMadin from '@/pages/RiwayatAbsensiMadin';
 import PengabsenKelas from '@/pages/PengabsenKelas';
 import AksesDitolak from '@/pages/AksesDitolak';
@@ -348,6 +349,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <MadrasahDiniyah />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/aliyah/kelas"
+        element={
+          <ProtectedRoute>
+            <KelasAliyah />
           </ProtectedRoute>
         }
       />

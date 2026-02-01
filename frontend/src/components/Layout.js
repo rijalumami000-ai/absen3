@@ -84,6 +84,17 @@ const Layout = ({ children }) => {
       ]
     },
     {
+      id: 'setting-aliyah',
+      type: 'group',
+      icon: GraduationCap,
+      label: 'Setting Madrasah Aliyah',
+      allowedRoles: ['superadmin'],
+      items: [
+        { path: '/aliyah/siswa', icon: BookOpen, label: 'Siswa Aliyah' },
+        { path: '/aliyah/kelas', icon: GraduationCap, label: 'Kelas Madrasah Aliyah' },
+      ],
+    },
+    {
       id: 'absensi-madrasah',
       type: 'group',
       icon: ClipboardCheck,
