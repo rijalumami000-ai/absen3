@@ -579,6 +579,28 @@ const SiswaAliyah = () => {
           </div>
         </div>
       )}
+      {/* QR Preview Dialog */}
+      <Dialog open={isQrPreviewOpen} onOpenChange={setIsQrPreviewOpen}>
+        <DialogContent className="max-w-xs">
+          <DialogHeader>
+            <DialogTitle>QR Siswa Aliyah</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center py-4 space-y-2">
+            {qrPreviewSiswa && (
+              <p className="text-xs text-muted-foreground">{qrPreviewSiswa.nama}</p>
+            )}
+            {qrPreviewUrl ? (
+              <img
+                src={qrPreviewUrl}
+                alt={qrPreviewSiswa ? `QR ${qrPreviewSiswa.nama}` : 'QR Siswa Aliyah'}
+                className="w-40 h-40 object-contain border border-border rounded-lg"
+              />
+            ) : (
+              <p className="text-xs text-muted-foreground">Memuat QR Code...</p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
