@@ -3030,16 +3030,6 @@ async def delete_kelas_aliyah(kelas_id: str, _: dict = Depends(get_current_admin
 
     return {"message": "Kelas Aliyah berhasil dihapus"}
 
-            # Standalone with QR
-            has_qr = True
-        
-        result.append(SiswaMadrasahResponse(
-            **siswa,
-            kelas_nama=kelas["nama"],
-            has_qr=has_qr
-        ))
-    
-    return result
 
 @api_router.get("/pengabsen-kelas/kelas-saya", response_model=List[KelasResponse])
 async def get_kelas_saya(current_pengabsen: dict = Depends(get_current_pengabsen_kelas)):
