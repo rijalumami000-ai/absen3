@@ -524,6 +524,7 @@ const SiswaAliyah = () => {
                   <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">NIS</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Gender</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Kelas</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Wali & WA</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">QR Preview</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">QR Download</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Aksi</th>
