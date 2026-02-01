@@ -484,6 +484,8 @@ class SiswaAliyah(BaseModel):
     gender: Literal["putra", "putri"]
     kelas_id: Optional[str] = None
     santri_id: Optional[str] = None
+    wali_nama: Optional[str] = None
+    wali_wa: Optional[str] = None
     qr_code: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -494,6 +496,8 @@ class SiswaAliyahCreate(BaseModel):
     gender: Literal["putra", "putri"]
     kelas_id: Optional[str] = None
     santri_id: Optional[str] = None
+    wali_nama: Optional[str] = None
+    wali_wa: Optional[str] = None
 
 class SiswaAliyahUpdate(BaseModel):
     nama: Optional[str] = None
@@ -501,6 +505,8 @@ class SiswaAliyahUpdate(BaseModel):
     gender: Optional[Literal["putra", "putri"]] = None
     kelas_id: Optional[str] = None
     santri_id: Optional[str] = None
+    wali_nama: Optional[str] = None
+    wali_wa: Optional[str] = None
 
 class SiswaAliyahResponse(BaseModel):
     id: str
@@ -510,6 +516,8 @@ class SiswaAliyahResponse(BaseModel):
     kelas_id: Optional[str]
     kelas_nama: Optional[str] = None
     santri_id: Optional[str]
+    wali_nama: Optional[str] = None
+    wali_wa: Optional[str] = None
     has_qr: bool = False
 
     waktu_absen: Optional[datetime] = None
