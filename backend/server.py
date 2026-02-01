@@ -4444,34 +4444,6 @@ async def get_aliyah_monitoring_absensi_riwayat(
 
 
 
-        siswa_gender = siswa.get("gender") or ""
-
-        if gender and gender != "all":
-            if siswa_gender != gender:
-                continue
-
-        status = absensi.get("status", "")
-        if status in summary:
-            summary[status] += 1
-
-        row = {
-            "id": absensi.get("id"),
-            "siswa_id": absensi.get("siswa_id"),
-            "siswa_nama": siswa.get("nama") if siswa else "Unknown",
-            "kelas_id": absensi.get("kelas_id"),
-            "kelas_nama": kelas.get("nama") if kelas else "Unknown",
-            "tanggal": absensi.get("tanggal"),
-            "status": status,
-            "gender": siswa_gender,
-            "waktu_absen": absensi.get("waktu_absen"),
-        }
-        detail.append(row)
-
-    return {"summary": summary, "detail": detail}
-
-
-
-
 @api_router.delete("/aliyah/monitoring/{pembimbing_id}")
 async def delete_monitoring_aliyah(pembimbing_id: str, _: dict = Depends(get_current_admin)):
     result = await db.pembimbing_aliyah.delete_one({"id": pembimbing_id})
