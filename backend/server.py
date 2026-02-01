@@ -618,6 +618,102 @@ class PembimbingKelasUpdate(BaseModel):
 
 class PembimbingKelasResponse(BaseModel):
     id: str
+
+# ==================== PENGABSEN & MONITORING ALIYAH MODELS ====================
+
+class PengabsenAliyah(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    nama: str
+    email_atau_hp: str
+    username: str
+    kode_akses: str
+    kelas_ids: List[str] = []  # refer ke kelas_aliyah.id
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class PengabsenAliyahCreate(BaseModel):
+    nama: str
+    email_atau_hp: str
+    username: str
+    kelas_ids: List[str]
+
+
+class PengabsenAliyahUpdate(BaseModel):
+    nama: Optional[str] = None
+    email_atau_hp: Optional[str] = None
+    username: Optional[str] = None
+    kelas_ids: Optional[List[str]] = None
+
+
+class PengabsenAliyahResponse(BaseModel):
+    id: str
+    nama: str
+    email_atau_hp: str
+    username: str
+    kode_akses: str
+    kelas_ids: List[str]
+    created_at: datetime
+
+
+class MonitoringAliyah(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    nama: str
+    email_atau_hp: str
+    username: str
+    kode_akses: str
+    kelas_ids: List[str] = []
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class MonitoringAliyahCreate(BaseModel):
+    nama: str
+    email_atau_hp: str
+    username: str
+    kelas_ids: List[str] = []
+
+
+class MonitoringAliyahUpdate(BaseModel):
+    nama: Optional[str] = None
+    email_atau_hp: Optional[str] = None
+    username: Optional[str] = None
+    kelas_ids: Optional[List[str]] = None
+
+
+class MonitoringAliyahResponse(BaseModel):
+    id: str
+    nama: str
+    email_atau_hp: str
+    username: str
+    kode_akses: str
+    kelas_ids: List[str]
+    created_at: datetime
+
+
+class AbsensiAliyah(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    siswa_id: str
+    kelas_id: str
+    tanggal: str  # YYYY-MM-DD
+    status: Literal["hadir", "alfa", "sakit", "izin", "dispensasi", "bolos"]
+    waktu_absen: Optional[datetime] = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class AbsensiAliyahResponse(BaseModel):
+    id: str
+    siswa_id: str
+    siswa_nama: str
+    kelas_id: str
+    kelas_nama: str
+    tanggal: str
+    status: str
+    gender: Optional[str] = None
+    waktu_absen: Optional[datetime] = None
+
+
     nama: str
     username: str
     kode_akses: str
@@ -658,6 +754,42 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
         expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+
+async def get_current_pengabsen_aliyah(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
+    try:
+        token = credentials.credentials
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        pengabsen_id: str = payload.get("sub")
+        if pengabsen_id is None:
+            raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+
+        pengabsen = await db.pengabsen_aliyah.find_one({"id": pengabsen_id}, {"_id": 0})
+        if pengabsen is None:
+            raise HTTPException(status_code=401, detail="Pengabsen Aliyah not found")
+
+        return pengabsen
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+
+
+async def get_current_monitoring_aliyah(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
+    try:
+        token = credentials.credentials
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        monitoring_id: str = payload.get("sub")
+        if monitoring_id is None:
+            raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+
+        monitoring = await db.pembimbing_aliyah.find_one({"id": monitoring_id}, {"_id": 0})
+        if monitoring is None:
+            raise HTTPException(status_code=401, detail="Monitoring Aliyah not found")
+
+        return monitoring
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+
+
     return encoded_jwt
 
 
