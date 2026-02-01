@@ -418,6 +418,23 @@ class SiswaMadrasahCreate(BaseModel):
     santri_id: Optional[str] = None
 
 class SiswaMadrasahUpdate(BaseModel):
+    nama: Optional[str] = None
+    nis: Optional[str] = None
+    gender: Optional[Literal["putra", "putri"]] = None
+    kelas_id: Optional[str] = None
+    santri_id: Optional[str] = None
+
+
+class SiswaMadrasahResponse(BaseModel):
+    id: str
+    nama: str
+    nis: Optional[str]
+    gender: str
+    kelas_id: Optional[str]
+    kelas_nama: Optional[str] = None
+    santri_id: Optional[str]
+    has_qr: bool = False
+
 
 # ==================== KELAS ALIYAH MODELS ====================
 
