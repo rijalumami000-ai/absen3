@@ -344,6 +344,22 @@ const SiswaAliyah = () => {
                     </SelectContent>
                   </Select>
                 </div>
+                <div>
+                  <Label>Nama Wali (Ayah/Ibu)</Label>
+                  <Input
+                    placeholder="Nama Wali"
+                    value={formData.wali_nama}
+                    onChange={(e) => setFormData({ ...formData, wali_nama: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label>Nomor WhatsApp Wali</Label>
+                  <Input
+                    placeholder="62812xxxxxxx"
+                    value={formData.wali_wa}
+                    onChange={(e) => setFormData({ ...formData, wali_wa: e.target.value })}
+                  />
+                </div>
                 <Button onClick={handleCreate} className="w-full">
                   Simpan
                 </Button>
