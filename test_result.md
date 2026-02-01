@@ -105,6 +105,30 @@
 user_problem_statement: "Debug masalah tanggal dan visibilitas data untuk absensi sholat: 1) Di Riwayat Absensi Sholat (admin): Pada tanggal sekarang (misal 28), sholat subuh tidak ada data, padahal sudah banyak yang scan. Diduga data subuh hari ini masuk ke tanggal kemarin (27), seperti ada pergeseran tanggal. 2) Di Aplikasi Pengabsen Sholat (PWA): Di menu 'Absensi hari ini' untuk subuh/dzuhur, sudah muncul data seakan-akan hari ini padahal baru mulai subuh tadi. Data tersebut tidak muncul di Riwayat Absensi Sholat maupun di menu 'Riwayat Saya' di aplikasi Pengabsen. 3) Di Aplikasi Monitoring Sholat: masalah serupa (data seperti bergeser tanggal / tidak sinkron antara hari ini vs riwayat). YANG SUDAH DIKETAHUI: Di backend, semua penentuan today pakai: today = datetime.now(timezone.utc).astimezone().date().isoformat(). Endpoint terkait: /pengabsen/absensi (POST), /pengabsen/santri-absensi-hari-ini (GET), /pembimbing/santri-absensi-hari-ini (GET), /wali/anak-absensi-hari-ini (GET), /absensi/riwayat dan /absensi/detail (admin)."
 
 backend:
+  - task: "Pengabsen & Monitoring Aliyah Endpoints"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Endpoint admin untuk pengelolaan Pengabsen Aliyah dan Monitoring Aliyah telah dibuat: /api/aliyah/pengabsen* dan /api/aliyah/monitoring*. CRUD, validasi kelas_aliyah, dan regenerate kode_akses perlu dites oleh testing agent."
+
+  - task: "Riwayat Absensi Aliyah Endpoint"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Endpoint GET /api/aliyah/absensi/riwayat dibuat dengan summary status (hadir, alfa, sakit, izin, dispensasi, bolos) dan detail per siswa Aliyah. Perlu pengujian filter tanggal/kelas/gender dan struktur respons."
+
   - task: "Date Consistency Testing for Absensi Sholat"
     implemented: true
     working: true
