@@ -791,9 +791,6 @@ async def get_current_monitoring_aliyah(credentials: HTTPAuthorizationCredential
         raise HTTPException(status_code=401, detail="Invalid authentication credentials")
 
 
-    return encoded_jwt
-
-
 async def send_wali_push_notification(wali: dict, title: str, body: str):
     """Send FCM push notification to all tokens of a wali (if configured)."""
     try:
