@@ -122,15 +122,18 @@ backend:
 
   - task: "Riwayat Absensi Aliyah Endpoint"
     implemented: true
-    working: false
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Endpoint GET /api/aliyah/absensi/riwayat dibuat dengan summary status (hadir, alfa, sakit, izin, dispensasi, bolos) dan detail per siswa Aliyah. Perlu pengujian filter tanggal/kelas/gender dan struktur respons."
+        - working: true
+          agent: "testing"
+          comment: "✅ Riwayat Absensi Aliyah endpoint tested successfully. GET /api/aliyah/absensi/riwayat working correctly with all required features: 1) SUMMARY contains all 6 status types (hadir, alfa, sakit, izin, dispensasi, bolos) with accurate counts, 2) DETAIL array contains proper fields (id, siswa_id, siswa_nama, kelas_id, kelas_nama, tanggal, status, gender, waktu_absen), 3) FILTERS working correctly - kelas_id filter returns only matching records, gender filter (putra/putri) returns only matching records, 4) Created and tested with 12 dummy absensi records across 2 siswa with all status combinations. Response structure matches specification exactly."
 
   - task: "Date Consistency Testing for Absensi Sholat"
     implemented: true
