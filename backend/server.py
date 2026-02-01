@@ -3810,6 +3810,245 @@ async def delete_absensi_kelas(absensi_id: str, current_pengabsen: dict = Depend
     return {"message": "Absensi berhasil dihapus"}
 
 
+
+# ==================== PENGABSEN & MONITORING ALIYAH ENDPOINTS (ADMIN) ====================
+
+@api_router.get("/aliyah/pengabsen", response_model=List[PengabsenAliyahResponse])
+async def get_pengabsen_aliyah_list(_: dict = Depends(get_current_admin)):
+    pengabsen_list = await db.pengabsen_aliyah.find({}, {"_id": 0}).to_list(1000)
+    return [PengabsenAliyahResponse(**p) for p in pengabsen_list]
+
+
+@api_router.post("/aliyah/pengabsen", response_model=PengabsenAliyahResponse)
+async def create_pengabsen_aliyah(data: PengabsenAliyahCreate, _: dict = Depends(get_current_admin)):
+    # Validate kelas_ids terhadap kelas_aliyah
+    for kelas_id in data.kelas_ids:
+        kelas = await db.kelas_aliyah.find_one({"id": kelas_id}, {"_id": 0})
+        if not kelas:
+            raise HTTPException(status_code=404, detail=f"Kelas Aliyah {kelas_id} tidak ditemukan")
+
+    # Cek username unik
+    existing = await db.pengabsen_aliyah.find_one({"username": data.username})
+    if existing:
+        raise HTTPException(status_code=400, detail="Username sudah digunakan")
+
+    pengabsen = PengabsenAliyah(
+        **data.model_dump(),
+        kode_akses=generate_kode_akses(),
+    )
+
+    doc = pengabsen.model_dump()
+    doc["created_at"] = doc["created_at"].isoformat()
+    await db.pengabsen_aliyah.insert_one(doc)
+
+    return PengabsenAliyahResponse(**pengabsen.model_dump())
+
+
+@api_router.put("/aliyah/pengabsen/{pengabsen_id}", response_model=PengabsenAliyahResponse)
+async def update_pengabsen_aliyah(pengabsen_id: str, data: PengabsenAliyahUpdate, _: dict = Depends(get_current_admin)):
+    pengabsen = await db.pengabsen_aliyah.find_one({"id": pengabsen_id}, {"_id": 0})
+    if not pengabsen:
+        raise HTTPException(status_code=404, detail="Pengabsen Aliyah tidak ditemukan")
+
+    update_data = {k: v for k, v in data.model_dump().items() if v is not None}
+
+    if "username" in update_data:
+        existing = await db.pengabsen_aliyah.find_one({"username": update_data["username"], "id": {"$ne": pengabsen_id}})
+        if existing:
+            raise HTTPException(status_code=400, detail="Username sudah digunakan")
+
+    if "kelas_ids" in update_data:
+        for kelas_id in update_data["kelas_ids"]:
+            kelas = await db.kelas_aliyah.find_one({"id": kelas_id}, {"_id": 0})
+            if not kelas:
+                raise HTTPException(status_code=404, detail=f"Kelas Aliyah {kelas_id} tidak ditemukan")
+
+    if update_data:
+        await db.pengabsen_aliyah.update_one({"id": pengabsen_id}, {"$set": update_data})
+
+    updated = await db.pengabsen_aliyah.find_one({"id": pengabsen_id}, {"_id": 0})
+    return PengabsenAliyahResponse(**updated)
+
+
+@api_router.post("/aliyah/pengabsen/{pengabsen_id}/regenerate-kode-akses", response_model=PengabsenAliyahResponse)
+async def regenerate_pengabsen_aliyah_kode(pengabsen_id: str, _: dict = Depends(get_current_admin)):
+    pengabsen = await db.pengabsen_aliyah.find_one({"id": pengabsen_id}, {"_id": 0})
+    if not pengabsen:
+        raise HTTPException(status_code=404, detail="Pengabsen Aliyah tidak ditemukan")
+
+    new_kode = generate_kode_akses()
+    await db.pengabsen_aliyah.update_one({"id": pengabsen_id}, {"$set": {"kode_akses": new_kode}})
+
+    updated = await db.pengabsen_aliyah.find_one({"id": pengabsen_id}, {"_id": 0})
+    return PengabsenAliyahResponse(**updated)
+
+
+@api_router.delete("/aliyah/pengabsen/{pengabsen_id}")
+async def delete_pengabsen_aliyah(pengabsen_id: str, _: dict = Depends(get_current_admin)):
+    result = await db.pengabsen_aliyah.delete_one({"id": pengabsen_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Pengabsen Aliyah tidak ditemukan")
+    return {"message": "Pengabsen Aliyah berhasil dihapus"}
+
+
+@api_router.get("/aliyah/monitoring", response_model=List[MonitoringAliyahResponse])
+async def get_monitoring_aliyah_list(_: dict = Depends(get_current_admin)):
+    pembimbing_list = await db.pembimbing_aliyah.find({}, {"_id": 0}).to_list(1000)
+    return [MonitoringAliyahResponse(**p) for p in pembimbing_list]
+
+
+@api_router.post("/aliyah/monitoring", response_model=MonitoringAliyahResponse)
+async def create_monitoring_aliyah(data: MonitoringAliyahCreate, _: dict = Depends(get_current_admin)):
+    # Validate kelas_ids ke kelas_aliyah
+    for kelas_id in data.kelas_ids:
+        kelas = await db.kelas_aliyah.find_one({"id": kelas_id}, {"_id": 0})
+        if not kelas:
+            raise HTTPException(status_code=404, detail=f"Kelas Aliyah {kelas_id} tidak ditemukan")
+
+    existing = await db.pembimbing_aliyah.find_one({"username": data.username})
+    if existing:
+        raise HTTPException(status_code=400, detail="Username sudah digunakan")
+
+    pembimbing = MonitoringAliyah(
+        **data.model_dump(),
+        kode_akses=generate_kode_akses(),
+    )
+
+    doc = pembimbing.model_dump()
+    doc["created_at"] = doc["created_at"].isoformat()
+    await db.pembimbing_aliyah.insert_one(doc)
+
+    return MonitoringAliyahResponse(**pembimbing.model_dump())
+
+
+@api_router.put("/aliyah/monitoring/{pembimbing_id}", response_model=MonitoringAliyahResponse)
+async def update_monitoring_aliyah(pembimbing_id: str, data: MonitoringAliyahUpdate, _: dict = Depends(get_current_admin)):
+    pembimbing = await db.pembimbing_aliyah.find_one({"id": pembimbing_id}, {"_id": 0})
+    if not pembimbing:
+        raise HTTPException(status_code=404, detail="Monitoring Aliyah tidak ditemukan")
+
+    update_data = {k: v for k, v in data.model_dump().items() if v is not None}
+
+    if "username" in update_data:
+        existing = await db.pembimbing_aliyah.find_one({"username": update_data["username"], "id": {"$ne": pembimbing_id}})
+        if existing:
+            raise HTTPException(status_code=400, detail="Username sudah digunakan")
+
+    if "kelas_ids" in update_data:
+        for kelas_id in update_data["kelas_ids"]:
+            kelas = await db.kelas_aliyah.find_one({"id": kelas_id}, {"_id": 0})
+            if not kelas:
+                raise HTTPException(status_code=404, detail=f"Kelas Aliyah {kelas_id} tidak ditemukan")
+
+    if update_data:
+        await db.pembimbing_aliyah.update_one({"id": pembimbing_id}, {"$set": update_data})
+
+    updated = await db.pembimbing_aliyah.find_one({"id": pembimbing_id}, {"_id": 0})
+    return MonitoringAliyahResponse(**updated)
+
+
+@api_router.post("/aliyah/monitoring/{pembimbing_id}/regenerate-kode-akses", response_model=MonitoringAliyahResponse)
+async def regenerate_monitoring_aliyah_kode(pembimbing_id: str, _: dict = Depends(get_current_admin)):
+    pembimbing = await db.pembimbing_aliyah.find_one({"id": pembimbing_id}, {"_id": 0})
+    if not pembimbing:
+        raise HTTPException(status_code=404, detail="Monitoring Aliyah tidak ditemukan")
+
+    new_kode = generate_kode_akses()
+    await db.pembimbing_aliyah.update_one({"id": pembimbing_id}, {"$set": {"kode_akses": new_kode}})
+
+    updated = await db.pembimbing_aliyah.find_one({"id": pembimbing_id}, {"_id": 0})
+    return MonitoringAliyahResponse(**updated)
+
+
+# ==================== ABSENSI ALIYAH RIWAYAT (ADMIN) ====================
+
+@api_router.get("/aliyah/absensi/riwayat")
+async def get_aliyah_absensi_riwayat(
+    tanggal_start: str,
+    tanggal_end: Optional[str] = None,
+    kelas_id: Optional[str] = None,
+    gender: Optional[str] = None,
+    _: dict = Depends(get_current_admin),
+):
+    """Riwayat absensi Madrasah Aliyah untuk admin.
+
+    Mirip dengan madin namun memakai koleksi siswa_aliyah, kelas_aliyah, dan absensi_aliyah,
+    dengan status: hadir, alfa, sakit, izin, dispensasi, bolos.
+    """
+    if not tanggal_end:
+        tanggal_end = tanggal_start
+
+    query: Dict[str, Any] = {
+        "tanggal": {"$gte": tanggal_start, "$lte": tanggal_end},
+    }
+    if kelas_id:
+        query["kelas_id"] = kelas_id
+
+    absensi_list = await db.absensi_aliyah.find(query, {"_id": 0}).to_list(10000)
+
+    if not absensi_list:
+        return {
+            "summary": {"hadir": 0, "alfa": 0, "sakit": 0, "izin": 0, "dispensasi": 0, "bolos": 0},
+            "detail": [],
+        }
+
+    # Ambil siswa & kelas untuk enrichment + filter gender
+    siswa_map: Dict[str, Dict[str, Any]] = {}
+    siswa_list = await db.siswa_aliyah.find({}, {"_id": 0}).to_list(10000)
+    for siswa in siswa_list:
+        siswa_map[siswa["id"]] = siswa
+
+    kelas_map: Dict[str, Dict[str, Any]] = {}
+    kelas_list = await db.kelas_aliyah.find({}, {"_id": 0}).to_list(1000)
+    for kelas in kelas_list:
+        kelas_map[kelas["id"]] = kelas
+
+    detail: List[Dict[str, Any]] = []
+    summary = {"hadir": 0, "alfa": 0, "sakit": 0, "izin": 0, "dispensasi": 0, "bolos": 0}
+
+    for absensi in absensi_list:
+        siswa = siswa_map.get(absensi["siswa_id"])
+        kelas = kelas_map.get(absensi["kelas_id"])
+
+        if not siswa:
+            continue
+
+        siswa_gender = siswa.get("gender") or ""
+
+        if gender and gender != "all":
+            if siswa_gender != gender:
+                continue
+
+        status = absensi.get("status", "")
+        if status in summary:
+            summary[status] += 1
+
+        row = {
+            "id": absensi.get("id"),
+            "siswa_id": absensi.get("siswa_id"),
+            "siswa_nama": siswa.get("nama") if siswa else "Unknown",
+            "kelas_id": absensi.get("kelas_id"),
+            "kelas_nama": kelas.get("nama") if kelas else "Unknown",
+            "tanggal": absensi.get("tanggal"),
+            "status": status,
+            "gender": siswa_gender,
+            "waktu_absen": absensi.get("waktu_absen"),
+        }
+        detail.append(row)
+
+    return {"summary": summary, "detail": detail}
+
+
+
+
+@api_router.delete("/aliyah/monitoring/{pembimbing_id}")
+async def delete_monitoring_aliyah(pembimbing_id: str, _: dict = Depends(get_current_admin)):
+    result = await db.pembimbing_aliyah.delete_one({"id": pembimbing_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Monitoring Aliyah tidak ditemukan")
+    return {"message": "Monitoring Aliyah berhasil dihapus"}
+
+
 # ==================== PENGABSEN KELAS ENDPOINTS ====================
 
 @api_router.get("/pengabsen-kelas", response_model=List[PengabsenKelasResponse])
