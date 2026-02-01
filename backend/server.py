@@ -460,11 +460,6 @@ class KelasAliyahResponse(BaseModel):
     created_at: datetime
     jumlah_siswa: int = 0
 
-    nama: Optional[str] = None
-    nis: Optional[str] = None
-    gender: Optional[Literal["putra", "putri"]] = None
-    kelas_id: Optional[str] = None
-    santri_id: Optional[str] = None
 
 class SiswaMadrasahResponse(BaseModel):
     id: str
