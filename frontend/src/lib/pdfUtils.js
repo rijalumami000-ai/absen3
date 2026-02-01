@@ -106,6 +106,47 @@ export const downloadPembimbingPDF = (pembimbingList, asramaList) => {
 };
 
 // Function to download Siswa Madin as PDF
+export const downloadSiswaAliyahPDF = (siswaList, kelasList) => {
+  const doc = new jsPDF('p', 'mm', 'a4');
+
+  doc.setFontSize(16);
+  doc.text('Daftar Siswa Madrasah Aliyah', 14, 18);
+
+  doc.setFontSize(10);
+  doc.text(`Total siswa: ${siswaList.length}`, 14, 24);
+
+  const kelasMap = {};
+  (kelasList || []).forEach((k) => {
+    kelasMap[k.id] = k.nama;
+  });
+
+  const tableData = (siswaList || []).map((s, idx) => [
+    idx + 1,
+    s.nama || '-',
+    s.nis || '-',
+    s.gender || '-',
+    s.kelas_nama || kelasMap[s.kelas_id] || '-',
+  ]);
+
+  autoTable(doc, {
+    startY: 30,
+    head: [['No', 'Nama', 'NIS', 'Gender', 'Kelas']],
+    body: tableData,
+    theme: 'grid',
+    headStyles: { fillColor: [37, 99, 235], fontStyle: 'bold' },
+    styles: { fontSize: 9 },
+    columnStyles: {
+      0: { cellWidth: 8 },
+      1: { cellWidth: 60 },
+      2: { cellWidth: 25 },
+      3: { cellWidth: 20 },
+      4: { cellWidth: 40 },
+    },
+  });
+
+  doc.save(`Daftar_Siswa_Aliyah_${new Date().getTime()}.pdf`);
+};
+
 export const downloadSiswaMadinPDF = (siswaList, kelasList) => {
   const doc = new jsPDF();
   
