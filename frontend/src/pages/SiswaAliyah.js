@@ -524,9 +524,8 @@ const SiswaAliyah = () => {
                   <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">NIS</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Gender</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Kelas</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Wali & WA</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">QR Preview</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">QR Download</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Nama Wali</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">No. WA Wali</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Aksi</th>
                 </tr>
               </thead>
@@ -538,47 +537,33 @@ const SiswaAliyah = () => {
                     <td className="px-6 py-4 text-sm text-muted-foreground capitalize">{siswa.gender}</td>
                     <td className="px-6 py-4 text-sm text-muted-foreground">{siswa.kelas_nama || '-'}</td>
                     <td className="px-6 py-4 text-sm text-muted-foreground">
-                      {siswa.wali_nama ? (
-                        <div className="flex flex-col text-xs">
-                          <span className="font-medium text-foreground">{siswa.wali_nama}</span>
-                          {siswa.wali_wa && (
-                            <span className="text-muted-foreground">WA: {siswa.wali_wa}</span>
-                          )}
-                        </div>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">-</span>
-                      )}
+                      {siswa.wali_nama || '-'}
                     </td>
                     <td className="px-6 py-4 text-sm text-muted-foreground">
-                      {siswa.has_qr ? (
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => fetchQrPreview(siswa)}
-                        >
-                          <QrCode className="w-4 h-4" />
-                        </Button>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">Tidak ada</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-muted-foreground">
-                      {siswa.has_qr ? (
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => downloadQRCode(siswa.id, siswa.nama)}
-                        >
-                          <FileDown className="w-4 h-4" />
-                        </Button>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">Tidak ada</span>
-                      )}
+                      {siswa.wali_wa || '-'}
                     </td>
                     <td className="px-6 py-4 text-sm text-muted-foreground">
                       <div className="flex gap-2">
+                        {siswa.has_qr && (
+                          <>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => fetchQrPreview(siswa)}
+                            >
+                              <QrCode className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => downloadQRCode(siswa.id, siswa.nama)}
+                            >
+                              <FileDown className="w-4 h-4" />
+                            </Button>
+                          </>
+                        )}
                         <Button
                           variant="outline"
                           size="icon"
@@ -587,7 +572,6 @@ const SiswaAliyah = () => {
                         >
                           <Edit2 className="w-4 h-4" />
                         </Button>
-{/* Aksi link ke santri dihapus sesuai permintaan */}
                         <Button
                           variant="outline"
                           size="icon"
