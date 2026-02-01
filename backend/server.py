@@ -473,6 +473,45 @@ class AbsensiKelas(BaseModel):
     kelas_id: str
     tanggal: str  # YYYY-MM-DD
     status: Literal["hadir", "alfa", "izin", "sakit", "telat"]  # a: alfa, i: izin, s: sakit, t: telat
+
+# ==================== SISWA ALIYAH MODELS ====================
+
+class SiswaAliyah(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    nama: str
+    nis: Optional[str] = None
+    gender: Literal["putra", "putri"]
+    kelas_id: Optional[str] = None
+    santri_id: Optional[str] = None
+    qr_code: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class SiswaAliyahCreate(BaseModel):
+    nama: str
+    nis: Optional[str] = None
+    gender: Literal["putra", "putri"]
+    kelas_id: Optional[str] = None
+    santri_id: Optional[str] = None
+
+class SiswaAliyahUpdate(BaseModel):
+    nama: Optional[str] = None
+    nis: Optional[str] = None
+    gender: Optional[Literal["putra", "putri"]] = None
+    kelas_id: Optional[str] = None
+    santri_id: Optional[str] = None
+
+class SiswaAliyahResponse(BaseModel):
+    id: str
+    nama: str
+    nis: Optional[str]
+    gender: str
+    kelas_id: Optional[str]
+    kelas_nama: Optional[str] = None
+    santri_id: Optional[str]
+    has_qr: bool = False
+
     waktu_absen: Optional[datetime] = None
     pengabsen_kelas_id: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -3094,6 +3133,141 @@ async def create_siswa_madrasah(data: SiswaMadrasahCreate, _: dict = Depends(get
         }
         siswa.qr_code = generate_qr_code(qr_data)
     
+
+
+# ==================== SISWA ALIYAH ENDPOINTS ====================
+
+@api_router.get("/aliyah/siswa", response_model=List[SiswaAliyahResponse])
+async def get_siswa_aliyah_list(_: dict = Depends(get_current_admin)):
+    siswa_list = await db.siswa_aliyah.find({}, {"_id": 0}).to_list(1000)
+
+    # Get kelas aliyah names
+    kelas_map: Dict[str, str] = {}
+    kelas_list = await db.kelas_aliyah.find({}, {"_id": 0}).to_list(1000)
+    for kelas in kelas_list:
+        kelas_map[kelas["id"]] = kelas["nama"]
+
+    result: List[SiswaAliyahResponse] = []
+    for siswa in siswa_list:
+        kelas_nama = kelas_map.get(siswa.get("kelas_id")) if siswa.get("kelas_id") else None
+        has_qr = False
+        if siswa.get("santri_id"):
+            has_qr = True
+        elif siswa.get("qr_code"):
+            has_qr = True
+
+        result.append(
+            SiswaAliyahResponse(
+                **siswa,
+                kelas_nama=kelas_nama,
+                has_qr=has_qr,
+            )
+        )
+
+    return result
+
+
+@api_router.post("/aliyah/siswa", response_model=SiswaAliyahResponse)
+async def create_siswa_aliyah(data: SiswaAliyahCreate, _: dict = Depends(get_current_admin)):
+    # Validate kelas_id if provided
+    if data.kelas_id:
+        kelas = await db.kelas_aliyah.find_one({"id": data.kelas_id}, {"_id": 0})
+        if not kelas:
+            raise HTTPException(status_code=404, detail="Kelas Aliyah tidak ditemukan")
+
+    # Validate santri_id if provided
+    if data.santri_id:
+        santri = await db.santri.find_one({"id": data.santri_id}, {"_id": 0})
+        if not santri:
+            raise HTTPException(status_code=404, detail="Santri tidak ditemukan")
+
+    siswa = SiswaAliyah(**data.model_dump())
+
+    # Generate QR code only if no santri_id
+    if not siswa.santri_id:
+        qr_data = {
+            "id": siswa.id,
+            "nama": siswa.nama,
+            "type": "siswa_aliyah",
+        }
+        siswa.qr_code = generate_qr_code(qr_data)
+
+    doc = siswa.model_dump()
+    doc["created_at"] = doc["created_at"].isoformat()
+    doc["updated_at"] = doc["updated_at"].isoformat()
+    await db.siswa_aliyah.insert_one(doc)
+
+    kelas_nama = None
+    if siswa.kelas_id:
+        kelas = await db.kelas_aliyah.find_one({"id": siswa.kelas_id}, {"_id": 0})
+        kelas_nama = kelas["nama"] if kelas else None
+
+    has_qr = bool(siswa.santri_id or siswa.qr_code)
+
+    return SiswaAliyahResponse(**siswa.model_dump(), kelas_nama=kelas_nama, has_qr=has_qr)
+
+
+@api_router.get("/aliyah/siswa/{siswa_id}/qr-code")
+async def get_siswa_aliyah_qr_code(siswa_id: str, _: dict = Depends(get_current_admin)):
+    siswa = await db.siswa_aliyah.find_one({"id": siswa_id}, {"_id": 0})
+    if not siswa:
+        raise HTTPException(status_code=404, detail="Siswa tidak ditemukan")
+
+    # If linked to santri, get QR from santri
+    if siswa.get("santri_id"):
+        santri = await db.santri.find_one({"id": siswa["santri_id"]}, {"_id": 0})
+        if not santri or not santri.get("qr_code"):
+            raise HTTPException(status_code=404, detail="QR Code tidak ditemukan")
+        img_data = base64.b64decode(santri["qr_code"])
+    elif siswa.get("qr_code"):
+        img_data = base64.b64decode(siswa["qr_code"])
+    else:
+        raise HTTPException(status_code=404, detail="QR Code tidak ditemukan")
+
+    return Response(content=img_data, media_type="image/png")
+
+
+@api_router.put("/aliyah/siswa/{siswa_id}", response_model=SiswaAliyahResponse)
+async def update_siswa_aliyah(siswa_id: str, data: SiswaAliyahUpdate, _: dict = Depends(get_current_admin)):
+    siswa = await db.siswa_aliyah.find_one({"id": siswa_id}, {"_id": 0})
+    if not siswa:
+        raise HTTPException(status_code=404, detail="Siswa tidak ditemukan")
+
+    update_data = {k: v for k, v in data.model_dump().items() if v is not None}
+
+    if "kelas_id" in update_data:
+        kelas = await db.kelas_aliyah.find_one({"id": update_data["kelas_id"]}, {"_id": 0})
+        if not kelas:
+            raise HTTPException(status_code=404, detail="Kelas Aliyah tidak ditemukan")
+
+    if "santri_id" in update_data:
+        santri = await db.santri.find_one({"id": update_data["santri_id"]}, {"_id": 0})
+        if not santri:
+            raise HTTPException(status_code=404, detail="Santri tidak ditemukan")
+
+    if update_data:
+        await db.siswa_aliyah.update_one({"id": siswa_id}, {"$set": update_data})
+
+    updated_siswa = await db.siswa_aliyah.find_one({"id": siswa_id}, {"_id": 0})
+
+    kelas_nama = None
+    if updated_siswa.get("kelas_id"):
+        kelas = await db.kelas_aliyah.find_one({"id": updated_siswa["kelas_id"]}, {"_id": 0})
+        kelas_nama = kelas["nama"] if kelas else None
+
+    has_qr = bool(updated_siswa.get("santri_id") or updated_siswa.get("qr_code"))
+
+    return SiswaAliyahResponse(**updated_siswa, kelas_nama=kelas_nama, has_qr=has_qr)
+
+
+@api_router.delete("/aliyah/siswa/{siswa_id}")
+async def delete_siswa_aliyah(siswa_id: str, _: dict = Depends(get_current_admin)):
+    result = await db.siswa_aliyah.delete_one({"id": siswa_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Siswa tidak ditemukan")
+
+    return {"message": "Siswa Aliyah berhasil dihapus"}
+
     doc = siswa.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
     doc['updated_at'] = doc['updated_at'].isoformat()
