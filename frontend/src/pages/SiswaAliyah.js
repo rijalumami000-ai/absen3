@@ -366,6 +366,83 @@ const SiswaAliyah = () => {
               </div>
             </DialogContent>
           </Dialog>
+          <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+            <DialogContent className="max-w-md animate-scale-in">
+              <DialogHeader>
+                <DialogTitle>Edit Siswa Aliyah</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <Label>Nama</Label>
+                  <Input
+                    placeholder="Nama siswa"
+                    value={formData.nama}
+                    onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label>NIS (Opsional)</Label>
+                  <Input
+                    placeholder="NIS"
+                    value={formData.nis}
+                    onChange={(e) => setFormData({ ...formData, nis: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label>Gender</Label>
+                  <Select
+                    value={formData.gender}
+                    onValueChange={(value) => setFormData({ ...formData, gender: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="putra">Putra</SelectItem>
+                      <SelectItem value="putri">Putri</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Kelas (Opsional)</Label>
+                  <Select
+                    value={formData.kelas_id}
+                    onValueChange={(value) => setFormData({ ...formData, kelas_id: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Belum Ada Kelas" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {kelasList.map((kelas) => (
+                        <SelectItem key={kelas.id} value={kelas.id}>
+                          {kelas.nama}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Nama Wali (Ayah/Ibu)</Label>
+                  <Input
+                    placeholder="Nama Wali"
+                    value={formData.wali_nama}
+                    onChange={(e) => setFormData({ ...formData, wali_nama: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label>Nomor WhatsApp Wali</Label>
+                  <Input
+                    placeholder="62812xxxxxxx"
+                    value={formData.wali_wa}
+                    onChange={(e) => setFormData({ ...formData, wali_wa: e.target.value })}
+                  />
+                </div>
+                <Button onClick={handleUpdate} className="w-full">
+                  Simpan Perubahan
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
