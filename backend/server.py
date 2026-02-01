@@ -718,6 +718,180 @@ class MonitoringAliyahCreate(BaseModel):
     kelas_ids: List[str] = []
 
 
+
+
+# ==================== ABSENSI ALIYAH PENGABSEN PWA ENDPOINTS ====================
+
+@api_router.get("/aliyah/pengabsen/absensi-hari-ini")
+async def get_aliyah_pengabsen_absensi_hari_ini(
+    jenis: Literal["pagi", "dzuhur"],
+    tanggal: Optional[str] = None,
+    current_pengabsen: dict = Depends(get_current_pengabsen_aliyah),
+):
+    if not tanggal:
+        tanggal = get_today_local_iso()
+
+    kelas_ids = current_pengabsen.get("kelas_ids", []) or []
+    if not kelas_ids:
+        return {"tanggal": tanggal, "jenis": jenis, "data": []}
+
+    siswa_list = await db.siswa_aliyah.find({"kelas_id": {"$in": kelas_ids}}, {"_id": 0}).to_list(5000)
+    siswa_by_id = {s["id"]: s for s in siswa_list}
+
+    absensi_list = await db.absensi_aliyah.find(
+        {"tanggal": tanggal, "jenis": jenis, "siswa_id": {"$in": list(siswa_by_id.keys())}},
+        {"_id": 0},
+    ).to_list(10000)
+
+    status_map = {a["siswa_id"]: a["status"] for a in absensi_list}
+
+    kelas_docs = await db.kelas_aliyah.find({"id": {"$in": kelas_ids}}, {"_id": 0}).to_list(1000)
+    kelas_map = {k["id"]: k["nama"] for k in kelas_docs}
+
+    data = []
+    for siswa in siswa_list:
+        data.append(
+            {
+                "siswa_id": siswa["id"],
+                "nama": siswa["nama"],
+                "nis": siswa.get("nis"),
+                "kelas_id": siswa.get("kelas_id"),
+                "kelas_nama": kelas_map.get(siswa.get("kelas_id"), "-"),
+                "gender": siswa.get("gender"),
+                "status": status_map.get(siswa["id"]),
+            }
+        )
+
+    data.sort(key=lambda x: (x["kelas_nama"], x["nama"]))
+
+    return {"tanggal": tanggal, "jenis": jenis, "data": data}
+
+
+class AliyahAbsensiUpsertRequest(BaseModel):
+    siswa_id: str
+    kelas_id: str
+    tanggal: str
+    jenis: Literal["pagi", "dzuhur"]
+    status: Optional[Literal["hadir", "alfa", "sakit", "izin", "dispensasi", "bolos"]] = None
+
+
+@api_router.post("/aliyah/pengabsen/absensi")
+async def upsert_aliyah_absensi(
+    payload: AliyahAbsensiUpsertRequest,
+    current_pengabsen: dict = Depends(get_current_pengabsen_aliyah),
+):
+    # Pastikan siswa ada dan termasuk kelas yang bisa diakses pengabsen
+    siswa = await db.siswa_aliyah.find_one({"id": payload.siswa_id}, {"_id": 0})
+    if not siswa:
+        raise HTTPException(status_code=404, detail="Siswa tidak ditemukan")
+
+    kelas_ids = current_pengabsen.get("kelas_ids", []) or []
+    if payload.kelas_id not in kelas_ids:
+        raise HTTPException(status_code=403, detail="Tidak boleh mengabsen kelas ini")
+
+    if payload.status is None:
+        # Hapus absensi jika status kosong
+        await db.absensi_aliyah.delete_one(
+            {
+                "siswa_id": payload.siswa_id,
+                "tanggal": payload.tanggal,
+                "jenis": payload.jenis,
+            }
+        )
+        return {"message": "Absensi dihapus"}
+
+    existing = await db.absensi_aliyah.find_one(
+        {
+            "siswa_id": payload.siswa_id,
+            "tanggal": payload.tanggal,
+            "jenis": payload.jenis,
+        },
+        {"_id": 0},
+    )
+
+    now = datetime.now(timezone.utc)
+
+    if existing:
+        await db.absensi_aliyah.update_one(
+            {"id": existing["id"]},
+            {"$set": {"status": payload.status, "kelas_id": payload.kelas_id, "waktu_absen": now}},
+        )
+    else:
+        absensi = AbsensiAliyah(
+            siswa_id=payload.siswa_id,
+            kelas_id=payload.kelas_id,
+            tanggal=payload.tanggal,
+            status=payload.status,
+        )
+        doc = absensi.model_dump()
+        doc["created_at"] = doc["created_at"].isoformat()
+        doc["waktu_absen"] = now.isoformat()
+        await db.absensi_aliyah.insert_one(doc)
+
+    return {"message": "Absensi disimpan"}
+
+
+class AliyahAbsensiScanPayload(BaseModel):
+    id: str
+    type: Optional[str] = None
+
+
+@api_router.post("/aliyah/pengabsen/absensi/scan")
+async def scan_aliyah_absensi(
+    payload: AliyahAbsensiScanPayload,
+    jenis: Literal["pagi", "dzuhur"],
+    current_pengabsen: dict = Depends(get_current_pengabsen_aliyah),
+):
+    siswa: Optional[Dict[str, Any]] = None
+
+    if payload.type == "siswa_aliyah":
+        siswa = await db.siswa_aliyah.find_one({"id": payload.id}, {"_id": 0})
+    else:
+        # Asumsikan QR dari santri, cari siswa_aliyah yang linked dengan santri_id
+        santri = await db.santri.find_one({"id": payload.id}, {"_id": 0})
+        if santri:
+            siswa = await db.siswa_aliyah.find_one({"santri_id": santri["id"]}, {"_id": 0})
+
+    if not siswa:
+        raise HTTPException(status_code=404, detail="Siswa Aliyah tidak ditemukan untuk QR ini")
+
+    kelas_ids = current_pengabsen.get("kelas_ids", []) or []
+    if siswa.get("kelas_id") not in kelas_ids:
+        raise HTTPException(status_code=403, detail="Siswa ini bukan dari kelas yang Anda pegang")
+
+    tanggal = get_today_local_iso()
+
+    existing = await db.absensi_aliyah.find_one(
+        {
+            "siswa_id": siswa["id"],
+            "tanggal": tanggal,
+            "jenis": jenis,
+        },
+        {"_id": 0},
+    )
+
+    now = datetime.now(timezone.utc)
+
+    if existing:
+        await db.absensi_aliyah.update_one(
+            {"id": existing["id"]},
+            {"$set": {"status": "hadir", "kelas_id": siswa.get("kelas_id"), "waktu_absen": now}},
+        )
+    else:
+        absensi = AbsensiAliyah(
+            siswa_id=siswa["id"],
+            kelas_id=siswa.get("kelas_id"),
+            tanggal=tanggal,
+            status="hadir",
+        )
+        doc = absensi.model_dump()
+        doc["created_at"] = doc["created_at"].isoformat()
+        doc["waktu_absen"] = now.isoformat()
+        await db.absensi_aliyah.insert_one(doc)
+
+    return {"message": "Absensi berhasil dicatat"}
+
+
 class MonitoringAliyahUpdate(BaseModel):
     nama: Optional[str] = None
     email_atau_hp: Optional[str] = None
