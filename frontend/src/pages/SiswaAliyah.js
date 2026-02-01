@@ -33,6 +33,9 @@ const SiswaAliyah = () => {
   const [isLinkSantriOpen, setIsLinkSantriOpen] = useState(false);
   const [isLinkToSantriOpen, setIsLinkToSantriOpen] = useState(false);
   const [selectedSiswa, setSelectedSiswa] = useState(null);
+  const [isQrPreviewOpen, setIsQrPreviewOpen] = useState(false);
+  const [qrPreviewUrl, setQrPreviewUrl] = useState('');
+  const [qrPreviewSiswa, setQrPreviewSiswa] = useState(null);
   const [formData, setFormData] = useState({
     nama: '',
     nis: '',
