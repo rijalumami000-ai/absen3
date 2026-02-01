@@ -262,6 +262,18 @@ backend:
           comment: "All backend endpoints tested successfully in previous session. Authentication, asrama, pengabsen, pembimbing endpoints working correctly with proper model structure."
 
 frontend:
+  - task: "Admin Aliyah Pengabsen/Monitoring/Riwayat Pages"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/pages/PengabsenAliyah.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Halaman admin baru untuk Pengabsen Aliyah, Monitoring Aliyah, dan Riwayat Absensi Aliyah telah dibuat dan dihubungkan ke menu 'Absensi Madrasah Aliyah'. Perlu dicek: navigasi sidebar, CRUD, filter riwayat, dan download PDF."
+
   - task: "Admin Dashboard UI/UX Testing"
     implemented: true
     working: true
