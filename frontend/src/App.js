@@ -17,6 +17,7 @@ import Settings from '@/pages/Settings';
 import Kelas from '@/pages/Kelas';
 import MadrasahDiniyah from '@/pages/MadrasahDiniyah';
 import KelasAliyah from '@/pages/KelasAliyah';
+import SiswaAliyah from '@/pages/SiswaAliyah';
 import RiwayatAbsensiMadin from '@/pages/RiwayatAbsensiMadin';
 import PengabsenKelas from '@/pages/PengabsenKelas';
 import AksesDitolak from '@/pages/AksesDitolak';
@@ -349,6 +350,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <MadrasahDiniyah />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/aliyah/siswa"
+        element={
+          <ProtectedRoute>
+            <SiswaAliyah />
           </ProtectedRoute>
         }
       />
