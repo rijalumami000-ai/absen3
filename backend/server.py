@@ -3268,19 +3268,6 @@ async def delete_siswa_aliyah(siswa_id: str, _: dict = Depends(get_current_admin
 
     return {"message": "Siswa Aliyah berhasil dihapus"}
 
-    doc = siswa.model_dump()
-    doc['created_at'] = doc['created_at'].isoformat()
-    doc['updated_at'] = doc['updated_at'].isoformat()
-    await db.siswa_madrasah.insert_one(doc)
-    
-    kelas_nama = None
-    if siswa.kelas_id:
-        kelas = await db.kelas.find_one({"id": siswa.kelas_id}, {"_id": 0})
-        kelas_nama = kelas["nama"] if kelas else None
-    
-    has_qr = bool(siswa.santri_id or siswa.qr_code)
-    
-    return SiswaMadrasahResponse(**siswa.model_dump(), kelas_nama=kelas_nama, has_qr=has_qr)
 
 @api_router.get("/siswa-madrasah/{siswa_id}/qr-code")
 async def get_siswa_madrasah_qr_code(siswa_id: str, _: dict = Depends(get_current_admin)):
