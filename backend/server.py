@@ -2955,6 +2955,16 @@ async def get_kelas_siswa(kelas_id: str, _: dict = Depends(get_current_admin)):
             # Linked to santri, has QR
             has_qr = True
         elif siswa.get("qr_code"):
+            # Standalone with QR
+            has_qr = True
+        
+        result.append(SiswaMadrasahResponse(
+            **siswa,
+            kelas_nama=kelas["nama"],
+            has_qr=has_qr
+        ))
+    
+    return result
 
 
 # ==================== KELAS ALIYAH ENDPOINTS ====================
