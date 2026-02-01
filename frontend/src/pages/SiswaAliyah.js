@@ -94,6 +94,8 @@ const SiswaAliyah = () => {
       if (formData.nis) payload.nis = formData.nis;
       if (formData.gender) payload.gender = formData.gender;
       if (formData.kelas_id) payload.kelas_id = formData.kelas_id;
+      if (formData.wali_nama) payload.wali_nama = formData.wali_nama;
+      if (formData.wali_wa) payload.wali_wa = formData.wali_wa;
 
       await api.put(`/aliyah/siswa/${selectedSiswa.id}`, payload);
       toast.success('Siswa Aliyah berhasil diupdate');
