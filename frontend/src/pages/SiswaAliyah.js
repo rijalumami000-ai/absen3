@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, QrCode, Search, Link, UserPlus, Users, FileDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
+
 import {
   Dialog,
   DialogContent,
@@ -232,15 +234,33 @@ const SiswaAliyah = () => {
           <p className="text-muted-foreground mt-1">Kelola siswa Madrasah Aliyah</p>
         </div>
         <div className="flex gap-4 animate-slide-in-right items-center">
-          <div className="flex gap-3">
-            <div className="px-4 py-2 rounded-xl bg-primary-50 border border-primary-200 shadow-sm">
-              <p className="text-[11px] text-muted-foreground">Total Siswa (sesuai filter)</p>
-              <p className="text-lg font-semibold text-primary-700">{totalFiltered}</p>
-            </div>
-            <div className="px-4 py-2 rounded-xl bg-amber-50 border border-amber-200 shadow-sm">
-              <p className="text-[11px] text-muted-foreground">Belum Ada Kelas</p>
-              <p className="text-lg font-semibold text-amber-700">{totalBelumAdaKelas}</p>
-            </div>
+          <div className="grid grid-cols-2 gap-3">
+            <Card className="card-hover transition-smooth shadow-card hover:shadow-card-hover">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-[11px] text-muted-foreground">Total Siswa (sesuai filter)</p>
+                    <p className="text-2xl font-bold text-foreground">{totalFiltered}</p>
+                  </div>
+                  <div className="bg-blue-50 text-blue-700 p-2 rounded-lg">
+                    <Users className="w-4 h-4" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="card-hover transition-smooth shadow-card hover:shadow-card-hover">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-[11px] text-muted-foreground">Belum Ada Kelas</p>
+                    <p className="text-2xl font-bold text-foreground">{totalBelumAdaKelas}</p>
+                  </div>
+                  <div className="bg-amber-50 text-amber-700 p-2 rounded-lg">
+                    <Users className="w-4 h-4" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
           <Button
             variant="outline"
