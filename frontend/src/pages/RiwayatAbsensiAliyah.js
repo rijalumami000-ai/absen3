@@ -211,7 +211,7 @@ const RiwayatAbsensiAliyah = () => {
                 variant="outline"
                 size="sm"
                 onClick={() =>
-                  downloadRiwayatAbsensiMadinPDF(detail, {
+                  downloadRiwayatAbsensiAliyahPDF(detail, {
                     periodeLabel: getPeriodeLabel(),
                     tanggalStart,
                     tanggalEnd,
