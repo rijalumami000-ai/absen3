@@ -178,6 +178,42 @@ const PembimbingKelasProtectedRoute = ({ children }) => {
   return children;
 };
 
+const PengabsenAliyahProtectedRoute = ({ children }) => {
+  const { user, loading } = usePengabsenAliyahAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-gray-500">Memuat...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/pengabsen-aliyah-app/login" replace />;
+  }
+
+  return children;
+};
+
+const MonitoringAliyahProtectedRoute = ({ children }) => {
+  const { user, loading } = useMonitoringAliyahAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-gray-500">Memuat...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/monitoring-aliyah-app/login" replace />;
+  }
+
+  return children;
+};
+
 function AppRoutes() {
   return (
     <Routes>
