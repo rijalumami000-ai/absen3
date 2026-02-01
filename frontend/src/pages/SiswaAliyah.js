@@ -69,6 +69,8 @@ const SiswaAliyah = () => {
       if (!payload.santri_id) delete payload.santri_id;
       if (!payload.kelas_id) delete payload.kelas_id;
       if (!payload.nis) delete payload.nis;
+      if (!payload.wali_nama) delete payload.wali_nama;
+      if (!payload.wali_wa) delete payload.wali_wa;
 
       await api.post('/aliyah/siswa', payload);
       toast.success('Siswa Aliyah berhasil ditambahkan');
