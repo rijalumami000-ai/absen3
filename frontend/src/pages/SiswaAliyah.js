@@ -231,7 +231,17 @@ const SiswaAliyah = () => {
           <h1 className="text-3xl font-display font-bold text-foreground">Siswa Aliyah</h1>
           <p className="text-muted-foreground mt-1">Kelola siswa Madrasah Aliyah</p>
         </div>
-        <div className="flex gap-2 animate-slide-in-right">
+        <div className="flex gap-4 animate-slide-in-right items-center">
+          <div className="flex gap-3">
+            <div className="px-4 py-2 rounded-xl bg-primary-50 border border-primary-200 shadow-sm">
+              <p className="text-[11px] text-muted-foreground">Total Siswa (sesuai filter)</p>
+              <p className="text-lg font-semibold text-primary-700">{totalFiltered}</p>
+            </div>
+            <div className="px-4 py-2 rounded-xl bg-amber-50 border border-amber-200 shadow-sm">
+              <p className="text-[11px] text-muted-foreground">Belum Ada Kelas</p>
+              <p className="text-lg font-semibold text-amber-700">{totalBelumAdaKelas}</p>
+            </div>
+          </div>
           <Button
             variant="outline"
             onClick={() => downloadSiswaAliyahPDF(filteredSiswa, kelasList)}
