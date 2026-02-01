@@ -141,6 +141,8 @@ const SiswaAliyah = () => {
       gender: siswa.gender,
       kelas_id: siswa.kelas_id || '',
       santri_id: '',
+      wali_nama: siswa.wali_nama || '',
+      wali_wa: siswa.wali_wa || '',
     });
     setIsEditOpen(true);
   };
