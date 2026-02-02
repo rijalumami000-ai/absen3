@@ -170,6 +170,7 @@ const RiwayatAbsensiAliyah = () => {
       };
       if (filterKelas !== 'all') params.kelas_id = filterKelas;
       if (filterGender !== 'all') params.gender = filterGender;
+      if (filterJenis !== 'all') params.jenis = filterJenis;
 
       const res = await api.get('/aliyah/absensi/riwayat', { params });
       setSummary(res.data.summary);
