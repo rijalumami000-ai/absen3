@@ -4569,6 +4569,12 @@ async def create_pengabsen_kelas(data: PengabsenKelasCreate, _: dict = Depends(g
         **data.model_dump(),
         kode_akses=generate_kode_akses()
     )
+    
+    doc = pengabsen.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    await db.pengabsen_kelas.insert_one(doc)
+    
+    return PengabsenKelasResponse(**pengabsen.model_dump())
 
 
 # ==================== PENGABSEN ALIYAH PWA RIWAYAT ====================
