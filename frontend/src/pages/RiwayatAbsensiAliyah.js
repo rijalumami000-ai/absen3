@@ -27,6 +27,10 @@ const RiwayatAbsensiAliyah = () => {
   const [summary, setSummary] = useState(null);
   const [detail, setDetail] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filterJenis, setFilterJenis] = useState('all'); // 'all' | 'pagi' | 'dzuhur'
+
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(30);
 
   const getPeriodeLabel = () => {
     switch (filterPeriode) {
