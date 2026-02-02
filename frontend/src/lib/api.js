@@ -98,6 +98,16 @@ const getPembimbingAuthHeader = () => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
+const getPengabsenAliyahAuthHeader = () => {
+  const token = localStorage.getItem('pengabsen_aliyah_token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
+const getMonitoringAliyahAuthHeader = () => {
+  const token = localStorage.getItem('monitoring_aliyah_token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
 // API khusus PWA Pengabsen
 export const pengabsenAppAPI = {
   login: (username, kode_akses) =>
@@ -208,20 +218,20 @@ export const settingsAPI = {
 export const pengabsenAliyahAppAPI = {
   login: (username, kode_akses) =>
     axios.post(`${API}/aliyah/pengabsen/login`, { username, kode_akses }),
-  me: () => axios.get(`${API}/aliyah/pengabsen/me`, { headers: getAuthHeader() }),
+  me: () => axios.get(`${API}/aliyah/pengabsen/me`, { headers: getPengabsenAliyahAuthHeader() }),
   absensiHariIni: (params) =>
     axios.get(`${API}/aliyah/pengabsen/absensi-hari-ini`, {
       params,
-      headers: getAuthHeader(),
+      headers: getPengabsenAliyahAuthHeader(),
     }),
   upsertAbsensi: (data) =>
     axios.post(`${API}/aliyah/pengabsen/absensi`, data, {
-      headers: getAuthHeader(),
+      headers: getPengabsenAliyahAuthHeader(),
     }),
   scanAbsensi: (data, params) =>
     axios.post(`${API}/aliyah/pengabsen/absensi/scan`, data, {
       params,
-      headers: getAuthHeader(),
+      headers: getPengabsenAliyahAuthHeader(),
     }),
 };
 
@@ -229,16 +239,16 @@ export const pengabsenAliyahAppAPI = {
 export const monitoringAliyahAppAPI = {
   login: (username, kode_akses) =>
     axios.post(`${API}/aliyah/monitoring/login`, { username, kode_akses }),
-  me: () => axios.get(`${API}/aliyah/monitoring/me`, { headers: getAuthHeader() }),
+  me: () => axios.get(`${API}/aliyah/monitoring/me`, { headers: getMonitoringAliyahAuthHeader() }),
   absensiHariIni: (params) =>
     axios.get(`${API}/aliyah/monitoring/absensi-hari-ini`, {
       params,
-      headers: getAuthHeader(),
+      headers: getMonitoringAliyahAuthHeader(),
     }),
   absensiRiwayat: (params) =>
     axios.get(`${API}/aliyah/monitoring/absensi-riwayat`, {
       params,
-      headers: getAuthHeader(),
+      headers: getMonitoringAliyahAuthHeader(),
     }),
 };
 
