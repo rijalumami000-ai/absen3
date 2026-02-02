@@ -476,6 +476,14 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/aliyah/setting-aplikasi"
+        element={
+          <ProtectedRoute>
+            <SettingAplikasiAliyah />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/pengabsen-kelas"
         element={
           <ProtectedRoute>
