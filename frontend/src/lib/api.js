@@ -233,6 +233,11 @@ export const pengabsenAliyahAppAPI = {
       params,
       headers: getPengabsenAliyahAuthHeader(),
     }),
+  riwayat: (params) =>
+    axios.get(`${API}/aliyah/pengabsen/riwayat`, {
+      params,
+      headers: getPengabsenAliyahAuthHeader(),
+    }),
 };
 
 // PWA Monitoring Aliyah API
