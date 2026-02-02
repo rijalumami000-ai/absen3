@@ -1284,6 +1284,113 @@ async def sync_wali_santri():
 
 async def fetch_prayer_times(date: str) -> Optional[dict]:
     try:
+
+# ==================== DAILY WHATSAPP REPORT ENDPOINT ====================
+
+@api_router.post("/notifications/whatsapp/daily-report", dependencies=[Depends(get_current_admin)])
+async def trigger_daily_whatsapp_report(tanggal: Optional[str] = None):
+    """Bangun rekap absensi sholat per wali untuk 1 hari dan kirim ke WA Bot service.
+
+    Endpoint ini TIDAK mengirim WhatsApp langsung, hanya memanggil service bot eksternal
+    melalui WHATSAPP_BOT_URL (kalau diset). Kalau tidak diset, hanya mengembalikan
+    payload yang akan dikirim, supaya mudah dites.
+    """
+    if not tanggal:
+        tanggal = get_today_local_iso()
+
+    # Ambil semua absensi sholat (koleksi 'absensi') pada tanggal tsb
+    absensi_list = await db.absensi.find({"tanggal": tanggal}, {"_id": 0}).to_list(100000)
+    if not absensi_list:
+        return {"tanggal": tanggal, "reports": [], "message": "Tidak ada data absensi untuk tanggal ini"}
+
+    # Ambil semua santri yang muncul di absensi
+    santri_ids = list({a["santri_id"] for a in absensi_list if a.get("santri_id")})
+    santri_docs = await db.santri.find({"id": {"$in": santri_ids}}, {"_id": 0}).to_list(len(santri_ids))
+    santri_map = {s["id"]: s for s in santri_docs}
+
+    # Ambil kelas untuk info nama kelas
+    asrama_ids = list({s["asrama_id"] for s in santri_docs if s.get("asrama_id")})
+    asrama_docs = await db.asrama.find({"id": {"$in": asrama_ids}}, {"_id": 0}).to_list(len(asrama_ids))
+    asrama_map = {a["id"]: a["nama"] for a in asrama_docs}
+
+    # Group per wali -> per anak -> per waktu sholat
+    per_wali: Dict[str, Dict[str, Any]] = {}
+
+    for rec in absensi_list:
+        santri = santri_map.get(rec["santri_id"])
+        if not santri:
+            continue
+
+        wali_nomor = santri.get("nomor_hp_wali")
+        wali_nama = santri.get("nama_wali")
+        if not wali_nomor:
+            continue
+
+        wali_key = wali_nomor
+        if wali_key not in per_wali:
+            per_wali[wali_key] = {
+                "wali_nama": wali_nama or "Wali Santri",
+                "wali_nomor": wali_nomor,
+                "anak": {},
+            }
+
+        anak_key = santri["id"]
+        if anak_key not in per_wali[wali_key]["anak"]:
+            per_wali[wali_key]["anak"][anak_key] = {
+                "nama": santri["nama"],
+                "kelas": asrama_map.get(santri.get("asrama_id"), "-"),
+                "subuh": "-",
+                "dzuhur": "-",
+                "ashar": "-",
+                "maghrib": "-",
+                "isya": "-",
+            }
+
+        waktu = rec.get("waktu_sholat")
+        status = rec.get("status")
+        if waktu in ["subuh", "dzuhur", "ashar", "maghrib", "isya"] and status:
+            per_wali[wali_key]["anak"][anak_key][waktu] = status
+
+    reports: List[DailyWaliReport] = []
+    for wali in per_wali.values():
+        anak_items = [
+            DailyWaliReportAnak(**anak) for anak in wali["anak"].values()
+        ]
+        reports.append(
+            DailyWaliReport(
+                wali_nama=wali["wali_nama"],
+                wali_nomor=wali["wali_nomor"],
+                tanggal=tanggal,
+                anak=anak_items,
+            )
+        )
+
+    batch = DailyWaliReportBatch(tanggal=tanggal, reports=reports)
+
+    # Kalau env WA bot tidak diset, hanya kembalikan payload (untuk debugging)
+    if not WHATSAPP_BOT_URL:
+        return {"whatsapp_bot_url": None, "payload": batch.model_dump()}
+
+    # Kirim ke WA Bot service via HTTP POST
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(WHATSAPP_BOT_URL, json=batch.model_dump()) as resp:
+                text = await resp.text()
+                return {
+                    "whatsapp_bot_url": WHATSAPP_BOT_URL,
+                    "status_code": resp.status,
+                    "response_text": text,
+                    "payload_count": len(reports),
+                }
+    except Exception as e:
+        logging.error(f"Gagal mengirim ke WhatsApp Bot: {e}")
+        return {
+            "whatsapp_bot_url": WHATSAPP_BOT_URL,
+            "error": str(e),
+            "payload": batch.model_dump(),
+        }
+
+
         url = "http://api.aladhan.com/v1/timingsByAddress"
         params = {
             "address": "Desa Cintamulya, Candipuro, Lampung Selatan, Lampung, Indonesia",
