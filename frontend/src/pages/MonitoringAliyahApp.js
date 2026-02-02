@@ -29,6 +29,8 @@ const MonitoringAliyahApp = () => {
   const [historyStart, setHistoryStart] = useState(getTodayLocalYMD());
   const [historyEnd, setHistoryEnd] = useState(getTodayLocalYMD());
   const [historyItems, setHistoryItems] = useState([]);
+  const [collapsedGroups, setCollapsedGroups] = useState({});
+
   const [loadingHistory, setLoadingHistory] = useState(false);
   const navigate = useNavigate();
 

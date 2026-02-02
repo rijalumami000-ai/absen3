@@ -43,6 +43,8 @@ const PengabsenAliyahApp = () => {
   const [historyItems, setHistoryItems] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [kelasList, setKelasList] = useState([]);
+  const [collapsedGroups, setCollapsedGroups] = useState({});
+
 
   const { toast } = useToast();
   const navigate = useNavigate();
