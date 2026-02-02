@@ -178,9 +178,9 @@ const Layout = ({ children }) => {
                       onClick={handleClick}
                       className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 group relative overflow-hidden hover-lift ${
                         isActive
-                          ? 'bg-primary-700 text-white shadow-lg'
+                          ? 'bg-primary-800 text-white shadow-lg ring-1 ring-primary-500'
                           : isAllowed
-                            ? 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                            ? 'text-muted-foreground hover:bg-primary-50 hover:text-primary-700'
                             : 'text-muted-foreground opacity-60 cursor-not-allowed'
                       }`}
                     >
