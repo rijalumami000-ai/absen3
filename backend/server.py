@@ -4563,6 +4563,96 @@ async def create_pengabsen_kelas(data: PengabsenKelasCreate, _: dict = Depends(g
         **data.model_dump(),
         kode_akses=generate_kode_akses()
     )
+
+
+# ==================== PENGABSEN ALIYAH PWA RIWAYAT ====================
+
+@api_router.get("/aliyah/pengabsen/riwayat")
+async def get_aliyah_pengabsen_riwayat(
+    jenis: Literal["pagi", "dzuhur"],
+    tanggal_start: str,
+    tanggal_end: Optional[str] = None,
+    current_pengabsen: dict = Depends(get_current_pengabsen_aliyah),
+):
+    if not tanggal_end:
+        tanggal_end = tanggal_start
+
+    kelas_ids = current_pengabsen.get("kelas_ids", []) or []
+    if not kelas_ids:
+        return {"summary": {"hadir": 0, "alfa": 0, "sakit": 0, "izin": 0, "dispensasi": 0, "bolos": 0}, "detail": []}
+
+    query = {
+        "tanggal": {"$gte": tanggal_start, "$lte": tanggal_end},
+        "jenis": jenis,
+        "kelas_id": {"$in": kelas_ids},
+    }
+
+    absensi_list = await db.absensi_aliyah.find(query, {"_id": 0}).to_list(20000)
+
+    if not absensi_list:
+        return {
+            "summary": {"hadir": 0, "alfa": 0, "sakit": 0, "izin": 0, "dispensasi": 0, "bolos": 0},
+            "detail": [],
+        }
+
+    # Dedup per siswa/tanggal/jenis
+    dedup_map: Dict[tuple, Dict[str, Any]] = {}
+    for a in absensi_list:
+        key = (a.get("siswa_id"), a.get("tanggal"), a.get("jenis"))
+        current_best = dedup_map.get(key)
+
+        wa = a.get("waktu_absen")
+        ca = a.get("created_at")
+        ts = wa or ca or ""
+
+        if current_best is None:
+            dedup_map[key] = a
+        else:
+            wa_best = current_best.get("waktu_absen")
+            ca_best = current_best.get("created_at")
+            ts_best = wa_best or ca_best or ""
+            if ts > ts_best:
+                dedup_map[key] = a
+
+    absensi_list = list(dedup_map.values())
+
+    siswa_ids = list({a["siswa_id"] for a in absensi_list})
+    siswa_list = await db.siswa_aliyah.find({"id": {"$in": siswa_ids}}, {"_id": 0}).to_list(10000)
+    siswa_map = {s["id"]: s for s in siswa_list}
+
+    kelas_docs = await db.kelas_aliyah.find({"id": {"$in": kelas_ids}}, {"_id": 0}).to_list(1000)
+    kelas_map = {k["id"]: k["nama"] for k in kelas_docs}
+
+    summary = {"hadir": 0, "alfa": 0, "sakit": 0, "izin": 0, "dispensasi": 0, "bolos": 0}
+    detail: List[Dict[str, Any]] = []
+
+    for a in absensi_list:
+        status = a.get("status", "")
+        if status in summary:
+            summary[status] += 1
+
+        siswa = siswa_map.get(a["siswa_id"])
+        kelas_nama = kelas_map.get(a.get("kelas_id"), "-")
+
+        row = {
+            "id": a.get("id"),
+            "siswa_id": a.get("siswa_id"),
+            "siswa_nama": siswa.get("nama") if siswa else "Unknown",
+            "kelas_id": a.get("kelas_id"),
+            "kelas_nama": kelas_nama,
+            "tanggal": a.get("tanggal"),
+            "status": status,
+            "gender": siswa.get("gender") if siswa else None,
+            "waktu_absen": a.get("waktu_absen"),
+        }
+        detail.append(row)
+
+    # Urutkan agar rapih
+    detail.sort(key=lambda x: (x["tanggal"], x["kelas_nama"], x["siswa_nama"]))
+
+    return {"summary": summary, "detail": detail}
+
+
     
     doc = pengabsen.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
