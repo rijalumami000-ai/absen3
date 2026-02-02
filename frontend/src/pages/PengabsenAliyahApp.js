@@ -143,7 +143,7 @@ const PengabsenAliyahApp = () => {
       <header className="bg-white shadow-sm px-4 py-3 flex items-center justify-between">
         <div>
           <h1 className="text-lg font-semibold text-gray-800">
-            {appSettings.pengabsen_kelas_title || 'Pengabsen Madrasah Aliyah'}
+            {appSettings.pengabsen_aliyah_title || 'Pengabsen Kelas Aliyah'}
           </h1>
           <p className="text-xs text-gray-500">{user.nama} (@{user.username})</p>
         </div>

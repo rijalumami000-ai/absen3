@@ -113,9 +113,10 @@ const Layout = ({ children }) => {
       label: 'Absensi Madrasah Aliyah',
       allowedRoles: ['superadmin', 'aliyah'],
       items: [
-        { path: '/aliyah/pengabsen', icon: ClipboardCheck, label: 'Pengabsen Aliyah' },
-        { path: '/aliyah/monitoring', icon: Eye, label: 'Monitoring Aliyah' },
+        { path: '/aliyah/pengabsen', icon: ClipboardCheck, label: 'Pengabsen Kelas Aliyah' },
+        { path: '/aliyah/monitoring', icon: Eye, label: 'Monitoring Kelas Aliyah' },
         { path: '/aliyah/riwayat', icon: ClipboardList, label: 'Riwayat Absensi Aliyah' },
+        { path: '/aliyah/setting-aplikasi', icon: Settings, label: 'Setting Aplikasi' },
       ],
     },
     { 
