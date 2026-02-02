@@ -20,12 +20,12 @@ const Dashboard = () => {
     try {
       const today = new Date().toISOString().split('T')[0];
       const [statsRes, santriRes, siswaMadinRes, siswaAliyahRes] = await Promise.all([
-        absensiAPI.getStats(today),
+        absensiAPI.getStats({ tanggal_start: today, tanggal_end: today }),
         santriAPI.getAll({}),
         api.get('/siswa-madrasah'),
-        api.get('/siswa-aliyah'),
+        api.get('/aliyah/siswa'),
       ]);
-      
+
       setStats(statsRes.data);
       setTotalSantri(santriRes.data.length);
       setTotalSiswaMadin(siswaMadinRes.data.length || 0);
