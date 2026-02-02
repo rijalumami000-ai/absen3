@@ -329,37 +329,46 @@ const PengabsenAliyahApp = () => {
               <div className="mt-4">
                 {loadingData ? (
                   <div className="text-center text-xs text-gray-500 py-4">Memuat data...</div>
-                ) : filteredData.length === 0 ? (
+                ) : groupedData.length === 0 ? (
                   <div className="text-center text-xs text-gray-500 py-4">Tidak ada data siswa</div>
                 ) : (
-                  <div className="space-y-2 max-h-[420px] overflow-y-auto">
-                    {filteredData.map((row) => (
-                      <div
-                        key={row.siswa_id}
-                        className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-lg px-3 py-2"
-                      >
-                        <div>
-                          <p className="text-sm font-medium text-gray-800">{row.nama}</p>
-                          <p className="text-xs text-gray-500">
-                            {row.kelas_nama} • {row.gender === 'putra' ? 'Laki-laki' : row.gender === 'putri' ? 'Perempuan' : '-'}
-                          </p>
+                  <div className="space-y-4 max-h-[420px] overflow-y-auto">
+                    {groupedData.map((group) => (
+                      <div key={group.kelas_id || group.kelas_nama}>
+                        <div className="text-xs font-semibold text-slate-700 mb-2">
+                          {group.kelas_nama || 'Tanpa Kelas'}
                         </div>
-                        <div className="w-32">
-                          <Select
-                            value={row.status || 'null'}
-                            onValueChange={(val) => handleStatusChange(row.siswa_id, row.kelas_id, val)}
-                          >
-                            <SelectTrigger className="h-8 text-xs">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {STATUS_OPTIONS.map((opt) => (
-                                <SelectItem key={opt.value} value={opt.value} className="text-xs">
-                                  {opt.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                        <div className="space-y-2">
+                          {group.items.map((row) => (
+                            <div
+                              key={row.siswa_id}
+                              className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-lg px-3 py-2"
+                            >
+                              <div>
+                                <p className="text-sm font-medium text-gray-800">{row.nama}</p>
+                                <p className="text-xs text-gray-500">
+                                  {row.kelas_nama} • {row.gender === 'putra' ? 'Laki-laki' : row.gender === 'putri' ? 'Perempuan' : '-'}
+                                </p>
+                              </div>
+                              <div className="w-32">
+                                <Select
+                                  value={row.status || 'null'}
+                                  onValueChange={(val) => handleStatusChange(row.siswa_id, row.kelas_id, val)}
+                                >
+                                  <SelectTrigger className="h-8 text-xs">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {STATUS_OPTIONS.map((opt) => (
+                                      <SelectItem key={opt.value} value={opt.value} className="text-xs">
+                                        {opt.label}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     ))}
