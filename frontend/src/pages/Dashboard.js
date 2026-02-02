@@ -65,12 +65,11 @@ const Dashboard = () => {
       bgColor: 'bg-emerald-50',
     },
     {
-      title: 'Kartu 3',
-      value: '-',
+      title: 'Total Siswa Madrasah Aliyah',
+      value: totalSiswaAliyah,
       icon: Users,
-      color: 'text-gray-500',
-      bgColor: 'bg-gray-50',
-      subtitle: 'Belum digunakan',
+      color: 'text-indigo-600',
+      bgColor: 'bg-indigo-50',
     },
     {
       title: 'Kartu 4',
