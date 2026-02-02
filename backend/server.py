@@ -3174,6 +3174,8 @@ class AppSettings(BaseModel):
     pembimbing_title: str = Field(default="Monitoring Sholat Ponpes Al-Hamid")
     pengabsen_kelas_title: str = Field(default="Pengabsen Kelas Madin")
     monitoring_kelas_title: str = Field(default="Monitoring Kelas Madin")
+    pengabsen_aliyah_title: str = Field(default="Pengabsen Kelas Aliyah")
+    monitoring_aliyah_title: str = Field(default="Monitoring Kelas Aliyah")
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class AppSettingsUpdate(BaseModel):
@@ -3183,6 +3185,8 @@ class AppSettingsUpdate(BaseModel):
     pembimbing_title: Optional[str] = None
     pengabsen_kelas_title: Optional[str] = None
     monitoring_kelas_title: Optional[str] = None
+    pengabsen_aliyah_title: Optional[str] = None
+    monitoring_aliyah_title: Optional[str] = None
 
 
 @api_router.get("/settings/wali-notifikasi")
@@ -3238,6 +3242,8 @@ async def get_app_settings():
         "pembimbing_title": settings.get("pembimbing_title", "Monitoring Sholat Ponpes Al-Hamid"),
         "pengabsen_kelas_title": settings.get("pengabsen_kelas_title", "Pengabsen Kelas Madin"),
         "monitoring_kelas_title": settings.get("monitoring_kelas_title", "Monitoring Kelas Madin"),
+        "pengabsen_aliyah_title": settings.get("pengabsen_aliyah_title", "Pengabsen Kelas Aliyah"),
+        "monitoring_aliyah_title": settings.get("monitoring_aliyah_title", "Monitoring Kelas Aliyah"),
         "updated_at": settings.get("updated_at", datetime.now(timezone.utc).isoformat())
     }
 
