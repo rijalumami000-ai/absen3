@@ -3316,10 +3316,11 @@ async def initialize_admin():
 
     Endpoint ini aman dipanggil berulang kali (idempotent). Ia akan:
     - Memastikan akun lama `admin/admin123` tetap ada sebagai superadmin.
-    - Membuat / mengupdate 3 akun baru sesuai permintaan:
+    - Membuat / mengupdate 4 akun baru utama:
       * alhamidcintamulya / alhamidku123 -> superadmin
       * alhamid / alhamidku123 -> pesantren
       * madin / madinku123 -> madin
+      * aliyah / aliyah123 -> aliyah (khusus modul Madrasah Aliyah)
     """
     # Pastikan akun default lama tetap ada, tapi jangan paksa ganti password jika sudah diubah
     existing_default = await db.admins.find_one({"username": "admin"})
@@ -3355,6 +3356,12 @@ async def initialize_admin():
         nama="Admin Madrasah Diniyah",
         password="madinku123",
         role="madin",
+    )
+    await ensure_admin_account(
+        username="aliyah",
+        nama="Admin Madrasah Aliyah",
+        password="aliyah123",
+        role="aliyah",
     )
 
     return {"message": "Akun-akun admin berhasil diinisialisasi"}
