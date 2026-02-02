@@ -859,6 +859,7 @@ async def upsert_aliyah_absensi(
             siswa_id=payload.siswa_id,
             kelas_id=payload.kelas_id,
             tanggal=payload.tanggal,
+            jenis=payload.jenis,
             status=payload.status,
         )
         doc = absensi.model_dump()
@@ -920,6 +921,7 @@ async def scan_aliyah_absensi(
             siswa_id=siswa["id"],
             kelas_id=siswa.get("kelas_id"),
             tanggal=tanggal,
+            jenis=jenis,
             status="hadir",
         )
         doc = absensi.model_dump()
@@ -953,6 +955,7 @@ class AbsensiAliyah(BaseModel):
     siswa_id: str
     kelas_id: str
     tanggal: str  # YYYY-MM-DD
+    jenis: Literal["pagi", "dzuhur"]
     status: Literal["hadir", "alfa", "sakit", "izin", "dispensasi", "bolos"]
     waktu_absen: Optional[datetime] = Field(default_factory=lambda: datetime.now(timezone.utc))
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
