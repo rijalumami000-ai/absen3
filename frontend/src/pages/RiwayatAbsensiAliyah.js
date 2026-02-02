@@ -28,6 +28,7 @@ const RiwayatAbsensiAliyah = () => {
   const [detail, setDetail] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterJenis, setFilterJenis] = useState('all'); // 'all' | 'pagi' | 'dzuhur'
+  const [filterStatus, setFilterStatus] = useState(null); // null = semua status, selain itu = filter per status
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(30);
@@ -82,6 +83,7 @@ const RiwayatAbsensiAliyah = () => {
 
   useEffect(() => {
     loadData();
+    setPage(1);
   }, [filterKelas, filterGender, tanggalStart, tanggalEnd, filterJenis]);
 
   const calculateDateRange = () => {
@@ -181,6 +183,12 @@ const RiwayatAbsensiAliyah = () => {
       setLoading(false);
     }
   };
+
+  const handleStatusCardClick = (statusKey) => {
+    setFilterStatus((prev) => (prev === statusKey ? null : statusKey));
+    setPage(1);
+  };
+
 
   const statusCards = [
     { key: 'hadir', label: 'Hadir', icon: CheckCircle, color: 'text-green-700', bg: 'bg-green-50' },
