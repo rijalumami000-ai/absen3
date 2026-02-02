@@ -485,6 +485,14 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/aliyah/setting-jam-pagi"
+        element={
+          <ProtectedRoute>
+            <SettingJamPagiAliyah />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/pengabsen-kelas"
         element={
           <ProtectedRoute>
