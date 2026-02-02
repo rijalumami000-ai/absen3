@@ -1895,6 +1895,425 @@ class AbsensiSholatTester:
         
         return all_success
     
+    def test_pwa_aliyah_full_flow(self) -> bool:
+        """Test complete PWA Pengabsen & Monitoring Aliyah flow as requested"""
+        from datetime import datetime, timezone, timedelta
+        
+        # Use WIB timezone (UTC+7) for today's date
+        wib_tz = timezone(timedelta(hours=7))
+        today = datetime.now(wib_tz).date().isoformat()
+        
+        all_success = True
+        test_data = {
+            "kelas_aliyah_id": None,
+            "siswa_aliyah_id": None,
+            "pengabsen_aliyah_id": None,
+            "monitoring_aliyah_id": None,
+            "pengabsen_token": None,
+            "monitoring_token": None
+        }
+        
+        print(f"\n🔍 Testing PWA Aliyah Full Flow for date: {today}")
+        
+        # Step 1: Ensure basic data exists
+        try:
+            # 1.1: Check/Create kelas_aliyah
+            kelas_response = requests.get(
+                f"{self.base_url}/aliyah/kelas",
+                headers=self.headers,
+                timeout=30
+            )
+            
+            if kelas_response.status_code == 200:
+                kelas_list = kelas_response.json()
+                if kelas_list:
+                    test_data["kelas_aliyah_id"] = kelas_list[0]["id"]
+                    self.log_test("1.1 Get Kelas Aliyah", True, f"Using existing kelas: {kelas_list[0]['nama']}")
+                else:
+                    # Create kelas_aliyah
+                    kelas_data = {
+                        "nama": "XII IPA Test Flow",
+                        "tingkat": "XII"
+                    }
+                    
+                    create_kelas_response = requests.post(
+                        f"{self.base_url}/aliyah/kelas",
+                        json=kelas_data,
+                        headers=self.headers,
+                        timeout=30
+                    )
+                    
+                    if create_kelas_response.status_code == 200:
+                        created_kelas = create_kelas_response.json()
+                        test_data["kelas_aliyah_id"] = created_kelas["id"]
+                        self.log_test("1.1 Create Kelas Aliyah", True, f"Created kelas: {created_kelas['nama']}")
+                    else:
+                        self.log_test("1.1 Create Kelas Aliyah", False, f"Failed to create kelas", create_kelas_response.json())
+                        return False
+            else:
+                self.log_test("1.1 Get Kelas Aliyah", False, f"Failed to get kelas list", kelas_response.json())
+                return False
+            
+            # 1.2: Check/Create siswa_aliyah
+            siswa_response = requests.get(
+                f"{self.base_url}/aliyah/siswa",
+                params={"kelas_id": test_data["kelas_aliyah_id"]},
+                headers=self.headers,
+                timeout=30
+            )
+            
+            if siswa_response.status_code == 200:
+                siswa_list = siswa_response.json()
+                if siswa_list:
+                    test_data["siswa_aliyah_id"] = siswa_list[0]["id"]
+                    self.log_test("1.2 Get Siswa Aliyah", True, f"Using existing siswa: {siswa_list[0]['nama']}")
+                else:
+                    # Create siswa_aliyah
+                    siswa_data = {
+                        "nama": "Ahmad Test Siswa Aliyah",
+                        "nis": f"TEST{datetime.now().strftime('%H%M%S')}",
+                        "gender": "putra",
+                        "kelas_id": test_data["kelas_aliyah_id"]
+                    }
+                    
+                    create_siswa_response = requests.post(
+                        f"{self.base_url}/aliyah/siswa",
+                        json=siswa_data,
+                        headers=self.headers,
+                        timeout=30
+                    )
+                    
+                    if create_siswa_response.status_code == 200:
+                        created_siswa = create_siswa_response.json()
+                        test_data["siswa_aliyah_id"] = created_siswa["id"]
+                        self.log_test("1.2 Create Siswa Aliyah", True, f"Created siswa: {created_siswa['nama']}")
+                    else:
+                        self.log_test("1.2 Create Siswa Aliyah", False, f"Failed to create siswa", create_siswa_response.json())
+                        return False
+            else:
+                self.log_test("1.2 Get Siswa Aliyah", False, f"Failed to get siswa list", siswa_response.json())
+                return False
+            
+            # 1.3: Create Pengabsen Aliyah account
+            pengabsen_data = {
+                "nama": "Pengabsen Test Flow",
+                "email_atau_hp": "pengabsen.test@flow.com",
+                "username": f"pengabsen_flow_{datetime.now().strftime('%H%M%S')}",
+                "kelas_ids": [test_data["kelas_aliyah_id"]]
+            }
+            
+            create_pengabsen_response = requests.post(
+                f"{self.base_url}/aliyah/pengabsen",
+                json=pengabsen_data,
+                headers=self.headers,
+                timeout=30
+            )
+            
+            if create_pengabsen_response.status_code == 200:
+                created_pengabsen = create_pengabsen_response.json()
+                test_data["pengabsen_aliyah_id"] = created_pengabsen["id"]
+                test_data["pengabsen_username"] = created_pengabsen["username"]
+                test_data["pengabsen_kode"] = created_pengabsen["kode_akses"]
+                self.log_test("1.3 Create Pengabsen Aliyah", True, f"Created pengabsen: {created_pengabsen['nama']} (kode: {created_pengabsen['kode_akses']})")
+            else:
+                self.log_test("1.3 Create Pengabsen Aliyah", False, f"Failed to create pengabsen", create_pengabsen_response.json())
+                return False
+            
+            # 1.4: Create Monitoring Aliyah account
+            monitoring_data = {
+                "nama": "Monitoring Test Flow",
+                "email_atau_hp": "monitoring.test@flow.com",
+                "username": f"monitoring_flow_{datetime.now().strftime('%H%M%S')}",
+                "kelas_ids": [test_data["kelas_aliyah_id"]]
+            }
+            
+            create_monitoring_response = requests.post(
+                f"{self.base_url}/aliyah/monitoring",
+                json=monitoring_data,
+                headers=self.headers,
+                timeout=30
+            )
+            
+            if create_monitoring_response.status_code == 200:
+                created_monitoring = create_monitoring_response.json()
+                test_data["monitoring_aliyah_id"] = created_monitoring["id"]
+                test_data["monitoring_username"] = created_monitoring["username"]
+                test_data["monitoring_kode"] = created_monitoring["kode_akses"]
+                self.log_test("1.4 Create Monitoring Aliyah", True, f"Created monitoring: {created_monitoring['nama']} (kode: {created_monitoring['kode_akses']})")
+            else:
+                self.log_test("1.4 Create Monitoring Aliyah", False, f"Failed to create monitoring", create_monitoring_response.json())
+                return False
+                
+        except Exception as e:
+            self.log_test("Step 1: Basic Data Setup", False, f"Error in basic data setup: {str(e)}")
+            return False
+        
+        # Step 2: Simulate PWA Pengabsen Aliyah flow
+        try:
+            # 2.1: Login pengabsen aliyah
+            pengabsen_login_data = {
+                "username": test_data["pengabsen_username"],
+                "kode_akses": test_data["pengabsen_kode"]
+            }
+            
+            pengabsen_login_response = requests.post(
+                f"{self.base_url}/aliyah/pengabsen/login",
+                json=pengabsen_login_data,
+                timeout=30
+            )
+            
+            if pengabsen_login_response.status_code == 200:
+                login_data = pengabsen_login_response.json()
+                test_data["pengabsen_token"] = login_data.get("access_token")
+                pengabsen_headers = {"Authorization": f"Bearer {test_data['pengabsen_token']}"}
+                self.log_test("2.1 Login Pengabsen Aliyah", True, f"Successfully logged in as {test_data['pengabsen_username']}")
+            else:
+                self.log_test("2.1 Login Pengabsen Aliyah", False, f"Login failed", pengabsen_login_response.json())
+                return False
+            
+            # 2.2: Get absensi-hari-ini (before creating absensi)
+            absensi_hari_ini_url = f"{self.base_url}/aliyah/pengabsen/absensi-hari-ini"
+            absensi_params = {"jenis": "pagi", "tanggal": today}
+            
+            before_absensi_response = requests.get(
+                absensi_hari_ini_url,
+                params=absensi_params,
+                headers=pengabsen_headers,
+                timeout=30
+            )
+            
+            if before_absensi_response.status_code == 200:
+                before_data = before_absensi_response.json()
+                students_data = before_data.get("data", [])
+                
+                if students_data:
+                    target_student = None
+                    for student in students_data:
+                        if student.get("siswa_id") == test_data["siswa_aliyah_id"]:
+                            target_student = student
+                            break
+                    
+                    if target_student:
+                        initial_status = target_student.get("status")
+                        self.log_test("2.2 Get Absensi Hari Ini (Before)", True, f"Found target student with initial status: {initial_status}")
+                    else:
+                        self.log_test("2.2 Get Absensi Hari Ini (Before)", False, f"Target student not found in response")
+                        return False
+                else:
+                    self.log_test("2.2 Get Absensi Hari Ini (Before)", True, "No students data (empty response)")
+            else:
+                self.log_test("2.2 Get Absensi Hari Ini (Before)", False, f"Request failed", before_absensi_response.json())
+                return False
+            
+            # 2.3: Create absensi (upsert) with status "hadir"
+            absensi_upsert_data = {
+                "siswa_id": test_data["siswa_aliyah_id"],
+                "kelas_id": test_data["kelas_aliyah_id"],
+                "tanggal": today,
+                "jenis": "pagi",
+                "status": "hadir"
+            }
+            
+            upsert_response = requests.post(
+                f"{self.base_url}/aliyah/pengabsen/absensi",
+                json=absensi_upsert_data,
+                headers=pengabsen_headers,
+                timeout=30
+            )
+            
+            if upsert_response.status_code == 200:
+                upsert_data = upsert_response.json()
+                self.log_test("2.3 Upsert Absensi", True, f"Absensi created: {upsert_data.get('message', 'Success')}")
+            else:
+                self.log_test("2.3 Upsert Absensi", False, f"Upsert failed", upsert_response.json())
+                return False
+            
+            # 2.4: Get absensi-hari-ini again (after creating absensi)
+            after_absensi_response = requests.get(
+                absensi_hari_ini_url,
+                params=absensi_params,
+                headers=pengabsen_headers,
+                timeout=30
+            )
+            
+            if after_absensi_response.status_code == 200:
+                after_data = after_absensi_response.json()
+                students_data = after_data.get("data", [])
+                
+                if students_data:
+                    target_student = None
+                    for student in students_data:
+                        if student.get("siswa_id") == test_data["siswa_aliyah_id"]:
+                            target_student = student
+                            break
+                    
+                    if target_student:
+                        updated_status = target_student.get("status")
+                        if updated_status == "hadir":
+                            self.log_test("2.4 Get Absensi Hari Ini (After)", True, f"Student status updated to: {updated_status}")
+                        else:
+                            self.log_test("2.4 Get Absensi Hari Ini (After)", False, f"Status not updated correctly. Expected: hadir, Got: {updated_status}")
+                            all_success = False
+                    else:
+                        self.log_test("2.4 Get Absensi Hari Ini (After)", False, f"Target student not found in response")
+                        all_success = False
+                else:
+                    self.log_test("2.4 Get Absensi Hari Ini (After)", False, "No students data in response")
+                    all_success = False
+            else:
+                self.log_test("2.4 Get Absensi Hari Ini (After)", False, f"Request failed", after_absensi_response.json())
+                all_success = False
+            
+            # 2.5: Get pengabsen riwayat
+            riwayat_params = {
+                "jenis": "pagi",
+                "tanggal_start": today,
+                "tanggal_end": today
+            }
+            
+            pengabsen_riwayat_response = requests.get(
+                f"{self.base_url}/aliyah/pengabsen/riwayat",
+                params=riwayat_params,
+                headers=pengabsen_headers,
+                timeout=30
+            )
+            
+            if pengabsen_riwayat_response.status_code == 200:
+                riwayat_data = pengabsen_riwayat_response.json()
+                detail_items = riwayat_data.get("detail", [])
+                
+                if detail_items:
+                    found_student_in_riwayat = False
+                    for item in detail_items:
+                        if item.get("siswa_id") == test_data["siswa_aliyah_id"]:
+                            found_student_in_riwayat = True
+                            student_status = item.get("status")
+                            self.log_test("2.5 Get Pengabsen Riwayat", True, f"Found student in riwayat with status: {student_status}")
+                            break
+                    
+                    if not found_student_in_riwayat:
+                        self.log_test("2.5 Get Pengabsen Riwayat", False, f"Student not found in riwayat detail. URL: {self.base_url}/aliyah/pengabsen/riwayat?{requests.compat.urlencode(riwayat_params)}", riwayat_data)
+                        all_success = False
+                else:
+                    self.log_test("2.5 Get Pengabsen Riwayat", False, f"Empty detail[] in riwayat. URL: {self.base_url}/aliyah/pengabsen/riwayat?{requests.compat.urlencode(riwayat_params)}", riwayat_data)
+                    all_success = False
+            else:
+                self.log_test("2.5 Get Pengabsen Riwayat", False, f"Riwayat request failed", pengabsen_riwayat_response.json())
+                all_success = False
+                
+        except Exception as e:
+            self.log_test("Step 2: PWA Pengabsen Flow", False, f"Error in pengabsen flow: {str(e)}")
+            all_success = False
+        
+        # Step 3: Simulate PWA Monitoring Aliyah flow
+        try:
+            # 3.1: Login monitoring aliyah
+            monitoring_login_data = {
+                "username": test_data["monitoring_username"],
+                "kode_akses": test_data["monitoring_kode"]
+            }
+            
+            monitoring_login_response = requests.post(
+                f"{self.base_url}/aliyah/monitoring/login",
+                json=monitoring_login_data,
+                timeout=30
+            )
+            
+            if monitoring_login_response.status_code == 200:
+                login_data = monitoring_login_response.json()
+                test_data["monitoring_token"] = login_data.get("access_token")
+                monitoring_headers = {"Authorization": f"Bearer {test_data['monitoring_token']}"}
+                self.log_test("3.1 Login Monitoring Aliyah", True, f"Successfully logged in as {test_data['monitoring_username']}")
+            else:
+                self.log_test("3.1 Login Monitoring Aliyah", False, f"Login failed", monitoring_login_response.json())
+                return False
+            
+            # 3.2: Get monitoring absensi-hari-ini
+            monitoring_absensi_response = requests.get(
+                f"{self.base_url}/aliyah/monitoring/absensi-hari-ini",
+                params={"jenis": "pagi", "tanggal": today},
+                headers=monitoring_headers,
+                timeout=30
+            )
+            
+            if monitoring_absensi_response.status_code == 200:
+                monitoring_data = monitoring_absensi_response.json()
+                students_data = monitoring_data.get("data", [])
+                
+                if students_data:
+                    target_student = None
+                    for student in students_data:
+                        if student.get("siswa_id") == test_data["siswa_aliyah_id"]:
+                            target_student = student
+                            break
+                    
+                    if target_student:
+                        monitoring_status = target_student.get("status")
+                        if monitoring_status == "hadir":
+                            self.log_test("3.2 Get Monitoring Absensi Hari Ini", True, f"Student found with correct status: {monitoring_status}")
+                        else:
+                            self.log_test("3.2 Get Monitoring Absensi Hari Ini", False, f"Status mismatch. Expected: hadir, Got: {monitoring_status}")
+                            all_success = False
+                    else:
+                        self.log_test("3.2 Get Monitoring Absensi Hari Ini", False, f"Target student not found in monitoring response")
+                        all_success = False
+                else:
+                    self.log_test("3.2 Get Monitoring Absensi Hari Ini", False, "No students data in monitoring response")
+                    all_success = False
+            else:
+                self.log_test("3.2 Get Monitoring Absensi Hari Ini", False, f"Monitoring request failed", monitoring_absensi_response.json())
+                all_success = False
+            
+            # 3.3: Get monitoring absensi-riwayat
+            monitoring_riwayat_response = requests.get(
+                f"{self.base_url}/aliyah/monitoring/absensi-riwayat",
+                params=riwayat_params,
+                headers=monitoring_headers,
+                timeout=30
+            )
+            
+            if monitoring_riwayat_response.status_code == 200:
+                monitoring_riwayat_data = monitoring_riwayat_response.json()
+                detail_items = monitoring_riwayat_data.get("detail", [])
+                
+                if detail_items:
+                    found_student_in_monitoring_riwayat = False
+                    for item in detail_items:
+                        if item.get("siswa_id") == test_data["siswa_aliyah_id"]:
+                            found_student_in_monitoring_riwayat = True
+                            student_status = item.get("status")
+                            self.log_test("3.3 Get Monitoring Riwayat", True, f"Found student in monitoring riwayat with status: {student_status}")
+                            break
+                    
+                    if not found_student_in_monitoring_riwayat:
+                        self.log_test("3.3 Get Monitoring Riwayat", False, f"Student not found in monitoring riwayat detail. URL: {self.base_url}/aliyah/monitoring/absensi-riwayat?{requests.compat.urlencode(riwayat_params)}", monitoring_riwayat_data)
+                        all_success = False
+                else:
+                    self.log_test("3.3 Get Monitoring Riwayat", False, f"Empty detail[] in monitoring riwayat. URL: {self.base_url}/aliyah/monitoring/absensi-riwayat?{requests.compat.urlencode(riwayat_params)}", monitoring_riwayat_data)
+                    all_success = False
+            else:
+                self.log_test("3.3 Get Monitoring Riwayat", False, f"Monitoring riwayat request failed", monitoring_riwayat_response.json())
+                all_success = False
+                
+        except Exception as e:
+            self.log_test("Step 3: PWA Monitoring Flow", False, f"Error in monitoring flow: {str(e)}")
+            all_success = False
+        
+        # Cleanup: Delete created test data
+        try:
+            if test_data.get("pengabsen_aliyah_id"):
+                requests.delete(f"{self.base_url}/aliyah/pengabsen/{test_data['pengabsen_aliyah_id']}", headers=self.headers, timeout=30)
+            if test_data.get("monitoring_aliyah_id"):
+                requests.delete(f"{self.base_url}/aliyah/monitoring/{test_data['monitoring_aliyah_id']}", headers=self.headers, timeout=30)
+            if test_data.get("siswa_aliyah_id"):
+                requests.delete(f"{self.base_url}/aliyah/siswa/{test_data['siswa_aliyah_id']}", headers=self.headers, timeout=30)
+            # Note: We keep kelas_aliyah as it might be used by other tests
+            self.log_test("Cleanup", True, "Test data cleaned up")
+        except Exception as e:
+            self.log_test("Cleanup", False, f"Cleanup error: {str(e)}")
+        
+        return all_success
+    
     def run_all_tests(self):
         """Run all tests in sequence"""
         print("🚀 Starting Absensi Sholat Backend Tests - Focus on Aliyah Endpoints")
