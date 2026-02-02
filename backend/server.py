@@ -4306,6 +4306,7 @@ async def get_aliyah_absensi_riwayat(
 
     absensi_list = await db.absensi_aliyah.find(query, {"_id": 0}).to_list(10000)
 
+    # Deduplicate by siswa_id, tanggal, jenis -> keep latest by waktu_absen / created_at
     if not absensi_list:
         return {
             "summary": {"hadir": 0, "alfa": 0, "sakit": 0, "izin": 0, "dispensasi": 0, "bolos": 0},
