@@ -719,6 +719,43 @@ class MonitoringAliyahCreate(BaseModel):
 
 
 
+# Helper auth dependency for Pengabsen & Monitoring Aliyah (must be defined before endpoints)
+
+async def get_current_pengabsen_aliyah(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
+    try:
+        token = credentials.credentials
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        pengabsen_id: str = payload.get("sub")
+        if pengabsen_id is None:
+            raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+
+        pengabsen = await db.pengabsen_aliyah.find_one({"id": pengabsen_id}, {"_id": 0})
+        if pengabsen is None:
+            raise HTTPException(status_code=401, detail="Pengabsen Aliyah not found")
+
+        return pengabsen
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+
+
+async def get_current_monitoring_aliyah(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
+    try:
+        token = credentials.credentials
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        monitoring_id: str = payload.get("sub")
+        if monitoring_id is None:
+            raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+
+        monitoring = await db.pembimbing_aliyah.find_one({"id": monitoring_id}, {"_id": 0})
+        if monitoring is None:
+            raise HTTPException(status_code=401, detail="Monitoring Aliyah not found")
+
+        return monitoring
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+
+
+
 
 
 # ==================== ABSENSI ALIYAH PENGABSEN PWA ENDPOINTS ====================
@@ -974,40 +1011,6 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
-
-
-async def get_current_pengabsen_aliyah(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
-    try:
-        token = credentials.credentials
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        pengabsen_id: str = payload.get("sub")
-        if pengabsen_id is None:
-            raise HTTPException(status_code=401, detail="Invalid authentication credentials")
-
-        pengabsen = await db.pengabsen_aliyah.find_one({"id": pengabsen_id}, {"_id": 0})
-        if pengabsen is None:
-            raise HTTPException(status_code=401, detail="Pengabsen Aliyah not found")
-
-        return pengabsen
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
-
-
-async def get_current_monitoring_aliyah(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
-    try:
-        token = credentials.credentials
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        monitoring_id: str = payload.get("sub")
-        if monitoring_id is None:
-            raise HTTPException(status_code=401, detail="Invalid authentication credentials")
-
-        monitoring = await db.pembimbing_aliyah.find_one({"id": monitoring_id}, {"_id": 0})
-        if monitoring is None:
-            raise HTTPException(status_code=401, detail="Monitoring Aliyah not found")
-
-        return monitoring
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
 
 
 async def send_wali_push_notification(wali: dict, title: str, body: str):
