@@ -719,6 +719,12 @@ class MonitoringAliyahCreate(BaseModel):
 
 
 
+
+
+# Helper functions for PWA Aliyah dependencies (must be defined before use in endpoints)
+from .server import get_current_pengabsen_aliyah  # type: ignore  # noqa: F401
+
+
 # ==================== ABSENSI ALIYAH PENGABSEN PWA ENDPOINTS ====================
 
 @api_router.get("/aliyah/pengabsen/absensi-hari-ini")
