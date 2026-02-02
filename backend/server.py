@@ -1284,6 +1284,34 @@ async def sync_wali_santri():
 
 async def fetch_prayer_times(date: str) -> Optional[dict]:
     try:
+        url = "http://api.aladhan.com/v1/timingsByAddress"
+        params = {
+            "address": "Desa Cintamulya, Candipuro, Lampung Selatan, Lampung, Indonesia",
+            "method": 2,
+            "date": date
+        }
+        
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, params=params) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    timings = data['data']['timings']
+                    return {
+                        'subuh': timings['Fajr'],
+                        'dzuhur': timings['Dhuhr'],
+                        'ashar': timings['Asr'],
+                        'maghrib': timings['Maghrib'],
+                        'isya': timings['Isha']
+                    }
+        return None
+    except Exception as e:
+        logging.error(f"Error fetching prayer times: {e}")
+        return None
+
+# ==================== DAILY WHATSAPP REPORT ENDPOINT ====================
+
+@api_router.post("/notifications/whatsapp/daily-report", dependencies=[Depends(get_current_admin)])
+async def trigger_daily_whatsapp_report(tanggal: Optional[str] = None):
 
 # ==================== DAILY WHATSAPP REPORT ENDPOINT ====================
 
