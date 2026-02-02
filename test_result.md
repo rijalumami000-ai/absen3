@@ -198,6 +198,50 @@ backend:
   - task: "RBAC Admin Seeding Endpoint Testing"
     implemented: true
     working: true
+  - task: "Riwayat Absensi PWA Aliyah (Pengabsen & Monitoring)"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/pages/PengabsenAliyahApp.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "User melaporkan bahwa tab Riwayat di PWA Pengabsen Aliyah dan Monitoring Aliyah masih tidak menampilkan data meskipun absensi sudah tercatat dan endpoint backend sebelumnya dinyatakan OK. Perlu pengecekan ulang alur frontend+backend."
+
+frontend:
+  - task: "Dashboard Cards Stats & Counts"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/pages/Dashboard.js"
+    stuck_count: 1
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "User melaporkan kartu-kartu di dashboard belum menampilkan jumlah. Sudah diperbaiki pemanggilan API getStats dan endpoint siswa Aliyah; perlu diuji ulang apakah angka tampil."
+
+metadata:
+  created_by: "main_agent"
+  version: "1.1"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Riwayat Absensi PWA Aliyah (Pengabsen & Monitoring)"
+    - "Dashboard Cards Stats & Counts"
+  stuck_tasks:
+    - "Riwayat Absensi PWA Aliyah (Pengabsen & Monitoring)"
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "Perbaiki pemanggilan API Dashboard dan review ulang alur riwayat PWA Aliyah. Mohon testing agent fokus cek: (1) Apakah kartu dashboard sudah menampilkan angka total santri, siswa madin, siswa aliyah. (2) Alur Riwayat di Pengabsen Aliyah dan Monitoring Aliyah: setelah input absensi, tombol 'Tampilkan' di tab Riwayat apakah menghasilkan data (detail) dan tampil di UI."
+
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
