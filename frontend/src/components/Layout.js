@@ -212,9 +212,9 @@ const Layout = ({ children }) => {
                       onClick={handleGroupClick}
                       className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 hover-lift ${
                         hasActiveChild
-                          ? 'bg-primary-100 text-primary-700'
+                          ? 'bg-primary-50 text-primary-800 ring-1 ring-primary-300'
                           : isAllowedGroup
-                            ? 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                            ? 'text-muted-foreground hover:bg-primary-50 hover:text-primary-700'
                             : 'text-muted-foreground opacity-60 cursor-not-allowed'
                       }`}
                     >
