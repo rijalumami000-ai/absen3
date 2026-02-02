@@ -244,9 +244,9 @@ const Layout = ({ children }) => {
                                 onClick={handleItemClick}
                                 className={`flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                                   isActive
-                                    ? 'bg-primary-700 text-white shadow-md'
+                                    ? 'bg-primary-700 text-white shadow-md ring-1 ring-primary-400'
                                     : isAllowedItem
-                                      ? 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                                      ? 'text-muted-foreground hover:bg-primary-50 hover:text-primary-700'
                                       : 'text-muted-foreground opacity-60 cursor-not-allowed'
                                 }`}
                               >
