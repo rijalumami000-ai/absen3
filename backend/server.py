@@ -40,6 +40,8 @@ from firebase_admin import credentials, messaging
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
+WHATSAPP_BOT_URL = os.environ.get('WHATSAPP_BOT_URL')  # optional: URL service bot WA Web
+
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ.get('DB_NAME', 'absensi_sholat')]
