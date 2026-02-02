@@ -4486,6 +4486,28 @@ async def get_aliyah_monitoring_absensi_riwayat(
         status = a.get("status", "")
         if status in summary:
             summary[status] += 1
+    # Deduplicate by (siswa_id, tanggal, jenis) keeping the latest record
+    dedup_map: Dict[tuple, Dict[str, Any]] = {}
+    for a in absensi_list:
+        key = (a.get("siswa_id"), a.get("tanggal"), a.get("jenis"))
+        current_best = dedup_map.get(key)
+
+        wa = a.get("waktu_absen")
+        ca = a.get("created_at")
+        ts = wa or ca or ""
+
+        if current_best is None:
+            dedup_map[key] = a
+        else:
+            wa_best = current_best.get("waktu_absen")
+            ca_best = current_best.get("created_at")
+            ts_best = wa_best or ca_best or ""
+            if ts > ts_best:
+                dedup_map[key] = a
+
+    absensi_list = list(dedup_map.values())
+
+
 
         siswa = siswa_map.get(a["siswa_id"])
         kelas_nama = kelas_map.get(a.get("kelas_id"), "-")
