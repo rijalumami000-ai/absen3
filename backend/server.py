@@ -4440,6 +4440,27 @@ async def get_aliyah_monitoring_absensi_hari_ini(
 @api_router.get("/aliyah/monitoring/absensi-riwayat")
 async def get_aliyah_monitoring_absensi_riwayat(
     jenis: Literal["pagi", "dzuhur"],
+    dedup_map: Dict[tuple, Dict[str, Any]] = {}
+    for a in absensi_list:
+        key = (a.get("siswa_id"), a.get("tanggal"), a.get("jenis"))
+        current_best = dedup_map.get(key)
+
+        wa = a.get("waktu_absen")
+        ca = a.get("created_at")
+        ts = wa or ca or ""
+
+        if current_best is None:
+            dedup_map[key] = a
+        else:
+            wa_best = current_best.get("waktu_absen")
+            ca_best = current_best.get("created_at")
+            ts_best = wa_best or ca_best or ""
+            if ts > ts_best:
+                dedup_map[key] = a
+
+    absensi_list = list(dedup_map.values())
+
+
     tanggal_start: str,
     tanggal_end: Optional[str] = None,
     kelas_id: Optional[str] = None,
