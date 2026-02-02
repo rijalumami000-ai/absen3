@@ -19,15 +19,17 @@ const Dashboard = () => {
   const loadData = async () => {
     try {
       const today = new Date().toISOString().split('T')[0];
-      const [statsRes, santriRes, siswaMadinRes] = await Promise.all([
+      const [statsRes, santriRes, siswaMadinRes, siswaAliyahRes] = await Promise.all([
         absensiAPI.getStats(today),
         santriAPI.getAll({}),
         api.get('/siswa-madrasah'),
+        api.get('/siswa-aliyah'),
       ]);
       
       setStats(statsRes.data);
       setTotalSantri(santriRes.data.length);
       setTotalSiswaMadin(siswaMadinRes.data.length || 0);
+      setTotalSiswaAliyah(siswaAliyahRes.data.length || 0);
     } catch (error) {
       toast({
         title: "Error",
