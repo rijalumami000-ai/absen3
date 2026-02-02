@@ -143,8 +143,10 @@ const PengabsenAliyahApp = () => {
     return row.nama?.toLowerCase().includes(q);
   });
 
+  // Map urutan kelas dari data kelas Aliyah (mengikuti urutan di admin)
   const kelasOrderMap = new Map((kelasList || []).map((k, index) => [k.id, index]));
 
+  // Group data siswa berdasarkan kelas
   const groupedData = Object.values(
     filteredData.reduce((acc, row) => {
       const kId = row.kelas_id || 'unknown';
@@ -158,11 +160,13 @@ const PengabsenAliyahApp = () => {
   )
     .map((group) => ({
       ...group,
+      // Urutkan siswa berdasarkan nama (A-Z)
       items: [...group.items].sort((a, b) =>
         (a.nama || '').localeCompare(b.nama || '', 'id', { sensitivity: 'base' })
       ),
     }))
     .sort((a, b) => {
+      // Urutkan kelas mengikuti urutan kelasList, fallback nama kelas
       const idxA = kelasOrderMap.has(a.kelas_id) ? kelasOrderMap.get(a.kelas_id) : Infinity;
       const idxB = kelasOrderMap.has(b.kelas_id) ? kelasOrderMap.get(b.kelas_id) : Infinity;
       if (idxA !== idxB) return idxA - idxB;
