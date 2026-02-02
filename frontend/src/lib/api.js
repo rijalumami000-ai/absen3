@@ -212,6 +212,8 @@ export const settingsAPI = {
   updateWaliNotifikasi: (data) => axios.put(`${API}/settings/wali-notifikasi`, data, { headers: getAuthHeader() }),
   getAppSettings: () => axios.get(`${API}/settings/app`),
   updateAppSettings: (data) => axios.put(`${API}/settings/app`, data, { headers: getAuthHeader() }),
+  getAliyahAbsensiPagi: () => axios.get(`${API}/aliyah/settings/absensi-pagi`, { headers: getAuthHeader() }),
+  updateAliyahAbsensiPagi: (data) => axios.put(`${API}/aliyah/settings/absensi-pagi`, data, { headers: getAuthHeader() }),
 };
 
 // PWA Pengabsen Aliyah API
