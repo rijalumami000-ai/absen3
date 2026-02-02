@@ -84,7 +84,7 @@ const RiwayatAbsensiAliyah = () => {
   useEffect(() => {
     loadData();
     setPage(1);
-  }, [filterKelas, filterGender, tanggalStart, tanggalEnd, filterJenis]);
+  }, [filterKelas, filterGender, tanggalStart, tanggalEnd, filterJenis, filterStatus]);
 
   const calculateDateRange = () => {
     const date = new Date(filterTanggal);
