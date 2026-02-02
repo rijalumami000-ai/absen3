@@ -104,6 +104,32 @@ const MonitoringAliyahApp = () => {
   const totalSiswa = data.length;
   const hadirCount = data.filter((row) => row.status === 'hadir').length;
 
+  const kelasOrderMap = new Map((kelasList || []).map((k, index) => [k.id, index]));
+
+  const groupedData = Object.values(
+    data.reduce((acc, row) => {
+      const kId = row.kelas_id || 'unknown';
+      const kNama = row.kelas_nama || 'Tanpa Kelas';
+      if (!acc[kId]) {
+        acc[kId] = { kelas_id: kId, kelas_nama: kNama, items: [] };
+      }
+      acc[kId].items.push(row);
+      return acc;
+    }, {})
+  )
+    .map((group) => ({
+      ...group,
+      items: [...group.items].sort((a, b) =>
+        (a.nama || '').localeCompare(b.nama || '', 'id', { sensitivity: 'base' })
+      ),
+    }))
+    .sort((a, b) => {
+      const idxA = kelasOrderMap.has(a.kelas_id) ? kelasOrderMap.get(a.kelas_id) : Infinity;
+      const idxB = kelasOrderMap.has(b.kelas_id) ? kelasOrderMap.get(b.kelas_id) : Infinity;
+      if (idxA !== idxB) return idxA - idxB;
+      return (a.kelas_nama || '').localeCompare(b.kelas_nama || '', 'id', { sensitivity: 'base' });
+    });
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col" data-testid="monitoring-aliyah-app-page">
       <header className="bg-white shadow-sm px-4 py-3 flex items-center justify-between">
@@ -209,28 +235,37 @@ const MonitoringAliyahApp = () => {
 
             {loadingData ? (
               <div className="text-center text-xs text-gray-500 py-4">Memuat data...</div>
-            ) : data.length === 0 ? (
+            ) : groupedData.length === 0 ? (
               <div className="text-center text-xs text-gray-500 py-4">Tidak ada data</div>
             ) : (
-              <div className="overflow-x-auto max-h-[420px]">
-                <table className="w-full text-xs">
-                  <thead className="bg-slate-100">
-                    <tr>
-                      <th className="px-3 py-2 text-left font-semibold text-slate-700">Nama</th>
-                      <th className="px-3 py-2 text-left font-semibold text-slate-700">Kelas</th>
-                      <th className="px-3 py-2 text-left font-semibold text-slate-700">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-200">
-                    {data.map((row) => (
-                      <tr key={row.siswa_id}>
-                        <td className="px-3 py-1.5 text-slate-800">{row.nama}</td>
-                        <td className="px-3 py-1.5 text-slate-600">{row.kelas_nama}</td>
-                        <td className="px-3 py-1.5 text-slate-600 capitalize">{row.status || '-'}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="space-y-4 max-h-[420px] overflow-y-auto">
+                {groupedData.map((group) => (
+                  <div key={group.kelas_id || group.kelas_nama}>
+                    <div className="text-xs font-semibold text-slate-700 mb-2">
+                      {group.kelas_nama || 'Tanpa Kelas'}
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-xs">
+                        <thead className="bg-slate-100">
+                          <tr>
+                            <th className="px-3 py-2 text-left font-semibold text-slate-700">Nama</th>
+                            <th className="px-3 py-2 text-left font-semibold text-slate-700">Kelas</th>
+                            <th className="px-3 py-2 text-left font-semibold text-slate-700">Status</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-200">
+                          {group.items.map((row) => (
+                            <tr key={row.siswa_id}>
+                              <td className="px-3 py-1.5 text-slate-800">{row.nama}</td>
+                              <td className="px-3 py-1.5 text-slate-600">{row.kelas_nama}</td>
+                              <td className="px-3 py-1.5 text-slate-600 capitalize">{row.status || '-'}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </section>

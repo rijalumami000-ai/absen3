@@ -42,6 +42,8 @@ const PengabsenAliyahApp = () => {
   const [historyEnd, setHistoryEnd] = useState(getTodayLocalYMD());
   const [historyItems, setHistoryItems] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
+  const [kelasList, setKelasList] = useState([]);
+
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -50,6 +52,19 @@ const PengabsenAliyahApp = () => {
       navigate('/pengabsen-aliyah-app/login');
     }
   }, [loading, user, navigate]);
+
+  useEffect(() => {
+    const loadKelas = async () => {
+      try {
+        const resp = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/aliyah/kelas`);
+        const json = await resp.json();
+        setKelasList(json || []);
+      } catch (e) {
+        // ignore error load kelas untuk PWA
+      }
+    };
+    loadKelas();
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -125,6 +140,32 @@ const PengabsenAliyahApp = () => {
     const q = searchQuery.toLowerCase();
     return row.nama?.toLowerCase().includes(q);
   });
+
+  const kelasOrderMap = new Map((kelasList || []).map((k, index) => [k.id, index]));
+
+  const groupedData = Object.values(
+    filteredData.reduce((acc, row) => {
+      const kId = row.kelas_id || 'unknown';
+      const kNama = row.kelas_nama || 'Tanpa Kelas';
+      if (!acc[kId]) {
+        acc[kId] = { kelas_id: kId, kelas_nama: kNama, items: [] };
+      }
+      acc[kId].items.push(row);
+      return acc;
+    }, {})
+  )
+    .map((group) => ({
+      ...group,
+      items: [...group.items].sort((a, b) =>
+        (a.nama || '').localeCompare(b.nama || '', 'id', { sensitivity: 'base' })
+      ),
+    }))
+    .sort((a, b) => {
+      const idxA = kelasOrderMap.has(a.kelas_id) ? kelasOrderMap.get(a.kelas_id) : Infinity;
+      const idxB = kelasOrderMap.has(b.kelas_id) ? kelasOrderMap.get(b.kelas_id) : Infinity;
+      if (idxA !== idxB) return idxA - idxB;
+      return (a.kelas_nama || '').localeCompare(b.kelas_nama || '', 'id', { sensitivity: 'base' });
+    });
 
   if (loading || !user) {
     return (
