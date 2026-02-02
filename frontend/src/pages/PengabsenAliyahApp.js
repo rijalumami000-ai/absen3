@@ -313,45 +313,67 @@ const PengabsenAliyahApp = () => {
                   <div className="text-center text-xs text-gray-500 py-4">Tidak ada data siswa</div>
                 ) : (
                   <div className="space-y-4 max-h-[420px] overflow-y-auto">
-                    {groupedData.map((group) => (
-                      <div key={group.kelas_id || group.kelas_nama}>
-                        <div className="text-xs font-semibold text-slate-700 mb-2">
-                          {group.kelas_nama || 'Tanpa Kelas'}
-                        </div>
-                        <div className="space-y-2">
-                          {group.items.map((row) => (
-                            <div
-                              key={row.siswa_id}
-                              className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-lg px-3 py-2"
-                            >
-                              <div>
-                                <p className="text-sm font-medium text-gray-800">{row.nama}</p>
-                                <p className="text-xs text-gray-500">
-                                  {row.kelas_nama} • {row.gender === 'putra' ? 'Laki-laki' : row.gender === 'putri' ? 'Perempuan' : '-'}
-                                </p>
-                              </div>
-                              <div className="w-32">
-                                <Select
-                                  value={row.status || 'null'}
-                                  onValueChange={(val) => handleStatusChange(row.siswa_id, row.kelas_id, val)}
+                    {groupedData.map((group) => {
+                      const count = group.items.length;
+                      const key = group.kelas_id || group.kelas_nama;
+                      const isCollapsed = collapsedGroups[key];
+                      return (
+                        <div key={key}>
+                          <button
+                            type="button"
+                            className="w-full flex items-center justify-between text-xs font-semibold text-slate-700 mb-2 bg-slate-100 hover:bg-slate-200 rounded px-3 py-2"
+                            onClick={() =>
+                              setCollapsedGroups((prev) => ({
+                                ...prev,
+                                [key]: !isCollapsed,
+                              }))
+                            }
+                          >
+                            <span>
+                              {group.kelas_nama || 'Tanpa Kelas'} ({count} siswa)
+                            </span>
+                            <span className="text-[10px] text-slate-500">
+                              {isCollapsed ? 'Tampilkan' : 'Sembunyikan'}
+                            </span>
+                          </button>
+
+                          {!isCollapsed && (
+                            <div className="space-y-2">
+                              {group.items.map((row) => (
+                                <div
+                                  key={row.siswa_id}
+                                  className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-lg px-3 py-2"
                                 >
-                                  <SelectTrigger className="h-8 text-xs">
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {STATUS_OPTIONS.map((opt) => (
-                                      <SelectItem key={opt.value} value={opt.value} className="text-xs">
-                                        {opt.label}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </div>
+                                  <div>
+                                    <p className="text-sm font-medium text-gray-800">{row.nama}</p>
+                                    <p className="text-xs text-gray-500">
+                                      {row.kelas_nama} • {row.gender === 'putra' ? 'Laki-laki' : row.gender === 'putri' ? 'Perempuan' : '-'}
+                                    </p>
+                                  </div>
+                                  <div className="w-32">
+                                    <Select
+                                      value={row.status || 'null'}
+                                      onValueChange={(val) => handleStatusChange(row.siswa_id, row.kelas_id, val)}
+                                    >
+                                      <SelectTrigger className="h-8 text-xs">
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        {STATUS_OPTIONS.map((opt) => (
+                                          <SelectItem key={opt.value} value={opt.value} className="text-xs">
+                                            {opt.label}
+                                          </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                </div>
+                              ))}
                             </div>
-                          ))}
+                          )}
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>
