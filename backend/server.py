@@ -518,6 +518,28 @@ class AbsensiKelas(BaseModel):
     kelas_id: str
     tanggal: str  # YYYY-MM-DD
     status: Literal["hadir", "alfa", "izin", "sakit", "telat"]  # a: alfa, i: izin, s: sakit, t: telat
+# ==================== DAILY WHATSAPP REPORT MODELS ====================
+
+class DailyWaliReportAnak(BaseModel):
+    nama: str
+    kelas: Optional[str] = None
+    subuh: str
+    dzuhur: str
+    ashar: str
+    maghrib: str
+    isya: str
+
+class DailyWaliReport(BaseModel):
+    wali_nama: str
+    wali_nomor: str
+    tanggal: str
+    anak: List[DailyWaliReportAnak]
+
+class DailyWaliReportBatch(BaseModel):
+    tanggal: str
+    reports: List[DailyWaliReport]
+
+
 
 # ==================== SISWA ALIYAH MODELS ====================
 
