@@ -30,6 +30,7 @@ import PengabsenAliyahAppLogin from '@/pages/PengabsenAliyahAppLogin';
 import MonitoringAliyahApp from '@/pages/MonitoringAliyahApp';
 import MonitoringAliyahAppLogin from '@/pages/MonitoringAliyahAppLogin';
 import SettingAplikasiAliyah from '@/pages/SettingAplikasiAliyah';
+import SettingJamPagiAliyah from '@/pages/SettingJamPagiAliyah';
 import PengabsenKelasAppLogin from '@/pages/PengabsenKelasAppLogin';
 import PengabsenKelasApp from '@/pages/PengabsenKelasApp';
 import MonitoringKelasAppLogin from '@/pages/MonitoringKelasAppLogin';
