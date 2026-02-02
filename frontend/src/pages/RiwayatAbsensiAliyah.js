@@ -176,7 +176,11 @@ const RiwayatAbsensiAliyah = () => {
 
       const res = await api.get('/aliyah/absensi/riwayat', { params });
       setSummary(res.data.summary);
-      setDetail(res.data.detail);
+      let rows = res.data.detail || [];
+      if (filterStatus) {
+        rows = rows.filter((row) => row.status === filterStatus);
+      }
+      setDetail(rows);
     } catch (e) {
       console.error('Gagal memuat riwayat absensi aliyah', e);
     } finally {
