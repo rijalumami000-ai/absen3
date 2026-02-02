@@ -1312,11 +1312,6 @@ async def fetch_prayer_times(date: str) -> Optional[dict]:
 
 @api_router.post("/notifications/whatsapp/daily-report", dependencies=[Depends(get_current_admin)])
 async def trigger_daily_whatsapp_report(tanggal: Optional[str] = None):
-
-# ==================== DAILY WHATSAPP REPORT ENDPOINT ====================
-
-@api_router.post("/notifications/whatsapp/daily-report", dependencies=[Depends(get_current_admin)])
-async def trigger_daily_whatsapp_report(tanggal: Optional[str] = None):
     """Bangun rekap absensi sholat per wali untuk 1 hari dan kirim ke WA Bot service.
 
     Endpoint ini TIDAK mengirim WhatsApp langsung, hanya memanggil service bot eksternal
