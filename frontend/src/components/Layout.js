@@ -93,7 +93,6 @@ const Layout = ({ children }) => {
         { path: '/pengabsen-kelas', icon: ClipboardCheck, label: 'Pengabsen Kelas Madin' },
         { path: '/monitoring-kelas', icon: Eye, label: 'Monitoring Kelas Madin' },
         { path: '/riwayat-absensi-madin', icon: ClipboardList, label: 'Riwayat Absensi Madin' },
-        { path: '/aliyah/setting-jam-pagi', icon: Clock, label: 'Pengaturan Jam Pagi Aliyah' },
       ],
     },
     {
