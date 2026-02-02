@@ -194,6 +194,42 @@ const RiwayatAbsensiAliyah = () => {
   return (
     <div className="animate-fade-in">
       <div className="mb-6 animate-slide-in-left">
+      <div className="flex flex-wrap gap-2 mb-3">
+        <Button
+          type="button"
+          size="sm"
+          variant={filterJenis === 'pagi' ? 'default' : 'outline'}
+          onClick={() => {
+            setFilterJenis('pagi');
+            setPage(1);
+          }}
+        >
+          Absensi Kehadiran Siswa Pagi Hari
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant={filterJenis === 'dzuhur' ? 'default' : 'outline'}
+          onClick={() => {
+            setFilterJenis('dzuhur');
+            setPage(1);
+          }}
+        >
+          Kehadiran Sholat Dhuhur
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant={filterJenis === 'all' ? 'default' : 'outline'}
+          onClick={() => {
+            setFilterJenis('all');
+            setPage(1);
+          }}
+        >
+          Semua
+        </Button>
+      </div>
+
         <h1 className="text-3xl font-bold text-gray-800 flex items-center font-display">
           <div className="w-12 h-12 bg-gradient-to-br from-indigo-600 to-emerald-600 rounded-xl flex items-center justify-center mr-3 shadow-lg">
             <ClipboardList className="text-white" size={24} />
