@@ -117,6 +117,7 @@ const Layout = ({ children }) => {
         { path: '/aliyah/monitoring', icon: Eye, label: 'Monitoring Kelas Aliyah' },
         { path: '/aliyah/riwayat', icon: ClipboardList, label: 'Riwayat Absensi Aliyah' },
         { path: '/aliyah/setting-aplikasi', icon: Settings, label: 'Setting Aplikasi' },
+        { path: '/aliyah/setting-jam-pagi', icon: Clock, label: 'Pengaturan Jam Pagi Aliyah' },
       ],
     },
     { 
