@@ -191,32 +191,29 @@ const RiwayatAbsensiAliyah = () => {
     { key: 'bolos', label: 'Bolos', icon: Clock, color: 'text-orange-700', bg: 'bg-orange-50' },
   ];
 
+  // Pagination calculation
+  const total = detail.length;
+  const effectivePageSize = pageSize === -1 ? (total || 1) : pageSize;
+  const totalPages = pageSize === -1 ? 1 : Math.max(1, Math.ceil(total / effectivePageSize));
+  const currentPage = Math.min(page, totalPages);
+  const startIndex = (currentPage - 1) * effectivePageSize;
+  const endIndex = pageSize === -1 ? total : Math.min(startIndex + effectivePageSize, total);
+  const pageData = detail.slice(startIndex, endIndex);
+
   return (
     <div className="animate-fade-in">
       <div className="mb-6 animate-slide-in-left">
-      <div className="flex flex-wrap gap-2 mb-3">
-        <Button
-      {summary && (
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
-          {statusCards.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Card key={item.key} className="shadow-card animate-scale-in">
-                <CardContent className="p-4 flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-muted-foreground">{item.label}</p>
-                    <p className="text-2xl font-bold text-foreground">{summary[item.key] ?? 0}</p>
-                  </div>
-                  <div className={`${item.bg} ${item.color} p-2 rounded-lg`}>
-                    <Icon className="w-5 h-5" />
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      )}
+        <h1 className="text-3xl font-bold text-gray-800 flex items-center font-display">
+          <div className="w-12 h-12 bg-gradient-to-br from-indigo-600 to-emerald-600 rounded-xl flex items-center justify-center mr-3 shadow-lg">
+            <ClipboardList className="text-white" size={24} />
+          </div>
+          Riwayat Absensi Madrasah Aliyah
+        </h1>
+        <p className="text-gray-600 mt-2 ml-15">Ringkasan dan detail kehadiran siswa Madrasah Aliyah</p>
+      </div>
 
+      <div className="flex flex-wrap gap-2 mb-4">
+        <Button
           type="button"
           size="sm"
           variant={filterJenis === 'pagi' ? 'default' : 'outline'}
@@ -251,14 +248,26 @@ const RiwayatAbsensiAliyah = () => {
         </Button>
       </div>
 
-        <h1 className="text-3xl font-bold text-gray-800 flex items-center font-display">
-          <div className="w-12 h-12 bg-gradient-to-br from-indigo-600 to-emerald-600 rounded-xl flex items-center justify-center mr-3 shadow-lg">
-            <ClipboardList className="text-white" size={24} />
-          </div>
-          Riwayat Absensi Madrasah Aliyah
-        </h1>
-        <p className="text-gray-600 mt-2 ml-15">Ringkasan dan detail kehadiran siswa Madrasah Aliyah</p>
-      </div>
+      {summary && (
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+          {statusCards.map((item) => {
+            const Icon = item.icon;
+            return (
+              <Card key={item.key} className="shadow-card animate-scale-in">
+                <CardContent className="p-4 flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-muted-foreground">{item.label}</p>
+                    <p className="text-2xl font-bold text-foreground">{summary[item.key] ?? 0}</p>
+                  </div>
+                  <div className={`${item.bg} ${item.color} p-2 rounded-lg`}>
+                    <Icon className="w-5 h-5" />
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      )}
 
       {/* Filter Bar */}
       <Card className="mb-6 shadow-card animate-scale-in">
@@ -339,108 +348,6 @@ const RiwayatAbsensiAliyah = () => {
                     </SelectItem>
                   ))}
                 </SelectContent>
-          {/* Pagination helpers */}
-          {(() => {
-            const total = detail.length;
-            const effectivePageSize = pageSize === -1 ? (total || 1) : pageSize;
-            const totalPages = pageSize === -1 ? 1 : Math.max(1, Math.ceil(total / effectivePageSize));
-            const currentPage = Math.min(page, totalPages);
-            const startIndex = (currentPage - 1) * effectivePageSize;
-            const endIndex = pageSize === -1 ? total : Math.min(startIndex + effectivePageSize, total);
-
-            const pageData = detail.slice(startIndex, endIndex);
-
-            return (
-              <>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead className="bg-muted">
-                      <tr>
-                        <th className="px-4 py-3 text-left font-semibold text-foreground">Tanggal</th>
-                        <th className="px-4 py-3 text-left font-semibold text-foreground">Nama Siswa</th>
-                        <th className="px-4 py-3 text-left font-semibold text-foreground">Kelas</th>
-                        <th className="px-4 py-3 text-left font-semibold text-foreground">Gender</th>
-                        <th className="px-4 py-3 text-left font-semibold text-foreground">Status</th>
-                        <th className="px-4 py-3 text-left font-semibold text-foreground">Waktu Absen</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border">
-                      {pageData.map((row) => (
-                        <tr key={row.id || `${row.siswa_id}-${row.tanggal}-${row.status}`}>
-                          <td className="px-4 py-2 text-muted-foreground">{row.tanggal}</td>
-                          <td className="px-4 py-2 text-foreground">{row.siswa_nama}</td>
-                          <td className="px-4 py-2 text-muted-foreground">{row.kelas_nama}</td>
-                          <td className="px-4 py-2 text-muted-foreground">{row.gender}</td>
-                          <td className="px-4 py-2 text-muted-foreground capitalize">{row.status}</td>
-                          <td className="px-4 py-2 text-muted-foreground">
-                            {row.waktu_absen
-                              ? new Date(row.waktu_absen).toLocaleTimeString('id-ID', {
-                                  hour: '2-digit',
-                                  minute: '2-digit',
-                                })
-                              : '-'}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* Footer pagination */}
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 px-4 py-3 border-t text-xs text-muted-foreground">
-                  <div>
-                    Menampilkan {total === 0 ? 0 : startIndex + 1}-{endIndex} dari {total} baris
-                  </div>
-                  <div className="flex flex-col md:flex-row md:items-center gap-3">
-                    <div className="flex items-center gap-1">
-                      <span>Max per halaman:</span>
-                      <Select
-                        value={String(pageSize)}
-                        onValueChange={(val) => {
-                          const newSize = parseInt(val, 10);
-                          setPageSize(newSize);
-                          setPage(1);
-                        }}
-                      >
-                        <SelectTrigger className="h-8 w-28">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {[10, 30, 40, 50, 100, 150, 200, 300, 400, 500, 800, -1].map((opt) => (
-                            <SelectItem key={opt} value={String(opt)}>
-                              {opt === -1 ? 'Semua' : opt}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={currentPage <= 1}
-                        onClick={() => setPage((p) => Math.max(1, p - 1))}
-                      >
-                        Sebelumnya
-                      </Button>
-                      <span>
-                        Halaman {currentPage} / {totalPages}
-                      </span>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={currentPage >= totalPages}
-                        onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                      >
-                        Berikutnya
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </>
-            );
-          })()}
-
               </Select>
             </div>
             <div>
@@ -468,10 +375,96 @@ const RiwayatAbsensiAliyah = () => {
         <CardContent className="p-0">
           {loading ? (
             <div className="text-center py-8 text-muted-foreground">Memuat data...</div>
-          ) : detail.length === 0 ? (
+          ) : total === 0 ? (
             <div className="text-center py-8 text-muted-foreground">Tidak ada data absensi</div>
           ) : (
-            <></>
+            <>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-muted">
+                    <tr>
+                      <th className="px-4 py-3 text-left font-semibold text-foreground">Tanggal</th>
+                      <th className="px-4 py-3 text-left font-semibold text-foreground">Nama Siswa</th>
+                      <th className="px-4 py-3 text-left font-semibold text-foreground">Kelas</th>
+                      <th className="px-4 py-3 text-left font-semibold text-foreground">Gender</th>
+                      <th className="px-4 py-3 text-left font-semibold text-foreground">Status</th>
+                      <th className="px-4 py-3 text-left font-semibold text-foreground">Waktu Absen</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {pageData.map((row) => (
+                      <tr key={row.id || `${row.siswa_id}-${row.tanggal}-${row.status}`}>
+                        <td className="px-4 py-2 text-muted-foreground">{row.tanggal}</td>
+                        <td className="px-4 py-2 text-foreground">{row.siswa_nama}</td>
+                        <td className="px-4 py-2 text-muted-foreground">{row.kelas_nama}</td>
+                        <td className="px-4 py-2 text-muted-foreground">{row.gender}</td>
+                        <td className="px-4 py-2 text-muted-foreground capitalize">{row.status}</td>
+                        <td className="px-4 py-2 text-muted-foreground">
+                          {row.waktu_absen
+                            ? new Date(row.waktu_absen).toLocaleTimeString('id-ID', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })
+                            : '-'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Footer pagination */}
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 px-4 py-3 border-t text-xs text-muted-foreground">
+                <div>
+                  Menampilkan {total === 0 ? 0 : startIndex + 1}-{endIndex} dari {total} baris
+                </div>
+                <div className="flex flex-col md:flex-row md:items-center gap-3">
+                  <div className="flex items-center gap-1">
+                    <span>Max per halaman:</span>
+                    <Select
+                      value={String(pageSize)}
+                      onValueChange={(val) => {
+                        const newSize = parseInt(val, 10);
+                        setPageSize(newSize);
+                        setPage(1);
+                      }}
+                    >
+                      <SelectTrigger className="h-8 w-28">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {[10, 30, 40, 50, 100, 150, 200, 300, 400, 500, 800, -1].map((opt) => (
+                          <SelectItem key={opt} value={String(opt)}>
+                            {opt === -1 ? 'Semua' : opt}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={currentPage <= 1}
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    >
+                      Sebelumnya
+                    </Button>
+                    <span>
+                      Halaman {currentPage} / {totalPages}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={currentPage >= totalPages}
+                      onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    >
+                      Berikutnya
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
