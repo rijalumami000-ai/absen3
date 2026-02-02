@@ -4306,6 +4306,30 @@ async def get_aliyah_absensi_riwayat(
 
     absensi_list = await db.absensi_aliyah.find(query, {"_id": 0}).to_list(10000)
 
+    # Group by (siswa_id, tanggal, jenis)
+    dedup_map: Dict[tuple, Dict[str, Any]] = {}
+    for a in absensi_list:
+        key = (a.get("siswa_id"), a.get("tanggal"), a.get("jenis"))
+        current_best = dedup_map.get(key)
+
+        # Determine effective timestamp
+        wa = a.get("waktu_absen")
+        ca = a.get("created_at")
+        # stored as iso strings, compare lexicographically
+        ts = wa or ca or ""
+
+        if current_best is None:
+            dedup_map[key] = a
+        else:
+            wa_best = current_best.get("waktu_absen")
+            ca_best = current_best.get("created_at")
+            ts_best = wa_best or ca_best or ""
+            if ts > ts_best:
+                dedup_map[key] = a
+
+    absensi_list = list(dedup_map.values())
+
+
     # Deduplicate by siswa_id, tanggal, jenis -> keep latest by waktu_absen / created_at
     if not absensi_list:
         return {
