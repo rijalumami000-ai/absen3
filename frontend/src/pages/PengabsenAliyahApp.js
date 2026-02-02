@@ -167,6 +167,32 @@ const PengabsenAliyahApp = () => {
       return (a.kelas_nama || '').localeCompare(b.kelas_nama || '', 'id', { sensitivity: 'base' });
     });
 
+  const kelasOrderMap = new Map((kelasList || []).map((k, index) => [k.id, index]));
+
+  const groupedData = Object.values(
+    filteredData.reduce((acc, row) => {
+      const kId = row.kelas_id || 'unknown';
+      const kNama = row.kelas_nama || 'Tanpa Kelas';
+      if (!acc[kId]) {
+        acc[kId] = { kelas_id: kId, kelas_nama: kNama, items: [] };
+      }
+      acc[kId].items.push(row);
+      return acc;
+    }, {})
+  )
+    .map((group) => ({
+      ...group,
+      items: [...group.items].sort((a, b) =>
+        (a.nama || '').localeCompare(b.nama || '', 'id', { sensitivity: 'base' })
+      ),
+    }))
+    .sort((a, b) => {
+      const idxA = kelasOrderMap.has(a.kelas_id) ? kelasOrderMap.get(a.kelas_id) : Infinity;
+      const idxB = kelasOrderMap.has(b.kelas_id) ? kelasOrderMap.get(b.kelas_id) : Infinity;
+      if (idxA !== idxB) return idxA - idxB;
+      return (a.kelas_nama || '').localeCompare(b.kelas_nama || '', 'id', { sensitivity: 'base' });
+    });
+
   if (loading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
