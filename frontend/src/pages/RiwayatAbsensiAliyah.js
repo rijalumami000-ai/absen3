@@ -472,39 +472,7 @@ const RiwayatAbsensiAliyah = () => {
           ) : detail.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">Tidak ada data absensi</div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-muted">
-                  <tr>
-                    <th className="px-4 py-3 text-left font-semibold text-foreground">Tanggal</th>
-                    <th className="px-4 py-3 text-left font-semibold text-foreground">Nama Siswa</th>
-                    <th className="px-4 py-3 text-left font-semibold text-foreground">Kelas</th>
-                    <th className="px-4 py-3 text-left font-semibold text-foreground">Gender</th>
-                    <th className="px-4 py-3 text-left font-semibold text-foreground">Status</th>
-                    <th className="px-4 py-3 text-left font-semibold text-foreground">Waktu Absen</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {detail.map((row) => (
-                    <tr key={row.id || `${row.siswa_id}-${row.tanggal}-${row.status}`}>
-                      <td className="px-4 py-2 text-muted-foreground">{row.tanggal}</td>
-                      <td className="px-4 py-2 text-foreground">{row.siswa_nama}</td>
-                      <td className="px-4 py-2 text-muted-foreground">{row.kelas_nama}</td>
-                      <td className="px-4 py-2 text-muted-foreground">{row.gender}</td>
-                      <td className="px-4 py-2 text-muted-foreground capitalize">{row.status}</td>
-                      <td className="px-4 py-2 text-muted-foreground">
-                        {row.waktu_absen
-                          ? new Date(row.waktu_absen).toLocaleTimeString('id-ID', {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })
-                          : '-'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <></>
           )}
         </CardContent>
       </Card>
