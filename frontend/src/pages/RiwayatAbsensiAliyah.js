@@ -496,28 +496,6 @@ const RiwayatAbsensiAliyah = () => {
         </CardContent>
       </Card>
 
-      {/* Summary Cards */}
-      {summary && (
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
-          {statusCards.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Card key={item.key} className="shadow-card animate-scale-in">
-                <CardContent className="p-4 flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-muted-foreground">{item.label}</p>
-                    <p className="text-2xl font-bold text-foreground">{summary[item.key] ?? 0}</p>
-                  </div>
-                  <div className={`${item.bg} ${item.color} p-2 rounded-lg`}>
-                    <Icon className="w-5 h-5" />
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      )}
-
       {/* Detail Table */}
       <Card className="shadow-card">
         <CardHeader>
