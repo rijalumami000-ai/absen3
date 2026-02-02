@@ -881,6 +881,36 @@ async def scan_aliyah_absensi(
     jenis: Literal["pagi", "dzuhur"],
     current_pengabsen: dict = Depends(get_current_pengabsen_aliyah),
 ):
+    # Batasi scan absensi pagi berdasarkan pengaturan global
+    if jenis == "pagi":
+        settings = await db.settings.find_one({"id": "aliyah_absensi_pagi"}, {"_id": 0})
+        if not settings:
+            settings = AliyahAbsensiPagiSettings().model_dump()
+
+        start_time = settings.get("start_time", "06:30")
+        end_time = settings.get("end_time", "07:15")
+
+        try:
+            # Konversi ke menit
+            start_h, start_m = [int(x) for x in start_time.split(":")]
+            end_h, end_m = [int(x) for x in end_time.split(":")]
+            start_minutes = start_h * 60 + start_m
+            end_minutes = end_h * 60 + end_m
+
+            now_utc = datetime.now(timezone.utc)
+            # Konversi ke WIB (UTC+7)
+            now_wib = now_utc + timedelta(hours=7)
+            current_minutes = now_wib.hour * 60 + now_wib.minute
+
+            if current_minutes < start_minutes or current_minutes > end_minutes:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Scan Kehadiran Pagi hanya diizinkan antara {start_time} - {end_time} WIB",
+                )
+        except ValueError:
+            # Jika format jam salah di database, jangan blokir scan
+            pass
+
     siswa: Optional[Dict[str, Any]] = None
 
     if payload.type == "siswa_aliyah":
