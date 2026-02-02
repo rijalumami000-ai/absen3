@@ -264,8 +264,15 @@ const RiwayatAbsensiAliyah = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
           {statusCards.map((item) => {
             const Icon = item.icon;
+            const isActive = filterStatus === item.key;
             return (
-              <Card key={item.key} className="shadow-card animate-scale-in">
+              <Card
+                key={item.key}
+                className={`shadow-card animate-scale-in cursor-pointer transition-transform ${
+                  isActive ? 'ring-2 ring-emerald-500 scale-[1.02]' : 'hover:scale-[1.01]'
+                }`}
+                onClick={() => handleStatusCardClick(item.key)}
+              >
                 <CardContent className="p-4 flex items-center justify-between">
                   <div>
                     <p className="text-xs text-muted-foreground">{item.label}</p>
