@@ -4507,7 +4507,13 @@ async def get_aliyah_monitoring_absensi_riwayat(
 
     absensi_list = list(dedup_map.values())
 
+    summary = {"hadir": 0, "alfa": 0, "sakit": 0, "izin": 0, "dispensasi": 0, "bolos": 0}
+    detail: List[Dict[str, Any]] = []
 
+    for a in absensi_list:
+        status = a.get("status", "")
+        if status in summary:
+            summary[status] += 1
 
         siswa = siswa_map.get(a["siswa_id"])
         kelas_nama = kelas_map.get(a.get("kelas_id"), "-")
@@ -4529,7 +4535,6 @@ async def get_aliyah_monitoring_absensi_riwayat(
     detail.sort(key=lambda x: (x["tanggal"], x["kelas_nama"], x["siswa_nama"]))
 
     return {"summary": summary, "detail": detail}
-
 
 
 @api_router.delete("/aliyah/monitoring/{pembimbing_id}")
