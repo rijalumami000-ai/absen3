@@ -4288,6 +4288,7 @@ async def get_aliyah_absensi_riwayat(
     tanggal_end: Optional[str] = None,
     kelas_id: Optional[str] = None,
     gender: Optional[str] = None,
+    jenis: Optional[str] = None,
     _: dict = Depends(get_current_admin),
 ):
     """Riwayat absensi Madrasah Aliyah untuk admin.
@@ -4303,6 +4304,8 @@ async def get_aliyah_absensi_riwayat(
     }
     if kelas_id:
         query["kelas_id"] = kelas_id
+    if jenis and jenis in ["pagi", "dzuhur"]:
+        query["jenis"] = jenis
 
     absensi_list = await db.absensi_aliyah.find(query, {"_id": 0}).to_list(10000)
 
