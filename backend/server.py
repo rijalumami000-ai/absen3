@@ -4665,13 +4665,6 @@ async def get_aliyah_pengabsen_riwayat(
     return {"summary": summary, "detail": detail}
 
 
-    
-    doc = pengabsen.model_dump()
-    doc['created_at'] = doc['created_at'].isoformat()
-    await db.pengabsen_kelas.insert_one(doc)
-    
-    return PengabsenKelasResponse(**pengabsen.model_dump())
-
 @api_router.put("/pengabsen-kelas/{pengabsen_id}", response_model=PengabsenKelasResponse)
 async def update_pengabsen_kelas(pengabsen_id: str, data: PengabsenKelasUpdate, _: dict = Depends(get_current_admin)):
     pengabsen = await db.pengabsen_kelas.find_one({"id": pengabsen_id}, {"_id": 0})
