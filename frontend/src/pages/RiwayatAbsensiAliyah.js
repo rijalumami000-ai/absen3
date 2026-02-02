@@ -196,6 +196,63 @@ const RiwayatAbsensiAliyah = () => {
       <div className="mb-6 animate-slide-in-left">
       <div className="flex flex-wrap gap-2 mb-3">
         <Button
+      <div className="flex flex-wrap gap-2 mb-4">
+        <Button
+          type="button"
+          size="sm"
+          variant={filterJenis === 'pagi' ? 'default' : 'outline'}
+          onClick={() => {
+            setFilterJenis('pagi');
+            setPage(1);
+          }}
+        >
+          Absensi Kehadiran Siswa Pagi Hari
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant={filterJenis === 'dzuhur' ? 'default' : 'outline'}
+          onClick={() => {
+            setFilterJenis('dzuhur');
+            setPage(1);
+          }}
+        >
+          Kehadiran Sholat Dhuhur
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant={filterJenis === 'all' ? 'default' : 'outline'}
+          onClick={() => {
+            setFilterJenis('all');
+            setPage(1);
+          }}
+        >
+          Semua
+        </Button>
+      </div>
+
+      {summary && (
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+          {statusCards.map((item) => {
+            const Icon = item.icon;
+            return (
+              <Card key={item.key} className="shadow-card animate-scale-in">
+                <CardContent className="p-4 flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-muted-foreground">{item.label}</p>
+                    <p className="text-2xl font-bold text-foreground">{summary[item.key] ?? 0}</p>
+                  </div>
+                  <div className={`${item.bg} ${item.color} p-2 rounded-lg`}>
+                    <Icon className="w-5 h-5" />
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      )}
+
           type="button"
           size="sm"
           variant={filterJenis === 'pagi' ? 'default' : 'outline'}
