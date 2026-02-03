@@ -55,6 +55,7 @@ import { PengabsenKelasAuthProvider, usePengabsenKelasAuth } from '@/contexts/Pe
 import { PembimbingKelasAuthProvider, usePembimbingKelasAuth } from '@/contexts/PembimbingKelasAuthContext';
 import { PengabsenAliyahAuthProvider, usePengabsenAliyahAuth } from '@/contexts/PengabsenAliyahAuthContext';
 import { MonitoringAliyahAuthProvider, useMonitoringAliyahAuth } from '@/contexts/MonitoringAliyahAuthContext';
+import { PengabsenPMQAuthProvider, usePengabsenPMQAuth } from '@/contexts/PengabsenPMQAuthContext';
 import '@/App.css';
 
 const ProtectedRoute = ({ children }) => {
