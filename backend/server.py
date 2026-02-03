@@ -5730,10 +5730,6 @@ async def get_pmq_pengabsen_riwayat(
 
     return {"detail": detail}
 
-        await db.pengabsen_kelas.update_one({"id": pengabsen_id}, {"$set": update_data})
-    
-    updated = await db.pengabsen_kelas.find_one({"id": pengabsen_id}, {"_id": 0})
-    return PengabsenKelasResponse(**updated)
 
 @api_router.post("/pengabsen-kelas/{pengabsen_id}/regenerate-kode-akses", response_model=PengabsenKelasResponse)
 async def regenerate_pengabsen_kelas_kode(pengabsen_id: str, _: dict = Depends(get_current_admin)):
