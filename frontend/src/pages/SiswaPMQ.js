@@ -273,9 +273,9 @@ const SiswaPMQ = () => {
               <thead className="bg-muted">
                 <tr>
                   <th className="px-4 py-3 text-left font-semibold text-foreground">Nama</th>
+                  <th className="px-4 py-3 text-left font-semibold text-foreground">Gender</th>
                   <th className="px-4 py-3 text-left font-semibold text-foreground">Tingkatan</th>
                   <th className="px-4 py-3 text-left font-semibold text-foreground">Kelompok</th>
-                  <th className="px-4 py-3 text-left font-semibold text-foreground">Tipe</th>
                   <th className="px-4 py-3 text-left font-semibold text-foreground">QR</th>
                   <th className="px-4 py-3 text-left font-semibold text-foreground">Aksi</th>
                 </tr>
