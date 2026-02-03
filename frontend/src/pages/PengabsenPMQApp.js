@@ -214,13 +214,6 @@ const PengabsenPMQApp = () => {
     );
   }, [historyFiltered]);
 
-        {activeTab === 'history' && (
-          <section className="bg-white rounded-lg shadow p-4 space-y-4">
-            {/* TODO: isi ulang konten riwayat jika diperlukan */}
-          </section>
-        )}
-      </main>
-
       {/* Bottom Tingkatan & Tab Bar */}
       <div className="border-t bg-white px-4 py-2 flex items-center justify-between gap-2 fixed bottom-0 left-0 right-0 max-w-4xl mx-auto">
         <div className="flex gap-2 overflow-x-auto flex-1 pr-2">
