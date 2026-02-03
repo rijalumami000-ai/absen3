@@ -536,6 +536,30 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/pmq/siswa"
+        element={
+          <ProtectedRoute>
+            <SiswaPMQ />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/pmq/tingkatan"
+        element={
+          <ProtectedRoute>
+            <TingkatanPMQ />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/pmq/pengabsen"
+        element={
+          <ProtectedRoute>
+            <PengabsenPMQ />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/akses-ditolak"
         element={
           <ProtectedRoute>
