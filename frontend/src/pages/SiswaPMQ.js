@@ -509,6 +509,41 @@ const SiswaPMQ = () => {
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Pilih santri" />
+      {/* Dialog Preview QR */}
+      <Dialog open={qrPreview.open} onOpenChange={(open) => setQrPreview((prev) => ({ ...prev, open }))}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>QR Siswa PMQ</DialogTitle>
+          </DialogHeader>
+          {qrPreview.siswa && (
+            <div className="space-y-3 text-center">
+              <div>
+                <p className="font-semibold text-foreground">{qrPreview.siswa.nama}</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {qrPreview.siswa.santri_id ? 'Siswa Link dari Santri' : 'Siswa Manual PMQ'}
+                </p>
+              </div>
+              <div className="flex items-center justify-center">
+                <div className="w-56 h-56 bg-white border border-border rounded-xl flex items-center justify-center overflow-hidden">
+                  <img
+                    src={`data:image/png;base64,${qrPreview.siswa.qr_code}`}
+                    alt="QR Siswa PMQ"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+              </div>
+              <Button
+                className="w-full"
+                variant="outline"
+                onClick={() => handleDownloadSingleQR(qrPreview.siswa)}
+              >
+                Download QR
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
                 </SelectTrigger>
                 <SelectContent>
                   {availableSantri.map((s) => (
