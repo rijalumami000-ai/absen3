@@ -834,6 +834,7 @@ class SiswaPMQ(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     nama: str
+    gender: Optional[Literal["putra", "putri"]] = None
     tingkatan_key: str
     kelompok_id: Optional[str] = None
     santri_id: Optional[str] = None
@@ -843,6 +844,7 @@ class SiswaPMQ(BaseModel):
 
 class SiswaPMQCreate(BaseModel):
     nama: Optional[str] = None
+    gender: Optional[Literal["putra", "putri"]] = None
     tingkatan_key: str
     kelompok_id: Optional[str] = None
     santri_id: Optional[str] = None
@@ -850,6 +852,7 @@ class SiswaPMQCreate(BaseModel):
 
 class SiswaPMQUpdate(BaseModel):
     nama: Optional[str] = None
+    gender: Optional[Literal["putra", "putri"]] = None
     tingkatan_key: Optional[str] = None
     kelompok_id: Optional[str] = None
 
@@ -857,12 +860,14 @@ class SiswaPMQUpdate(BaseModel):
 class SiswaPMQResponse(BaseModel):
     id: str
     nama: str
+    gender: Optional[str] = None
     tingkatan_key: str
     tingkatan_label: str
     kelompok_id: Optional[str]
     kelompok_nama: Optional[str] = None
     santri_id: Optional[str]
     has_qr: bool = False
+    qr_code: Optional[str] = None
     created_at: datetime
 
 
