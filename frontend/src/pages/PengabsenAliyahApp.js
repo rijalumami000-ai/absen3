@@ -202,16 +202,6 @@ const PengabsenAliyahApp = () => {
     const idxA = historyKelasOrderMap.has(a.kelas_id) ? historyKelasOrderMap.get(a.kelas_id) : Infinity;
     const idxB = historyKelasOrderMap.has(b.kelas_id) ? historyKelasOrderMap.get(b.kelas_id) : Infinity;
     if (idxA !== idxB) return idxA - idxB;
-  useEffect(() => {
-    if (selectedMenu === 'pagi' || selectedMenu === 'dzuhur') {
-      setActiveTab('today');
-      setJenis(selectedMenu);
-    } else if (selectedMenu === 'history') {
-      setActiveTab('history');
-    }
-  }, [selectedMenu]);
-
-
     return (a.kelas_nama || '').localeCompare(b.kelas_nama || '', 'id', { sensitivity: 'base' });
   });
 
