@@ -309,11 +309,15 @@ const SiswaPMQ = () => {
               <SelectItem value="all">Semua Kelompok</SelectItem>
               {kelompokList
                 .filter((k) => filterTingkatan === 'all' || k.tingkatan_key === filterTingkatan)
-                .map((k) => (
-                  <SelectItem key={k.id} value={k.id}>
-                    {k.nama}
-                  </SelectItem>
-                ))}
+                .map((k) => {
+                  const tingkatanLabel =
+                    tingkatanList.find((t) => t.key === k.tingkatan_key)?.label || k.tingkatan_key;
+                  return (
+                    <SelectItem key={k.id} value={k.id}>
+                      {k.nama} ({tingkatanLabel})
+                    </SelectItem>
+                  );
+                })}
             </SelectContent>
           </Select>
         </div>
