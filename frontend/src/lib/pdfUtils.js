@@ -275,7 +275,7 @@ export const downloadMonitoringKelasPDF = (monitoringList, kelasList) => {
     }
   });
   
-  doc.save(`Monitoring_Kelas_Madin_${new Date().getTime()}.pdf`);
+  doc.save(`Monitoring_Kelas_Aliyah_${new Date().getTime()}.pdf`);
 };
 
 // Function to download Riwayat Absensi Aliyah as PDF
