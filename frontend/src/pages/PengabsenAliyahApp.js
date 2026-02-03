@@ -561,66 +561,6 @@ const PengabsenAliyahApp = () => {
                 </div>
               );
             })()}
-
-
-            </div>
-
-            {loadingHistory ? (
-              <div className="text-center text-xs text-gray-500 py-4">Memuat riwayat...</div>
-            ) : historyItems.length === 0 ? (
-              <div className="text-center text-xs text-gray-500 py-4">Tidak ada riwayat</div>
-            ) : (
-              <div className="space-y-2 max-h-[420px] overflow-y-auto">
-                {historyItems.map((row) => (
-                  <div
-                    key={row.id || `${row.siswa_id}-${row.tanggal}-${row.status}`}
-                    className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-lg px-3 py-2"
-                  >
-                    <div>
-                      <p className="text-sm font-medium text-gray-800">{row.siswa_nama}</p>
-                      <p className="text-xs text-gray-500">
-                        {row.kelas_nama} • {row.tanggal}
-                      </p>
-                    </div>
-                    <div className="w-32">
-                      <Select
-                        value={row.status || 'null'}
-                        onValueChange={async (val) => {
-                          const newStatus = val === 'null' ? null : val;
-                          try {
-                            await pengabsenAliyahAppAPI.upsertAbsensi({
-                              siswa_id: row.siswa_id,
-                              kelas_id: row.kelas_id,
-                              tanggal: row.tanggal,
-                              jenis: historyJenis,
-                              status: newStatus,
-                            });
-                            toast({ title: 'Sukses', description: 'Status riwayat diperbarui' });
-                          } catch (error) {
-                            toast({
-                              title: 'Error',
-                              description: error.response?.data?.detail || 'Gagal memperbarui status',
-                              variant: 'destructive',
-                            });
-                          }
-                        }}
-                      >
-                        <SelectTrigger className="h-8 text-xs">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {STATUS_OPTIONS.map((opt) => (
-                            <SelectItem key={opt.value} value={opt.value} className="text-xs">
-                              {opt.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
           </section>
         )}
       </main>
