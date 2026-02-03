@@ -153,20 +153,38 @@ const PengabsenPMQApp = () => {
   }, [data, searchQuery]);
 
   const groupedData = useMemo(() => {
-    return Object.values(
-      filteredData.reduce((acc, row) => {
-        const gId = row.kelompok_id || 'unknown';
-        const gNama = row.kelompok_nama || 'Tanpa Kelompok';
-        if (!acc[gId]) {
-          acc[gId] = { kelompok_id: gId, kelompok_nama: gNama, items: [] };
-        }
-        acc[gId].items.push(row);
-        return acc;
-      }, {})
-    ).map((group) => ({
-      ...group,
-      items: [...group.items].sort((a, b) => (a.nama || '').localeCompare(b.nama || '', 'id', { sensitivity: 'base' })),
-    }));
+    const byTingkatan = {};
+    filteredData.forEach((row) => {
+      const tKey = row.tingkatan_key || 'unknown';
+      const tLabel = row.tingkatan_label || 'Tanpa Tingkatan';
+      const kId = row.kelompok_id || 'unknown';
+      const kNama = row.kelompok_nama || 'Tanpa Kelompok';
+
+      if (!byTingkatan[tKey]) {
+        byTingkatan[tKey] = {
+          tingkatan_key: tKey,
+          tingkatan_label: tLabel,
+          kelompok: {},
+        };
+      }
+      if (!byTingkatan[tKey].kelompok[kId]) {
+        byTingkatan[tKey].kelompok[kId] = {
+          kelompok_id: kId,
+          kelompok_nama: kNama,
+          items: [],
+        };
+      }
+      byTingkatan[tKey].kelompok[kId].items.push(row);
+    });
+
+    // sort siswa per kelompok
+    Object.values(byTingkatan).forEach((t) => {
+      Object.values(t.kelompok).forEach((g) => {
+        g.items.sort((a, b) => (a.nama || '').localeCompare(b.nama || '', 'id', { sensitivity: 'base' }));
+      });
+    });
+
+    return byTingkatan;
   }, [filteredData]);
 
   const historyFiltered = useMemo(() => {
