@@ -188,6 +188,45 @@ export const downloadSiswaMadinPDF = (siswaList, kelasList) => {
   doc.save(`Siswa_Madin_${new Date().getTime()}.pdf`);
 };
 
+// Function to download Siswa PMQ as PDF
+export const downloadSiswaPMQPDF = (siswaList) => {
+  const doc = new jsPDF('p', 'mm', 'a4');
+
+  doc.setFontSize(16);
+  doc.text('Daftar Siswa PMQ', 14, 18);
+
+  doc.setFontSize(10);
+  doc.text(`Total siswa: ${siswaList.length}`, 14, 24);
+
+  const tableData = (siswaList || []).map((s, idx) => [
+    idx + 1,
+    s.nama || '-',
+    s.gender === 'putra' ? 'Putra' : s.gender === 'putri' ? 'Putri' : '-',
+    s.tingkatan_label || '-',
+    s.kelompok_nama || '-',
+    s.santri_id ? 'Link Santri' : 'Manual',
+  ]);
+
+  autoTable(doc, {
+    startY: 30,
+    head: [['No', 'Nama', 'Gender', 'Tingkatan', 'Kelompok', 'Tipe']],
+    body: tableData,
+    theme: 'grid',
+    headStyles: { fillColor: [37, 99, 235], fontStyle: 'bold' },
+    styles: { fontSize: 9 },
+    columnStyles: {
+      0: { cellWidth: 8 },
+      1: { cellWidth: 55 },
+      2: { cellWidth: 20 },
+      3: { cellWidth: 35 },
+      4: { cellWidth: 35 },
+      5: { cellWidth: 25 },
+    },
+  });
+
+  doc.save(`Daftar_Siswa_PMQ_${new Date().getTime()}.pdf`);
+};
+
 // Function to download Pengabsen Kelas Madin as PDF
 export const downloadPengabsenKelasPDF = (pengabsenList, kelasList) => {
   const doc = new jsPDF();
@@ -231,6 +270,72 @@ export const downloadPengabsenKelasPDF = (pengabsenList, kelasList) => {
   });
   
   doc.save(`Pengabsen_Kelas_Aliyah_${new Date().getTime()}.pdf`);
+};
+
+// Function to download Pengabsen PMQ as PDF
+export const downloadPengabsenPMQPDF = (pengabsenList, tingkatanList, kelompokList) => {
+  const doc = new jsPDF('p', 'mm', 'a4');
+
+  doc.setFontSize(16);
+  doc.text('Daftar Pengabsen PMQ', 14, 18);
+
+  doc.setFontSize(10);
+  doc.text(`Total pengabsen: ${pengabsenList.length}`, 14, 24);
+
+  const tingkatanMap = {};
+  (tingkatanList || []).forEach((t) => {
+    tingkatanMap[t.key] = t.label;
+  });
+
+  const kelompokMap = {};
+  (kelompokList || []).forEach((k) => {
+    kelompokMap[k.id] = `${k.nama} (${tingkatanMap[k.tingkatan_key] || k.tingkatan_key})`;
+  });
+
+  const formatTingkatan = (keys) => {
+    if (!keys || !keys.length) return '-';
+    return keys
+      .map((k) => tingkatanMap[k] || k)
+      .join(', ');
+  };
+
+  const formatKelompok = (ids) => {
+    if (!ids || !ids.length) return '-';
+    return ids
+      .map((id) => kelompokMap[id])
+      .filter(Boolean)
+      .join(', ');
+  };
+
+  const tableData = (pengabsenList || []).map((p, idx) => [
+    idx + 1,
+    p.nama || '-',
+    p.username || '-',
+    p.kode_akses || '-',
+    p.email_atau_hp || '-',
+    formatTingkatan(p.tingkatan_keys),
+    formatKelompok(p.kelompok_ids),
+  ]);
+
+  autoTable(doc, {
+    startY: 30,
+    head: [['No', 'Nama', 'Username', 'Kode Akses', 'Kontak', 'Tingkatan', 'Kelompok']],
+    body: tableData,
+    theme: 'grid',
+    headStyles: { fillColor: [22, 163, 74], fontStyle: 'bold' },
+    styles: { fontSize: 8 },
+    columnStyles: {
+      0: { cellWidth: 8 },
+      1: { cellWidth: 35 },
+      2: { cellWidth: 30 },
+      3: { cellWidth: 25 },
+      4: { cellWidth: 30 },
+      5: { cellWidth: 30 },
+      6: { cellWidth: 40 },
+    },
+  });
+
+  doc.save(`Daftar_Pengabsen_PMQ_${new Date().getTime()}.pdf`);
 };
 
 // Function to download Monitoring Kelas Madin as PDF

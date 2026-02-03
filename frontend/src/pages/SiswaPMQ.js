@@ -193,7 +193,18 @@ const SiswaPMQ = () => {
               </div>
             </CardContent>
           </Card>
-          <Button variant="outline" className="hover-lift" disabled>
+          <Button
+            variant="outline"
+            className="hover-lift"
+            onClick={() => {
+              if (!siswaList.length) {
+                toast.info('Tidak ada data siswa PMQ untuk diunduh');
+                return;
+              }
+              // Gunakan data yang sudah terfilter di tabel
+              downloadSiswaPMQPDF(siswaList);
+            }}
+          >
             <FileDown className="w-4 h-4 mr-2" />
             Download PDF
           </Button>
