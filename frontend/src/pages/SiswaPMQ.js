@@ -348,7 +348,25 @@ const SiswaPMQ = () => {
                               className="w-full h-full object-contain"
                             />
                           </div>
-                          <span className="text-xs text-muted-foreground">QR {s.santri_id ? 'Santri' : 'PMQ'}</span>
+                          <div className="flex flex-col gap-1">
+                            <span className="text-xs text-muted-foreground">QR {s.santri_id ? 'Santri' : 'PMQ'}</span>
+                            <div className="flex gap-1">
+                              <Button
+                                variant="outline"
+                                size="xs"
+                                onClick={() => setQrPreview({ open: true, siswa: s })}
+                              >
+                                Lihat QR
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="xs"
+                                onClick={() => handleDownloadSingleQR(s)}
+                              >
+                                Download
+                              </Button>
+                            </div>
+                          </div>
                         </div>
                       ) : (
                         <span className="text-muted-foreground text-xs">Belum ada QR</span>
