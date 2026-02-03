@@ -155,6 +155,22 @@ const SiswaPMQ = () => {
       toast.success('Siswa PMQ berhasil dihapus');
       fetchSiswa();
     } catch (e) {
+  const handleDownloadSingleQR = (s) => {
+    if (!s?.qr_code) return;
+    try {
+      const link = document.createElement('a');
+      link.href = `data:image/png;base64,${s.qr_code}`;
+      link.download = `${s.nama || 'QR_Siswa_PMQ'}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (e) {
+      console.error(e);
+      toast.error('Gagal mengunduh QR');
+    }
+  };
+
+
       toast.error(e.response?.data?.detail || 'Gagal menghapus siswa PMQ');
     }
   };
