@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Card, CardContent } from '@/components/ui/card';
 import { toast } from 'sonner';
 import api from '@/lib/api';
+import { downloadPengabsenPMQPDF } from '@/lib/pdfUtils';
 
 const PengabsenPMQ = () => {
   const [pengabsenList, setPengabsenList] = useState([]);
