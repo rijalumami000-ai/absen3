@@ -208,19 +208,6 @@ const PengabsenAliyahApp = () => {
       return acc;
     }, {})
   ).sort((a, b) => {
-  // Saat pertama kali load data, semua kelas dibuat ter-collaps dulu
-  useEffect(() => {
-    if (groupedData.length && Object.keys(collapsedGroups).length === 0) {
-      const initial = {};
-      groupedData.forEach((group) => {
-        const key = group.kelas_id || group.kelas_nama;
-        initial[key] = true; // true = collapsed
-      });
-      setCollapsedGroups(initial);
-    }
-  }, [groupedData]);
-
-
     const idxA = historyKelasOrderMap.has(a.kelas_id) ? historyKelasOrderMap.get(a.kelas_id) : Infinity;
     const idxB = historyKelasOrderMap.has(b.kelas_id) ? historyKelasOrderMap.get(b.kelas_id) : Infinity;
     if (idxA !== idxB) return idxA - idxB;
