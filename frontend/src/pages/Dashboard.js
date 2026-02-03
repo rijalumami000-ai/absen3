@@ -75,12 +75,11 @@ const Dashboard = () => {
       bgColor: 'bg-indigo-50',
     },
     {
-      title: 'Kartu 4',
-      value: '-',
+      title: 'Total Siswa PMQ',
+      value: totalSiswaPMQ,
       icon: Users,
-      color: 'text-gray-500',
-      bgColor: 'bg-gray-50',
-      subtitle: 'Belum digunakan',
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-50',
     },
   ];
 
