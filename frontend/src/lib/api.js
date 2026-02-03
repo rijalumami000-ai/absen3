@@ -206,6 +206,15 @@ export const madinAbsensiAPI = {
     }),
 };
 
+// PMQ Absensi API (Admin)
+export const pmqAbsensiAPI = {
+  getRiwayat: (params) =>
+    axios.get(`${API}/pmq/absensi/riwayat`, {
+      params,
+      headers: getAuthHeader(),
+    }),
+};
+
 // Settings API
 export const settingsAPI = {
   getWaliNotifikasi: () => axios.get(`${API}/settings/wali-notifikasi`, { headers: getAuthHeader() }),
