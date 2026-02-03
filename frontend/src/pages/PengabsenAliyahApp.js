@@ -410,6 +410,60 @@ const PengabsenAliyahApp = () => {
                     type="button"
                     size="sm"
                     variant={historyJenis === 'pagi' ? 'default' : 'outline'}
+      </main>
+
+      {/* Bottom Menu: Pagi Hari, Sholat Dhuhur, Riwayat */}
+      <div className="border-t bg-white px-4 py-2 flex items-center justify-between gap-2 fixed bottom-12 left-0 right-0 max-w-4xl mx-auto">
+        <div className="flex gap-2 overflow-x-auto flex-1 pr-2 justify-center">
+          <button
+            type="button"
+            onClick={() => setSelectedMenu('pagi')}
+            className={`flex flex-col items-center justify-center min-w-[80px] px-2 py-1 rounded-xl border text-[11px] transition-colors ${
+              selectedMenu === 'pagi'
+                ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white mb-1 shadow-sm">
+              <Sun className="w-4 h-4" />
+            </div>
+            <span className="truncate max-w-[90px]">Pagi Hari</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setSelectedMenu('dzuhur')}
+            className={`flex flex-col items-center justify-center min-w-[80px] px-2 py-1 rounded-xl border text-[11px] transition-colors ${
+              selectedMenu === 'dzuhur'
+                ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-sky-500 to-indigo-500 flex items-center justify-center text-white mb-1 shadow-sm">
+              <CloudSun className="w-4 h-4" />
+            </div>
+            <span className="truncate max-w-[90px]">Sholat Dhuhur</span>
+          </button>
+        </div>
+
+        <div className="flex flex-col items-center pl-2 border-l border-slate-200 ml-2">
+          <button
+            type="button"
+            onClick={() => setSelectedMenu('history')}
+            className={`flex flex-col items-center justify-center w-[70px] px-2 py-1 rounded-xl border text-[11px] transition-colors ${
+              selectedMenu === 'history'
+                ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            <div className="w-7 h-7 rounded-full bg-slate-800 flex items-center justify-center text-white mb-1 shadow-sm">
+              <History className="w-4 h-4" />
+            </div>
+            <span>Riwayat</span>
+          </button>
+        </div>
+      </div>
+
                     onClick={() => setHistoryJenis('pagi')}
                   >
                     Riwayat Kehadiran Pagi
