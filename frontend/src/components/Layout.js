@@ -120,6 +120,27 @@ const Layout = ({ children }) => {
         { path: '/aliyah/setting-jam-pagi', icon: Clock, label: 'Pengaturan Jam Pagi Aliyah' },
       ],
     },
+    {
+      id: 'setting-pmq',
+      type: 'group',
+      icon: GraduationCap,
+      label: 'Setting PMQ',
+      allowedRoles: ['superadmin', 'admin'],
+      items: [
+        { path: '/pmq/siswa', icon: Users, label: 'Database Siswa PMQ' },
+        { path: '/pmq/tingkatan', icon: Layers, label: 'Tingkatan & Kelompok PMQ' },
+      ],
+    },
+    {
+      id: 'absensi-pmq',
+      type: 'group',
+      icon: ClipboardCheck,
+      label: 'Absensi PMQ',
+      allowedRoles: ['superadmin', 'admin'],
+      items: [
+        { path: '/pmq/pengabsen', icon: UserCheck, label: 'Pengabsen PMQ' },
+      ],
+    },
     { 
       id: 'settings',
       type: 'single', 
