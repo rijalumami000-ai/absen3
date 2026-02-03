@@ -351,47 +351,91 @@ const MonitoringAliyahApp = () => {
                   </Button>
                 </div>
               </div>
-              <div className="flex gap-2 items-end">
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">Tanggal Mulai</p>
-                  <Input type="date" value={historyStart} onChange={(e) => setHistoryStart(e.target.value)} />
+              <div className="flex flex-col md:flex-row gap-2 items-end">
+                <div className="flex gap-2">
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Tanggal Mulai</p>
+                    <Input type="date" value={historyStart} onChange={(e) => setHistoryStart(e.target.value)} />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Tanggal Akhir</p>
+                    <Input type="date" value={historyEnd} onChange={(e) => setHistoryEnd(e.target.value)} />
+                  </div>
+                  <Button type="button" size="sm" onClick={async () => {
+                    await loadHistory();
+                    setCollapsedHistoryGroups({});
+                  }}>
+                    Tampilkan
+                  </Button>
                 </div>
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">Tanggal Akhir</p>
-                  <Input type="date" value={historyEnd} onChange={(e) => setHistoryEnd(e.target.value)} />
+                <div className="w-full md:w-64">
+                  <p className="text-xs text-gray-500 mb-1">Cari Nama / Kelas</p>
+                  <Input
+                    placeholder="Cari di riwayat..."
+                    value={historySearchQuery}
+                    onChange={(e) => setHistorySearchQuery(e.target.value)}
+                  />
                 </div>
-                <Button type="button" size="sm" onClick={loadHistory}>
-                  Tampilkan
-                </Button>
               </div>
             </div>
 
             {loadingHistory ? (
               <div className="text-center text-xs text-gray-500 py-4">Memuat riwayat...</div>
-            ) : historyItems.length === 0 ? (
+            ) : groupedHistory.length === 0 ? (
               <div className="text-center text-xs text-gray-500 py-4">Tidak ada riwayat</div>
             ) : (
-              <div className="overflow-x-auto max-h-[420px]">
-                <table className="w-full text-xs">
-                  <thead className="bg-slate-100">
-                    <tr>
-                      <th className="px-3 py-2 text-left font-semibold text-slate-700">Tanggal</th>
-                      <th className="px-3 py-2 text-left font-semibold text-slate-700">Nama</th>
-                      <th className="px-3 py-2 text-left font-semibold text-slate-700">Kelas</th>
-                      <th className="px-3 py-2 text-left font-semibold text-slate-700">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-200">
-                    {historyItems.map((row) => (
-                      <tr key={row.id || `${row.siswa_id}-${row.tanggal}-${row.status}`}>
-                        <td className="px-3 py-1.5 text-slate-600">{row.tanggal}</td>
-                        <td className="px-3 py-1.5 text-slate-800">{row.siswa_nama}</td>
-                        <td className="px-3 py-1.5 text-slate-600">{row.kelas_nama}</td>
-                        <td className="px-3 py-1.5 text-slate-600 capitalize">{row.status}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="space-y-4 max-h-[420px] overflow-y-auto">
+                {groupedHistory.map((group) => {
+                  const count = group.items.length;
+                  const key = group.kelas_id || group.kelas_nama;
+                  const isCollapsed = collapsedHistoryGroups[key];
+                  return (
+                    <div key={key}>
+                      <button
+                        type="button"
+                        className="w-full flex items-center justify-between text-xs font-semibold text-slate-700 mb-2 bg-slate-100 hover:bg-slate-200 rounded px-3 py-2"
+                        onClick={() =>
+                          setCollapsedHistoryGroups((prev) => ({
+                            ...prev,
+                            [key]: !isCollapsed,
+                          }))
+                        }
+                      >
+                        <span>
+                          {group.kelas_nama || 'Tanpa Kelas'} ({count} data)
+                        </span>
+                        <span className="text-[10px] text-slate-500">
+                          {isCollapsed ? 'Tampilkan' : 'Sembunyikan'}
+                        </span>
+                      </button>
+
+                      {!isCollapsed && (
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-xs">
+                            <thead className="bg-slate-100">
+                              <tr>
+                                <th className="px-3 py-2 text-left font-semibold text-slate-700">Tanggal</th>
+                                <th className="px-3 py-2 text-left font-semibold text-slate-700">Nama</th>
+                                <th className="px-3 py-2 text-left font-semibold text-slate-700">Kelas</th>
+                                <th className="px-3 py-2 text-left font-semibold text-slate-700">Status</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-200">
+                              {group.items.map((row) => (
+                                <tr key={row.id || `${row.siswa_id}-${row.tanggal}-${row.status}`}>
+                                  <td className="px-3 py-1.5 text-slate-600">{row.tanggal}</td>
+                                  <td className="px-3 py-1.5 text-slate-800">{row.siswa_nama}</td>
+                                  <td className="px-3 py-1.5 text-slate-600">{row.kelas_nama}</td>
+                                  <td className="px-3 py-1.5 text-slate-600 capitalize">{row.status}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
           </section>
