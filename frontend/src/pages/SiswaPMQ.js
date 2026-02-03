@@ -31,6 +31,7 @@ const SiswaPMQ = () => {
     tingkatan_key: '',
     kelompok_id: '',
   });
+  const [editingSiswa, setEditingSiswa] = useState(null);
   const [availableSantri, setAvailableSantri] = useState([]);
   const [editingId, setEditingId] = useState(null);
 
