@@ -442,33 +442,125 @@ const PengabsenAliyahApp = () => {
                   Tampilkan
                 </Button>
               </div>
-            const historyFiltered = historyItems.filter((row) => {
-              if (!historySearchQuery) return true;
-              const q = historySearchQuery.toLowerCase();
-              return (
-                (row.siswa_nama || '').toLowerCase().includes(q) ||
-                (row.kelas_nama || '').toLowerCase().includes(q)
+            </div>
+
+            {(() => {
+              const historyFiltered = historyItems.filter((row) => {
+                if (!historySearchQuery) return true;
+                const q = historySearchQuery.toLowerCase();
+                return (
+                  (row.siswa_nama || '').toLowerCase().includes(q) ||
+                  (row.kelas_nama || '').toLowerCase().includes(q)
+                );
+              });
+
+              const historyKelasOrderMap = new Map((kelasList || []).map((k, index) => [k.id, index]));
+
+              const filteredHistoryGroups = Object.values(
+                historyFiltered.reduce((acc, row) => {
+                  const kId = row.kelas_id || 'unknown';
+                  const kNama = row.kelas_nama || 'Tanpa Kelas';
+                  if (!acc[kId]) {
+                    acc[kId] = { kelas_id: kId, kelas_nama: kNama, items: [] };
+                  }
+                  acc[kId].items.push(row);
+                  return acc;
+                }, {})
+              ).sort((a, b) => {
+                const idxA = historyKelasOrderMap.has(a.kelas_id) ? historyKelasOrderMap.get(a.kelas_id) : Infinity;
+                const idxB = historyKelasOrderMap.has(b.kelas_id) ? historyKelasOrderMap.get(b.kelas_id) : Infinity;
+                if (idxA !== idxB) return idxA - idxB;
+                return (a.kelas_nama || '').localeCompare(b.kelas_nama || '', 'id', { sensitivity: 'base' });
+              });
+
+              return loadingHistory ? (
+                <div className="text-center text-xs text-gray-500 py-4">Memuat riwayat...</div>
+              ) : filteredHistoryGroups.length === 0 ? (
+                <div className="text-center text-xs text-gray-500 py-4">Tidak ada riwayat</div>
+              ) : (
+                <div className="space-y-4 max-h-[420px] overflow-y-auto">
+                  {filteredHistoryGroups.map((group) => {
+                    const count = group.items.length;
+                    const key = group.kelas_id || group.kelas_nama;
+                    const isCollapsed = collapsedHistoryGroups[key];
+                    return (
+                      <div key={key}>
+                        <button
+                          type="button"
+                          className="w-full flex items-center justify-between text-xs font-semibold text-slate-700 mb-2 bg-slate-100 hover:bg-slate-200 rounded px-3 py-2"
+                          onClick={() =>
+                            setCollapsedHistoryGroups((prev) => ({
+                              ...prev,
+                              [key]: !isCollapsed,
+                            }))
+                          }
+                        >
+                          <span>
+                            {group.kelas_nama || 'Tanpa Kelas'} ({count} data)
+                          </span>
+                          <span className="text-[10px] text-slate-500">
+                            {isCollapsed ? 'Tampilkan' : 'Sembunyikan'}
+                          </span>
+                        </button>
+
+                        {!isCollapsed && (
+                          <div className="space-y-2">
+                            {group.items.map((row) => (
+                              <div
+                                key={row.id || `${row.siswa_id}-${row.tanggal}-${row.status}`}
+                                className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-lg px-3 py-2"
+                              >
+                                <div>
+                                  <p className="text-sm font-medium text-gray-800">{row.siswa_nama}</p>
+                                  <p className="text-xs text-gray-500">
+                                    {row.kelas_nama} d {row.tanggal}
+                                  </p>
+                                </div>
+                                <div className="w-32">
+                                  <Select
+                                    value={row.status || 'null'}
+                                    onValueChange={async (val) => {
+                                      const newStatus = val === 'null' ? null : val;
+                                      try {
+                                        await pengabsenAliyahAppAPI.upsertAbsensi({
+                                          siswa_id: row.siswa_id,
+                                          kelas_id: row.kelas_id,
+                                          tanggal: row.tanggal,
+                                          jenis: historyJenis,
+                                          status: newStatus,
+                                        });
+                                        toast({ title: 'Sukses', description: 'Status riwayat diperbarui' });
+                                      } catch (error) {
+                                        toast({
+                                          title: 'Error',
+                                          description: error.response?.data?.detail || 'Gagal memperbarui status',
+                                          variant: 'destructive',
+                                        });
+                                      }
+                                    }}
+                                  >
+                                    <SelectTrigger className="h-8 text-xs">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {STATUS_OPTIONS.map((opt) => (
+                                        <SelectItem key={opt.value} value={opt.value} className="text-xs">
+                                          {opt.label}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               );
-            });
-
-            const historyKelasOrderMap = new Map((kelasList || []).map((k, index) => [k.id, index]));
-
-            const filteredHistoryGroups = Object.values(
-              historyFiltered.reduce((acc, row) => {
-                const kId = row.kelas_id || 'unknown';
-                const kNama = row.kelas_nama || 'Tanpa Kelas';
-                if (!acc[kId]) {
-                  acc[kId] = { kelas_id: kId, kelas_nama: kNama, items: [] };
-                }
-                acc[kId].items.push(row);
-                return acc;
-              }, {})
-            ).sort((a, b) => {
-              const idxA = historyKelasOrderMap.has(a.kelas_id) ? historyKelasOrderMap.get(a.kelas_id) : Infinity;
-              const idxB = historyKelasOrderMap.has(b.kelas_id) ? historyKelasOrderMap.get(b.kelas_id) : Infinity;
-              if (idxA !== idxB) return idxA - idxB;
-              return (a.kelas_nama || '').localeCompare(b.kelas_nama || '', 'id', { sensitivity: 'base' });
-            });
+            })()}
 
 
             </div>
