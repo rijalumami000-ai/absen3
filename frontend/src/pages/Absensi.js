@@ -373,14 +373,39 @@ const Absensi = () => {
 
       {/* Detail per Waktu Sholat */}
       {detailData ? (
-        <div className="space-y-6">
-          {waktuSholatList.map((waktu) => (
-            <Card key={waktu.key}>
-              <CardHeader className={`bg-${waktu.color}-50`}>
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
+            {waktuSholatList.map((waktu) => (
+              <Card
+                key={waktu.key}
+                className={`cursor-pointer border-2 transition-all ${
+                  activeWaktu === waktu.key
+                    ? `border-${waktu.color}-500 bg-${waktu.color}-50 shadow-card`
+                    : 'border-muted hover:border-primary-300 hover:shadow-card'
+                }`}
+                onClick={() => setActiveWaktu(waktu.key)}
+              >
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center text-base">
+                    <span className="capitalize">{waktu.name}</span>
+                    <span className="ml-auto text-xs font-normal text-gray-600">
+                      Total: {Object.values(detailData[waktu.key] || {}).reduce((sum, arr) => sum + arr.length, 0)} record
+                    </span>
+                  </CardTitle>
+                </CardHeader>
+              </Card>
+            ))}
+          </div>
+
+          {activeWaktu && detailData[activeWaktu] && (
+            <Card>
+              <CardHeader className={`bg-${waktuSholatList.find((w) => w.key === activeWaktu)?.color}-50`}>
                 <CardTitle className="flex items-center text-xl">
-                  <span className="capitalize">{waktu.name}</span>
+                  <span className="capitalize">
+                    {waktuSholatList.find((w) => w.key === activeWaktu)?.name || activeWaktu}
+                  </span>
                   <span className="ml-auto text-sm font-normal text-gray-600">
-                    Total: {Object.values(detailData[waktu.key] || {}).reduce((sum, arr) => sum + arr.length, 0)} record
+                    Total: {Object.values(detailData[activeWaktu] || {}).reduce((sum, arr) => sum + arr.length, 0)} record
                   </span>
                 </CardTitle>
               </CardHeader>
@@ -388,12 +413,12 @@ const Absensi = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {statusInfo.map((status) => {
                     const Icon = status.icon;
-                    const santriList = detailData[waktu.key]?.[status.key] || [];
+                    const santriList = detailData[activeWaktu]?.[status.key] || [];
                     return (
                       <div
                         key={status.key}
                         className={`border-2 rounded-lg p-4 ${getStatusColor(status.key)}`}
-                        data-testid={`${waktu.key}-${status.key}`}
+                        data-testid={`${activeWaktu}-${status.key}`}
                       >
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center">
@@ -429,8 +454,8 @@ const Absensi = () => {
                 </div>
               </CardContent>
             </Card>
-          ))}
-        </div>
+          )}
+        </>
       ) : (
         <Card>
           <CardContent className="p-12 text-center text-gray-500">
