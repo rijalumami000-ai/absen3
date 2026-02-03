@@ -3872,13 +3872,21 @@ class AliyahAbsensiPagiSettings(BaseModel):
     updated_at: Optional[str] = None
 
 
+class PMQSesi(BaseModel):
+    key: str
+    label: str
+    start_time: str  # HH:MM
+    end_time: str  # HH:MM
+    active: bool = True
+
+
 class PMQWaktuSettings(BaseModel):
     id: str = Field(default="pmq_waktu")
-    sesi: List[Dict[str, Any]]
+    sesi: List[PMQSesi] = [
+        PMQSesi(key="pagi", label="Sesi Pagi", start_time="06:30", end_time="07:30", active=True),
+        PMQSesi(key="malam", label="Sesi Malam", start_time="19:30", end_time="20:30", active=True),
+    ]
     updated_at: Optional[str] = None
-
-
-class PMQSesi(BaseModel):
     key: str
     label: str
     start_time: str  # HH:MM
