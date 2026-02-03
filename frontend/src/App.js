@@ -34,6 +34,8 @@ import PengabsenAliyahApp from '@/pages/PengabsenAliyahApp';
 import PengabsenAliyahAppLogin from '@/pages/PengabsenAliyahAppLogin';
 import MonitoringAliyahApp from '@/pages/MonitoringAliyahApp';
 import MonitoringAliyahAppLogin from '@/pages/MonitoringAliyahAppLogin';
+import PengabsenPMQAppLogin from '@/pages/PengabsenPMQAppLogin';
+import PengabsenPMQApp from '@/pages/PengabsenPMQApp';
 import SettingAplikasiAliyah from '@/pages/SettingAplikasiAliyah';
 import SettingJamPagiAliyah from '@/pages/SettingJamPagiAliyah';
 import PengabsenKelasAppLogin from '@/pages/PengabsenKelasAppLogin';
