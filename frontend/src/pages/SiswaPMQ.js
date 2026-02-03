@@ -366,7 +366,7 @@ const SiswaPMQ = () => {
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Tambah Siswa PMQ Baru</DialogTitle>
+            <DialogTitle>{editingId ? 'Edit Siswa PMQ' : 'Tambah Siswa PMQ Baru'}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
