@@ -960,6 +960,7 @@ class PMQAbsensi(BaseModel):
     tanggal: str
     sesi: Literal["pagi", "malam"]
     status: Literal["hadir", "alfa", "sakit", "izin", "terlambat"]
+    kelompok_id: Optional[str] = None
     pengabsen_id: Optional[str] = None
     waktu_absen: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
