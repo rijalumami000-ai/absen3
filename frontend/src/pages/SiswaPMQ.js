@@ -140,6 +140,8 @@ const SiswaPMQ = () => {
   };
 
   const totalSiswa = siswaList.length;
+  const totalPutra = siswaList.filter((s) => s.gender === 'putra').length;
+  const totalPutri = siswaList.filter((s) => s.gender === 'putri').length;
 
   return (
     <div className="space-y-6 animate-fade-in">
