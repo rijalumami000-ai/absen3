@@ -153,10 +153,14 @@ const SiswaPMQ = () => {
         </div>
         <div className="flex gap-3 animate-slide-in-right items-center">
           <Card className="shadow-card">
-            <CardContent className="p-3 flex items-center gap-3">
+            <CardContent className="p-3 flex items-center gap-4">
               <div>
                 <p className="text-[11px] text-muted-foreground">Total Siswa PMQ</p>
                 <p className="text-2xl font-bold text-foreground">{totalSiswa}</p>
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  Putra: <span className="font-semibold text-foreground">{totalPutra}</span> · Putri:{' '}
+                  <span className="font-semibold text-foreground">{totalPutri}</span>
+                </p>
               </div>
               <div className="bg-emerald-50 text-emerald-700 p-2 rounded-lg">
                 <Users className="w-4 h-4" />
