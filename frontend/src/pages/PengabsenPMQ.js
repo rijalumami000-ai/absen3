@@ -158,7 +158,17 @@ const PengabsenPMQ = () => {
           <p className="text-muted-foreground mt-1">Kelola pengabsen Pendidikan Murottilil Qur'an</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" className="hover-lift" disabled>
+          <Button
+            variant="outline"
+            className="hover-lift"
+            onClick={() => {
+              if (!pengabsenList.length) {
+                toast.info('Tidak ada data pengabsen PMQ untuk diunduh');
+                return;
+              }
+              downloadPengabsenPMQPDF(pengabsenList, tingkatanList, kelompokList);
+            }}
+          >
             <FileDown className="w-4 h-4 mr-2" />
             Download PDF
           </Button>
