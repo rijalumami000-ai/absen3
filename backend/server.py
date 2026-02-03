@@ -988,6 +988,8 @@ async def get_siswa_pmq(
                 kelompok_nama=kelompok.get("nama") if kelompok else None,
                 santri_id=doc.get("santri_id"),
                 has_qr=bool(doc.get("qr_code")),
+                qr_code=doc.get("qr_code"),
+                gender=doc.get("gender"),
                 created_at=doc.get("created_at", datetime.now(timezone.utc)),
             )
         )
