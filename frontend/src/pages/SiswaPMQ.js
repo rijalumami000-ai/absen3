@@ -134,6 +134,11 @@ const SiswaPMQ = () => {
   const filteredKelompokForForm = (tingkatanKey) =>
     kelompokList.filter((k) => k.tingkatan_key === tingkatanKey);
 
+  const getGenderLabel = (g) => {
+    if (!g) return '-';
+    return g === 'putra' ? 'Putra' : 'Putri';
+  };
+
   const totalSiswa = siswaList.length;
 
   return (
