@@ -208,6 +208,19 @@ const PengabsenAliyahApp = () => {
       return acc;
     }, {})
   ).sort((a, b) => {
+  // Saat pertama kali load data, semua kelas dibuat ter-collaps dulu
+  useEffect(() => {
+    if (groupedData.length && Object.keys(collapsedGroups).length === 0) {
+      const initial = {};
+      groupedData.forEach((group) => {
+        const key = group.kelas_id || group.kelas_nama;
+        initial[key] = true; // true = collapsed
+      });
+      setCollapsedGroups(initial);
+    }
+  }, [groupedData]);
+
+
     const idxA = historyKelasOrderMap.has(a.kelas_id) ? historyKelasOrderMap.get(a.kelas_id) : Infinity;
     const idxB = historyKelasOrderMap.has(b.kelas_id) ? historyKelasOrderMap.get(b.kelas_id) : Infinity;
     if (idxA !== idxB) return idxA - idxB;
@@ -425,35 +438,35 @@ const PengabsenAliyahApp = () => {
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Tanggal Akhir</p>
                     <Input type="date" value={historyEnd} onChange={(e) => setHistoryEnd(e.target.value)} />
-                  </div>
-                  <div className="pt-5">
-                    <Button
-                      type="button"
-                      size="sm"
-                      className="w-full md:w-auto"
-                      onClick={async () => {
-                        try {
-                          setLoadingHistory(true);
-                          const resp = await pengabsenAliyahAppAPI.riwayat({
-                            jenis: historyJenis,
-                            tanggal_start: historyStart,
-                            tanggal_end: historyEnd,
-                          });
-                          setHistoryItems(resp.data.detail || []);
-                          setCollapsedHistoryGroups({});
-                        } catch (error) {
-                          toast({
-                            title: 'Error',
-                            description: 'Gagal memuat riwayat',
-                            variant: 'destructive',
-                          });
-                        } finally {
-                          setLoadingHistory(false);
-                        }
-                      }}
-                    >
-                      Tampilkan
-                    </Button>
+                    <div className="mt-2">
+                      <Button
+                        type="button"
+                        size="sm"
+                        className="w-full md:w-auto"
+                        onClick={async () => {
+                          try {
+                            setLoadingHistory(true);
+                            const resp = await pengabsenAliyahAppAPI.riwayat({
+                              jenis: historyJenis,
+                              tanggal_start: historyStart,
+                              tanggal_end: historyEnd,
+                            });
+                            setHistoryItems(resp.data.detail || []);
+                            setCollapsedHistoryGroups({});
+                          } catch (error) {
+                            toast({
+                              title: 'Error',
+                              description: 'Gagal memuat riwayat',
+                              variant: 'destructive',
+                            });
+                          } finally {
+                            setLoadingHistory(false);
+                          }
+                        }}
+                      >
+                        Tampilkan
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
