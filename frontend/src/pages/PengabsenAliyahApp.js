@@ -315,7 +315,7 @@ const PengabsenAliyahApp = () => {
                 ) : groupedData.length === 0 ? (
                   <div className="text-center text-xs text-gray-500 py-4">Tidak ada data siswa</div>
                 ) : (
-                  <div className="space-y-4 max-h-[420px] overflow-y-auto">
+                  <div className="space-y-4 max-h-[360px] overflow-y-auto">
                     {groupedData.map((group) => {
                       const count = group.items.length;
                       const key = group.kelas_id || group.kelas_nama;
