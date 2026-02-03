@@ -434,6 +434,59 @@ export const downloadRiwayatAbsensiAliyahPDF = (detail, filters) => {
   doc.save(`Riwayat_Absensi_Aliyah_${new Date().getTime()}.pdf`);
 };
 
+// Function to download Riwayat Absensi PMQ as PDF
+export const downloadRiwayatAbsensiPMQPDF = (detail, filters) => {
+  const doc = new jsPDF('p', 'mm', 'a4');
+
+  doc.setFontSize(16);
+  doc.text('Riwayat Absensi PMQ', 14, 18);
+
+  doc.setFontSize(10);
+  const periodeText = filters.periodeLabel || '';
+  const tanggalText = `Periode: ${filters.tanggalStart} s.d. ${filters.tanggalEnd}`;
+  const tingkatanText = filters.tingkatanLabel ? `Tingkatan: ${filters.tingkatanLabel}` : 'Tingkatan: Semua';
+  const kelompokText = filters.kelompokLabel ? `Kelompok: ${filters.kelompokLabel}` : 'Kelompok: Semua';
+
+  doc.text(periodeText, 14, 26);
+  doc.text(tanggalText, 14, 31);
+  doc.text(tingkatanText, 14, 36);
+  doc.text(kelompokText, 14, 41);
+
+  const tableData = detail.map((row, index) => [
+    index + 1,
+    row.tanggal || '-',
+    row.sesi || '-',
+    row.siswa_nama || '-',
+    row.tingkatan_label || '-',
+    row.kelompok_nama || '-',
+    row.status || '-',
+    row.waktu_absen
+      ? new Date(row.waktu_absen).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+      : '-',
+  ]);
+
+  autoTable(doc, {
+    startY: 46,
+    head: [['No', 'Tanggal', 'Sesi', 'Nama Siswa', 'Tingkatan', 'Kelompok', 'Status', 'Waktu Absen']],
+    body: tableData,
+    theme: 'grid',
+    headStyles: { fillColor: [5, 150, 105], fontStyle: 'bold' },
+    styles: { fontSize: 8 },
+    columnStyles: {
+      0: { cellWidth: 8 },
+      1: { cellWidth: 20 },
+      2: { cellWidth: 18 },
+      3: { cellWidth: 40 },
+      4: { cellWidth: 25 },
+      5: { cellWidth: 25 },
+      6: { cellWidth: 18 },
+      7: { cellWidth: 20 },
+    },
+  });
+
+  doc.save(`Riwayat_Absensi_PMQ_${new Date().getTime()}.pdf`);
+};
+
 // Function to download Riwayat Absensi Madin as PDF
 export const downloadRiwayatAbsensiMadinPDF = (detail, filters) => {
   const doc = new jsPDF('p', 'mm', 'a4');
