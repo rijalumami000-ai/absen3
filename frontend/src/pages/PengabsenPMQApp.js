@@ -213,51 +213,12 @@ const PengabsenPMQApp = () => {
     );
   }, [historyFiltered]);
 
-      {/* Bottom Tingkatan & Tab Bar */}
-      <div className="border-t bg-white px-4 py-2 flex items-center justify-between gap-2 fixed bottom-0 left-0 right-0 max-w-4xl mx-auto">
-        <div className="flex gap-2 overflow-x-auto flex-1 pr-2">
-          {allowedTingkatanKeys.map((t) => {
-            const Icon = t.icon;
-            const isActive = selectedTingkatanKey === t.key;
-            return (
-              <button
-                key={t.key}
-                type="button"
-                onClick={() => setSelectedTingkatanKey(t.key)}
-                className={`flex flex-col items-center justify-center min-w-[70px] px-2 py-1 rounded-xl border text-[11px] transition-colors ${
-                  isActive
-                    ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                    : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
-                }`}
-              >
-                <div
-                  className={`w-7 h-7 rounded-full bg-gradient-to-br ${t.color} flex items-center justify-center text-white mb-1 shadow-sm`}
-                >
-                  <Icon className="w-4 h-4" />
-                </div>
-                <span className="truncate max-w-[80px]">{t.label}</span>
-              </button>
-            );
-          })}
-        </div>
-        <div className="flex flex-col items-center pl-2 border-l border-slate-200 ml-2">
-          <button
-            type="button"
-            onClick={() => setActiveTab('history')}
-            className={`flex flex-col items-center justify-center w-[60px] px-2 py-1 rounded-xl border text-[11px] transition-colors ${
-              activeTab === 'history'
-                ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
-            }`}
-          >
-            <div className="w-7 h-7 rounded-full bg-slate-800 flex items-center justify-center text-white mb-1 shadow-sm">
-              <ClockHistory className="w-4 h-4" />
-            </div>
-            <span>Riwayat</span>
-          </button>
-        </div>
-      </div>
-
+  // Tentukan tingkatan default pertama kali
+  useEffect(() => {
+    if (!selectedTingkatanKey && allowedTingkatanKeys.length) {
+      setSelectedTingkatanKey(allowedTingkatanKeys[0].key);
+    }
+  }, [allowedTingkatanKeys, selectedTingkatanKey]);
 
   const totalSiswa = data.length;
   const hadirCount = data.filter((row) => row.status === 'hadir').length;
