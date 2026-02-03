@@ -429,6 +429,7 @@ const PengabsenAliyahApp = () => {
                     <Button
                     type="button"
                     size="sm"
+                    className="w-full md:w-auto"
                     onClick={async () => {
                       try {
                         setLoadingHistory(true);
