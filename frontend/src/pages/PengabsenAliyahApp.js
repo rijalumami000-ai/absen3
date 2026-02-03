@@ -248,25 +248,10 @@ const PengabsenAliyahApp = () => {
             <section className="bg-white rounded-lg shadow p-4 space-y-4">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                 <div>
-                  <p className="text-xs text-gray-500">Jenis Absensi</p>
-                  <div className="flex gap-2 mt-1">
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant={jenis === 'pagi' ? 'default' : 'outline'}
-                      onClick={() => setJenis('pagi')}
-                    >
-                      Kehadiran Siswa Pagi Hari
-                    </Button>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant={jenis === 'dzuhur' ? 'default' : 'outline'}
-                      onClick={() => setJenis('dzuhur')}
-                    >
-                      Kehadiran Sholat Dhuhur
-                    </Button>
-                  </div>
+                  <p className="text-xs text-gray-500 mb-1">Jenis Absensi</p>
+                  <p className="text-sm font-medium text-gray-800">
+                    {jenis === 'pagi' ? 'Kehadiran Siswa Pagi Hari' : 'Kehadiran Sholat Dhuhur'}
+                  </p>
                 </div>
                 <div className="flex gap-2 items-end">
                   <div>
