@@ -193,7 +193,7 @@ export const downloadPengabsenKelasPDF = (pengabsenList, kelasList) => {
   const doc = new jsPDF();
   
   doc.setFontSize(18);
-  doc.text('Daftar Pengabsen Kelas Madin', 14, 20);
+  doc.text('Daftar Pengabsen Kelas Aliyah', 14, 20);
   
   doc.setFontSize(11);
   doc.text(`Tanggal: ${new Date().toLocaleDateString('id-ID')}`, 14, 28);
@@ -238,7 +238,7 @@ export const downloadMonitoringKelasPDF = (monitoringList, kelasList) => {
   const doc = new jsPDF();
   
   doc.setFontSize(18);
-  doc.text('Daftar Monitoring Kelas Madin', 14, 20);
+  doc.text('Daftar Monitoring Kelas Aliyah', 14, 20);
   
   doc.setFontSize(11);
   doc.text(`Tanggal: ${new Date().toLocaleDateString('id-ID')}`, 14, 28);
