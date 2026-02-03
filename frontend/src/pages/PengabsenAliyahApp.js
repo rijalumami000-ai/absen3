@@ -80,6 +80,15 @@ const PengabsenAliyahApp = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, jenis, tanggal]);
 
+  useEffect(() => {
+    if (selectedMenu === 'pagi' || selectedMenu === 'dzuhur') {
+      setActiveTab('today');
+      setJenis(selectedMenu);
+    } else if (selectedMenu === 'history') {
+      setActiveTab('history');
+    }
+  }, [selectedMenu]);
+
   const loadData = async (jenisAbsensi, tgl) => {
     try {
       setLoadingData(true);
