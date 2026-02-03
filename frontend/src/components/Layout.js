@@ -22,7 +22,8 @@ import {
   GraduationCap,
   ClipboardCheck,
   Eye,
-  Database
+  Database,
+  Layers
 } from 'lucide-react';
 
 const Layout = ({ children }) => {
