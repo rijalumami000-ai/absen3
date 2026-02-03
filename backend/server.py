@@ -3756,6 +3756,25 @@ async def get_absensi_riwayat(
 
     # Process absensi data
     for a in absensi_list:
+
+
+@api_router.get("/pmq/settings/waktu")
+async def get_pmq_waktu_settings(_: dict = Depends(get_current_admin)):
+    settings = await db.settings.find_one({"id": "pmq_waktu"}, {"_id": 0})
+    if not settings:
+        return PMQWaktuSettings().model_dump()
+    return settings
+
+
+@api_router.put("/pmq/settings/waktu")
+async def update_pmq_waktu_settings(data: PMQWaktuSettings, _: dict = Depends(get_current_admin)):
+    payload = data.model_dump()
+    payload["id"] = "pmq_waktu"
+    payload["updated_at"] = datetime.now(timezone.utc).isoformat()
+
+    await db.settings.update_one({"id": "pmq_waktu"}, {"$set": payload}, upsert=True)
+    return {"message": "Pengaturan waktu PMQ berhasil disimpan"}
+
         waktu = a.get("waktu_sholat")
         status = a.get("status")
         santri_id = a.get("santri_id")
