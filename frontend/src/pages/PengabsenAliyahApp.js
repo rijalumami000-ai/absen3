@@ -407,40 +407,51 @@ const PengabsenAliyahApp = () => {
                   </Button>
                 </div>
               </div>
-              <div className="flex gap-2 items-end">
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">Tanggal Mulai</p>
-                  <Input type="date" value={historyStart} onChange={(e) => setHistoryStart(e.target.value)} />
+              <div className="flex flex-col md:flex-row gap-2 items-end">
+                <div className="flex gap-2">
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Tanggal Mulai</p>
+                    <Input type="date" value={historyStart} onChange={(e) => setHistoryStart(e.target.value)} />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Tanggal Akhir</p>
+                    <Input type="date" value={historyEnd} onChange={(e) => setHistoryEnd(e.target.value)} />
+                  </div>
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={async () => {
+                      try {
+                        setLoadingHistory(true);
+                        const resp = await pengabsenAliyahAppAPI.riwayat({
+                          jenis: historyJenis,
+                          tanggal_start: historyStart,
+                          tanggal_end: historyEnd,
+                        });
+                        setHistoryItems(resp.data.detail || []);
+                        setCollapsedHistoryGroups({});
+                      } catch (error) {
+                        toast({
+                          title: 'Error',
+                          description: 'Gagal memuat riwayat',
+                          variant: 'destructive',
+                        });
+                      } finally {
+                        setLoadingHistory(false);
+                      }
+                    }}
+                  >
+                    Tampilkan
+                  </Button>
                 </div>
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">Tanggal Akhir</p>
-                  <Input type="date" value={historyEnd} onChange={(e) => setHistoryEnd(e.target.value)} />
+                <div className="w-full md:w-64">
+                  <p className="text-xs text-gray-500 mb-1">Cari Nama / Kelas</p>
+                  <Input
+                    placeholder="Cari di riwayat..."
+                    value={historySearchQuery}
+                    onChange={(e) => setHistorySearchQuery(e.target.value)}
+                  />
                 </div>
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={async () => {
-                    try {
-                      setLoadingHistory(true);
-                      const resp = await pengabsenAliyahAppAPI.riwayat({
-                        jenis: historyJenis,
-                        tanggal_start: historyStart,
-                        tanggal_end: historyEnd,
-                      });
-                      setHistoryItems(resp.data.detail || []);
-                    } catch (error) {
-                      toast({
-                        title: 'Error',
-                        description: 'Gagal memuat riwayat',
-                        variant: 'destructive',
-                      });
-                    } finally {
-                      setLoadingHistory(false);
-                    }
-                  }}
-                >
-                  Tampilkan
-                </Button>
               </div>
             </div>
 
