@@ -33,6 +33,7 @@ const SiswaPMQ = () => {
     kelompok_id: '',
   });
   const [editingSiswa, setEditingSiswa] = useState(null);
+  const [qrPreview, setQrPreview] = useState({ open: false, siswa: null });
   const [availableSantri, setAvailableSantri] = useState([]);
   const [editingId, setEditingId] = useState(null);
 
