@@ -2127,18 +2127,6 @@ async def login_pengabsen_pmq(request: PengabsenPMQLoginRequest):
 async def get_pengabsen_pmq_me(current_pengabsen: dict = Depends(get_current_pengabsen_pmq)):
     return PengabsenPMQMeResponse(**current_pengabsen)
 
-        await db.admins.update_one({"id": admin["id"]}, {"$set": {"role": role}})
-    
-    access_token = create_access_token(data={"sub": admin['id'], "role": role})
-    
-    user_data = dict(admin)
-    user_data.setdefault("role", role)
-    
-    return {
-        "access_token": access_token,
-        "token_type": "bearer",
-        "user": AdminResponse(**user_data)
-    }
 
 @api_router.get("/auth/me", response_model=AdminResponse)
 async def get_me(current_admin: dict = Depends(get_current_admin)):
