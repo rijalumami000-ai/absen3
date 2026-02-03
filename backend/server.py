@@ -1036,6 +1036,9 @@ async def create_siswa_pmq(payload: SiswaPMQCreate, _: dict = Depends(get_curren
         # Opsional: gunakan QR santri jika ada
         if santri.get("qr_code"):
             data["qr_code"] = santri["qr_code"]
+        # Bawa juga gender santri jika ada
+        if santri.get("gender"):
+            data["gender"] = santri["gender"]
     else:
         if not data.get("nama"):
             raise HTTPException(status_code=400, detail="Nama wajib diisi untuk siswa PMQ baru")
