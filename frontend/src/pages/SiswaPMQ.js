@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Plus, Search, Users, Link, FileDown } from 'lucide-react';
+import { Plus, Search, Users, Link, FileDown, QrCode, Download, Link2, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -344,10 +344,17 @@ const SiswaPMQ = () => {
                 {siswaList.map((s) => (
                   <tr key={s.id} className="hover:bg-muted/50">
                     <td className="px-4 py-2 font-medium text-foreground">
-                      <div className="flex flex-col">
+                      <div className="flex items-center gap-2">
                         <span>{s.nama}</span>
-                        <span className="text-[11px] text-muted-foreground mt-0.5">
-                          {s.santri_id ? 'Siswa Link dari Santri' : 'Siswa Manual PMQ'}
+                        <span
+                          className={`inline-flex h-5 w-5 items-center justify-center rounded-full border text-[10px] ${
+                            s.santri_id
+                              ? 'border-blue-300 bg-blue-50 text-blue-600'
+                              : 'border-emerald-300 bg-emerald-50 text-emerald-600'
+                          }`}
+                          title={s.santri_id ? 'Siswa link dari santri' : 'Siswa manual PMQ'}
+                        >
+                          {s.santri_id ? <Link2 className="w-3 h-3" /> : <User className="w-3 h-3" />}
                         </span>
                       </div>
                     </td>
