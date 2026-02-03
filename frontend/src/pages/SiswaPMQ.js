@@ -57,6 +57,7 @@ const SiswaPMQ = () => {
       const params = {};
       if (filterTingkatan !== 'all') params.tingkatan_key = filterTingkatan;
       if (filterKelompok !== 'all') params.kelompok_id = filterKelompok;
+      if (filterGender !== 'all') params.gender = filterGender;
       if (searchQuery) params.search = searchQuery;
       const res = await api.get('/pmq/siswa', { params });
       setSiswaList(res.data || []);
