@@ -84,6 +84,28 @@ const PengabsenPMQApp = () => {
     } catch (e) {
       // silent
     } finally {
+  const tingkatanDefs = useMemo(
+    () => [
+      { key: 'jet_tempur', label: 'Jet Tempur', icon: Rocket, color: 'from-sky-500 to-emerald-400' },
+      { key: 'persiapan', label: 'Persiapan', icon: Sparkles, color: 'from-amber-500 to-orange-400' },
+      { key: 'jazariyah', label: 'Jazariyah', icon: BookOpen, color: 'from-indigo-500 to-sky-500' },
+      { key: 'al_quran', label: "Al-Qur'an", icon: MoonStar, color: 'from-emerald-600 to-lime-500' },
+    ],
+    []
+  );
+
+  const allowedTingkatanKeys = useMemo(() => {
+    const keys = user?.tingkatan_keys || [];
+    if (!keys.length) return [];
+    return tingkatanDefs.filter((t) => keys.includes(t.key));
+  }, [tingkatanDefs, user]);
+
+  const selectedTingkatan = useMemo(() => {
+    if (!selectedTingkatanKey) return null;
+    return tingkatanDefs.find((t) => t.key === selectedTingkatanKey) || null;
+  }, [selectedTingkatanKey, tingkatanDefs]);
+
+
       setLoadingData(false);
     }
   };
