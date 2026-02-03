@@ -41,9 +41,11 @@ const PengabsenAliyahApp = () => {
   const [historyStart, setHistoryStart] = useState(getTodayLocalYMD());
   const [historyEnd, setHistoryEnd] = useState(getTodayLocalYMD());
   const [historyItems, setHistoryItems] = useState([]);
+  const [historySearchQuery, setHistorySearchQuery] = useState('');
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [kelasList, setKelasList] = useState([]);
   const [collapsedGroups, setCollapsedGroups] = useState({});
+  const [collapsedHistoryGroups, setCollapsedHistoryGroups] = useState({});
 
 
   const { toast } = useToast();
@@ -440,6 +442,35 @@ const PengabsenAliyahApp = () => {
                   Tampilkan
                 </Button>
               </div>
+            const historyFiltered = historyItems.filter((row) => {
+              if (!historySearchQuery) return true;
+              const q = historySearchQuery.toLowerCase();
+              return (
+                (row.siswa_nama || '').toLowerCase().includes(q) ||
+                (row.kelas_nama || '').toLowerCase().includes(q)
+              );
+            });
+
+            const historyKelasOrderMap = new Map((kelasList || []).map((k, index) => [k.id, index]));
+
+            const filteredHistoryGroups = Object.values(
+              historyFiltered.reduce((acc, row) => {
+                const kId = row.kelas_id || 'unknown';
+                const kNama = row.kelas_nama || 'Tanpa Kelas';
+                if (!acc[kId]) {
+                  acc[kId] = { kelas_id: kId, kelas_nama: kNama, items: [] };
+                }
+                acc[kId].items.push(row);
+                return acc;
+              }, {})
+            ).sort((a, b) => {
+              const idxA = historyKelasOrderMap.has(a.kelas_id) ? historyKelasOrderMap.get(a.kelas_id) : Infinity;
+              const idxB = historyKelasOrderMap.has(b.kelas_id) ? historyKelasOrderMap.get(b.kelas_id) : Infinity;
+              if (idxA !== idxB) return idxA - idxB;
+              return (a.kelas_nama || '').localeCompare(b.kelas_nama || '', 'id', { sensitivity: 'base' });
+            });
+
+
             </div>
 
             {loadingHistory ? (
