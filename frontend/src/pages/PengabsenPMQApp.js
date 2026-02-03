@@ -169,14 +169,6 @@ const PengabsenPMQApp = () => {
       }
       if (!byTingkatan[tKey].kelompok[kId]) {
         byTingkatan[tKey].kelompok[kId] = {
-  // Tentukan tingkatan default pertama kali
-  useEffect(() => {
-    if (!selectedTingkatanKey && allowedTingkatanKeys.length) {
-      setSelectedTingkatanKey(allowedTingkatanKeys[0].key);
-    }
-  }, [allowedTingkatanKeys, selectedTingkatanKey]);
-
-
           kelompok_id: kId,
           kelompok_nama: kNama,
           items: [],
