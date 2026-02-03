@@ -570,6 +570,14 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/pmq/setting-waktu"
+        element={
+          <ProtectedRoute>
+            <SettingWaktuPMQ />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/akses-ditolak"
         element={
           <ProtectedRoute>
