@@ -361,39 +361,31 @@ const SiswaPMQ = () => {
                     <td className="px-4 py-2 text-muted-foreground">{getGenderLabel(s.gender)}</td>
                     <td className="px-4 py-2 text-muted-foreground">{s.tingkatan_label}</td>
                     <td className="px-4 py-2 text-muted-foreground">{s.kelompok_nama || '-'}</td>
-                    <td className="px-4 py-2">
-                      {s.qr_code ? (
-                        <div className="flex items-center gap-2">
-                          <div className="w-12 h-12 bg-white border border-border rounded flex items-center justify-center overflow-hidden">
-                            <img
-                              src={`data:image/png;base64,${s.qr_code}`}
-                              alt="QR PMQ"
-                              className="w-full h-full object-contain"
-                            />
-                          </div>
-                          <div className="flex flex-col gap-1">
-                            <span className="text-xs text-muted-foreground">QR {s.santri_id ? 'Santri' : 'PMQ'}</span>
-                            <div className="flex gap-1">
-                              <Button
-                                variant="outline"
-                                size="xs"
-                                onClick={() => setQrPreview({ open: true, siswa: s })}
-                              >
-                                Lihat QR
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="xs"
-                                onClick={() => handleDownloadSingleQR(s)}
-                              >
-                                Download
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <span className="text-muted-foreground text-xs">Belum ada QR</span>
-                      )}
+                    <td className="px-4 py-2 text-muted-foreground">
+                      <div className="flex items-center gap-2">
+                        {s.qr_code ? (
+                          <>
+                            <button
+                              type="button"
+                              className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card hover:bg-muted transition-colors"
+                              onClick={() => setQrPreview({ open: true, siswa: s })}
+                              title="Lihat QR"
+                            >
+                              <QrCode className="w-4 h-4" />
+                            </button>
+                            <button
+                              type="button"
+                              className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card hover:bg-muted transition-colors"
+                              onClick={() => handleDownloadSingleQR(s)}
+                              title="Download QR"
+                            >
+                              <Download className="w-4 h-4" />
+                            </button>
+                          </>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">Belum ada QR</span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-4 py-2 text-muted-foreground">
                       <div className="flex gap-2">
