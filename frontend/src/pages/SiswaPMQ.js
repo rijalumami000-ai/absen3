@@ -130,6 +130,7 @@ const SiswaPMQ = () => {
       tingkatan_key: siswa.tingkatan_key,
       kelompok_id: siswa.kelompok_id || '',
     });
+    setEditingId(siswa.id);
     setIsCreateOpen(true);
   };
 
