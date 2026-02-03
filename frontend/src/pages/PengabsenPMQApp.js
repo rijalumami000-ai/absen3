@@ -371,11 +371,15 @@ const PengabsenPMQApp = () => {
             <div className="mt-4">
               {loadingData ? (
                 <div className="text-center text-xs text-gray-500 py-4">Memuat data...</div>
-              ) : groupedData.length === 0 ? (
-                <div className="text-center text-xs text-gray-500 py-4">Tidak ada data siswa</div>
+              ) : !selectedTingkatan ? (
+                <div className="text-center text-xs text-gray-500 py-4">
+                  Pilih tingkatan di menu bawah untuk melihat daftar siswa.
+                </div>
+              ) : !groupedData[selectedTingkatan.key] ? (
+                <div className="text-center text-xs text-gray-500 py-4">Tidak ada data siswa untuk tingkatan ini</div>
               ) : (
                 <div className="space-y-4 max-h-[420px] overflow-y-auto">
-                  {groupedData.map((group) => {
+                  {Object.values(groupedData[selectedTingkatan.key].kelompok).map((group) => {
                     const count = group.items.length;
                     const key = group.kelompok_id || group.kelompok_nama;
                     const isCollapsed = collapsedGroups[key];
@@ -408,9 +412,7 @@ const PengabsenPMQApp = () => {
                               >
                                 <div>
                                   <p className="text-sm font-medium text-gray-800">{row.nama}</p>
-                                  <p className="text-xs text-gray-500">
-                                    {row.tingkatan_label}  b7 {group.kelompok_nama || '-'}
-                                  </p>
+                                  {/* Tanpa keterangan tingkatan/kelompok di bawah nama */}
                                 </div>
                                 <div className="w-32">
                                   <Select
