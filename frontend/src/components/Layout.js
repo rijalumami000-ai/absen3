@@ -141,6 +141,7 @@ const Layout = ({ children }) => {
       items: [
         { path: '/pmq/pengabsen', icon: UserCheck, label: 'Pengabsen PMQ' },
         { path: '/pmq/riwayat', icon: ClipboardList, label: 'Riwayat Absensi PMQ' },
+        { path: '/pmq/setting-waktu', icon: Clock, label: 'Setting Waktu PMQ' },
       ],
     },
     { 

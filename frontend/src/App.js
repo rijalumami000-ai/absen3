@@ -29,6 +29,7 @@ import SiswaPMQ from '@/pages/SiswaPMQ';
 import TingkatanPMQ from '@/pages/TingkatanPMQ';
 import PengabsenPMQ from '@/pages/PengabsenPMQ';
 import RiwayatAbsensiPMQ from '@/pages/RiwayatAbsensiPMQ';
+import SettingWaktuPMQ from '@/pages/SettingWaktuPMQ';
 import PengabsenAliyahApp from '@/pages/PengabsenAliyahApp';
 import PengabsenAliyahAppLogin from '@/pages/PengabsenAliyahAppLogin';
 import MonitoringAliyahApp from '@/pages/MonitoringAliyahApp';
