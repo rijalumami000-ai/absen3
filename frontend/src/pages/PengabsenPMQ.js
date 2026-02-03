@@ -155,7 +155,7 @@ const PengabsenPMQ = () => {
       <div className="flex justify-between items-center animate-slide-in-left">
         <div>
           <h1 className="text-3xl font-display font-bold text-foreground">Pengabsen PMQ</h1>
-          <p className="text-muted-foreground mt-1">Kelola pengabsen Pendidikan Murottilil Qur'an</p>
+          <p className="text-muted-foreground mt-1">Kelola pengabsen Pendidikan Murottilil Qur&apos;an</p>
         </div>
         <div className="flex gap-2">
           <Button
