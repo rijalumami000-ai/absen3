@@ -956,6 +956,7 @@ async def get_siswa_pmq(
     search: Optional[str] = None,
     tingkatan_key: Optional[str] = None,
     kelompok_id: Optional[str] = None,
+    gender: Optional[str] = None,
     _: dict = Depends(get_current_admin),
 ):
     query: dict = {}
@@ -963,6 +964,8 @@ async def get_siswa_pmq(
         query["tingkatan_key"] = tingkatan_key
     if kelompok_id:
         query["kelompok_id"] = kelompok_id
+    if gender in ["putra", "putri"]:
+        query["gender"] = gender
 
     docs = await db.siswa_pmq.find(query, {"_id": 0}).to_list(5000)
 
@@ -1044,6 +1047,11 @@ async def create_siswa_pmq(payload: SiswaPMQCreate, _: dict = Depends(get_curren
             raise HTTPException(status_code=400, detail="Nama wajib diisi untuk siswa PMQ baru")
 
     siswa = SiswaPMQ(**data)
+
+    # Generate QR baru untuk siswa manual (tanpa santri_id) bila belum ada
+    if not siswa.santri_id and not siswa.qr_code:
+        siswa.qr_code = generate_qr_code({"type": "siswa_pmq", "id": siswa.id})
+
     doc = siswa.model_dump()
     if isinstance(doc.get("created_at"), datetime):
         doc["created_at"] = doc["created_at"].isoformat()
@@ -1058,12 +1066,14 @@ async def create_siswa_pmq(payload: SiswaPMQCreate, _: dict = Depends(get_curren
     return SiswaPMQResponse(
         id=siswa.id,
         nama=siswa.nama,
+        gender=siswa.gender,
         tingkatan_key=siswa.tingkatan_key,
         tingkatan_label=tingkatan_map.get(siswa.tingkatan_key, siswa.tingkatan_key),
         kelompok_id=siswa.kelompok_id,
         kelompok_nama=kelompok.get("nama") if kelompok else None,
         santri_id=siswa.santri_id,
         has_qr=bool(siswa.qr_code),
+        qr_code=siswa.qr_code,
         created_at=siswa.created_at,
     )
 
