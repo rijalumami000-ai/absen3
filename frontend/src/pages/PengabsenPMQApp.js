@@ -498,7 +498,7 @@ const PengabsenPMQApp = () => {
                               <div>
                                 <p className="text-sm font-medium text-gray-800">{row.siswa_nama}</p>
                                 <p className="text-xs text-gray-500">
-                                  {row.tingkatan_label}  b7 {group.kelompok_nama || '-'}  b7 {row.tanggal}
+                                  {row.tingkatan_label} • {group.kelompok_nama || '-'} • {row.tanggal}
                                 </p>
                               </div>
                               <div className="text-xs capitalize text-gray-700">{row.status}</div>
