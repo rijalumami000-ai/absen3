@@ -230,7 +230,7 @@ export const downloadPengabsenKelasPDF = (pengabsenList, kelasList) => {
     }
   });
   
-  doc.save(`Pengabsen_Kelas_Madin_${new Date().getTime()}.pdf`);
+  doc.save(`Pengabsen_Kelas_Aliyah_${new Date().getTime()}.pdf`);
 };
 
 // Function to download Monitoring Kelas Madin as PDF
