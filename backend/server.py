@@ -3889,6 +3889,18 @@ async def get_pmq_waktu_settings(_: dict = Depends(get_current_admin)):
     return settings
 
 
+@api_router.get("/pmq/pengabsen/settings/waktu")
+async def get_pmq_waktu_settings_for_pengabsen(_: dict = Depends(get_current_pengabsen_pmq)):
+    """Endpoint untuk PWA pengabsen PMQ mengambil daftar sesi waktu.
+
+    Menggunakan setting yang sama dengan admin, tetapi auth-nya via pengabsen PMQ.
+    """
+    settings = await db.settings.find_one({"id": "pmq_waktu"}, {"_id": 0})
+    if not settings:
+        return PMQWaktuSettings().model_dump()
+    return settings
+
+
 @api_router.put("/pmq/settings/waktu")
 async def update_pmq_waktu_settings(data: PMQWaktuSettings, _: dict = Depends(get_current_admin)):
     payload = data.model_dump()
