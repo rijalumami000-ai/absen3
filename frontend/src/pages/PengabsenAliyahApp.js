@@ -456,131 +456,124 @@ const PengabsenAliyahApp = () => {
                   </div>
                   <div className="pt-5">
                     <Button
-                    type="button"
-                    size="sm"
-                    className="w-full md:w-auto"
-                    onClick={async () => {
-                      try {
-                        setLoadingHistory(true);
-                        const resp = await pengabsenAliyahAppAPI.riwayat({
-                          jenis: historyJenis,
-                          tanggal_start: historyStart,
-                          tanggal_end: historyEnd,
-                        });
-                        setHistoryItems(resp.data.detail || []);
-                        setCollapsedHistoryGroups({});
-                      } catch (error) {
-                        toast({
-                          title: 'Error',
-                          description: 'Gagal memuat riwayat',
-                          variant: 'destructive',
-                        });
-                      } finally {
-                        setLoadingHistory(false);
-                      }
-                    }}
-                  >
-                    Tampilkan
-                  </Button>
-                </div>
-                <div className="w-full md:w-64">
-                  <p className="text-xs text-gray-500 mb-1">Cari Nama / Kelas</p>
-                  <Input
-                    placeholder="Cari di riwayat..."
-                    value={historySearchQuery}
-                    onChange={(e) => setHistorySearchQuery(e.target.value)}
-                  />
+                      type="button"
+                      size="sm"
+                      className="w-full md:w-auto"
+                      onClick={async () => {
+                        try {
+                          setLoadingHistory(true);
+                          const resp = await pengabsenAliyahAppAPI.riwayat({
+                            jenis: historyJenis,
+                            tanggal_start: historyStart,
+                            tanggal_end: historyEnd,
+                          });
+                          setHistoryItems(resp.data.detail || []);
+                          setCollapsedHistoryGroups({});
+                        } catch (error) {
+                          toast({
+                            title: 'Error',
+                            description: 'Gagal memuat riwayat',
+                            variant: 'destructive',
+                          });
+                        } finally {
+                          setLoadingHistory(false);
+                        }
+                      }}
+                    >
+                      Tampilkan
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
 
             {loadingHistory ? (
-                <div className="text-center text-xs text-gray-500 py-4">Memuat riwayat...</div>
-              ) : filteredHistoryGroups.length === 0 ? (
-                <div className="text-center text-xs text-gray-500 py-4">Tidak ada riwayat</div>
-              ) : (
-                <div className="space-y-4 max-h-[420px] overflow-y-auto">
-                  {filteredHistoryGroups.map((group) => {
-                    const count = group.items.length;
-                    const key = group.kelas_id || group.kelas_nama;
-                    const isCollapsed = collapsedHistoryGroups[key];
-                    return (
-                      <div key={key}>
-                        <button
-                          type="button"
-                          className="w-full flex items-center justify-between text-xs font-semibold text-slate-700 mb-2 bg-slate-100 hover:bg-slate-200 rounded px-3 py-2"
-                          onClick={() =>
-                            setCollapsedHistoryGroups((prev) => ({
-                              ...prev,
-                              [key]: !isCollapsed,
-                            }))
-                          }
-                        >
-                          <span>
-                            {group.kelas_nama || 'Tanpa Kelas'} ({count} data)
-                          </span>
-                          <span className="text-[10px] text-slate-500">
-                            {isCollapsed ? 'Tampilkan' : 'Sembunyikan'}
-                          </span>
-                        </button>
+              <div className="text-center text-xs text-gray-500 py-4">Memuat riwayat...</div>
+            ) : filteredHistoryGroups.length === 0 ? (
+              <div className="text-center text-xs text-gray-500 py-4">Tidak ada riwayat</div>
+            ) : (
+              <div className="space-y-4 max-h-[420px] overflow-y-auto">
+                {filteredHistoryGroups.map((group) => {
+                  const count = group.items.length;
+                  const key = group.kelas_id || group.kelas_nama;
+                  const isCollapsed = collapsedHistoryGroups[key];
+                  return (
+                    <div key={key}>
+                      <button
+                        type="button"
+                        className="w-full flex items-center justify-between text-xs font-semibold text-slate-700 mb-2 bg-slate-100 hover:bg-slate-200 rounded px-3 py-2"
+                        onClick={() =>
+                          setCollapsedHistoryGroups((prev) => ({
+                            ...prev,
+                            [key]: !isCollapsed,
+                          }))
+                        }
+                      >
+                        <span>
+                          {group.kelas_nama || 'Tanpa Kelas'} ({count} data)
+                        </span>
+                        <span className="text-[10px] text-slate-500">
+                          {isCollapsed ? 'Tampilkan' : 'Sembunyikan'}
+                        </span>
+                      </button>
 
-                        {!isCollapsed && (
-                          <div className="space-y-2">
-                            {group.items.map((row) => (
-                              <div
-                                key={row.id || `${row.siswa_id}-${row.tanggal}-${row.status}`}
-                                className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-lg px-3 py-2"
-                              >
-                                <div>
-                                  <p className="text-sm font-medium text-gray-800">{row.siswa_nama}</p>
-                                  <p className="text-xs text-gray-500">
-                                    {row.kelas_nama} • {row.tanggal}
-                                  </p>
-                                </div>
-                                <div className="w-32">
-                                  <Select
-                                    value={row.status || 'null'}
-                                    onValueChange={async (val) => {
-                                      const newStatus = val === 'null' ? null : val;
-                                      try {
-                                        await pengabsenAliyahAppAPI.upsertAbsensi({
-                                          siswa_id: row.siswa_id,
-                                          kelas_id: row.kelas_id,
-                                          tanggal: row.tanggal,
-                                          jenis: historyJenis,
-                                          status: newStatus,
-                                        });
-                                        toast({ title: 'Sukses', description: 'Status riwayat diperbarui' });
-                                      } catch (error) {
-                                        toast({
-                                          title: 'Error',
-                                          description: error.response?.data?.detail || 'Gagal memperbarui status',
-                                          variant: 'destructive',
-                                        });
-                                      }
-                                    }}
-                                  >
-                                    <SelectTrigger className="h-8 text-xs">
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {STATUS_OPTIONS.map((opt) => (
-                                        <SelectItem key={opt.value} value={opt.value} className="text-xs">
-                                          {opt.label}
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                </div>
+                      {!isCollapsed && (
+                        <div className="space-y-2">
+                          {group.items.map((row) => (
+                            <div
+                              key={row.id || `${row.siswa_id}-${row.tanggal}-${row.status}`}
+                              className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-lg px-3 py-2"
+                            >
+                              <div>
+                                <p className="text-sm font-medium text-gray-800">{row.siswa_nama}</p>
+                                <p className="text-xs text-gray-500">
+                                  {row.kelas_nama} • {row.tanggal}
+                                </p>
                               </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+                              <div className="w-32">
+                                <Select
+                                  value={row.status || 'null'}
+                                  onValueChange={async (val) => {
+                                    const newStatus = val === 'null' ? null : val;
+                                    try {
+                                      await pengabsenAliyahAppAPI.upsertAbsensi({
+                                        siswa_id: row.siswa_id,
+                                        kelas_id: row.kelas_id,
+                                        tanggal: row.tanggal,
+                                        jenis: historyJenis,
+                                        status: newStatus,
+                                      });
+                                      toast({ title: 'Sukses', description: 'Status riwayat diperbarui' });
+                                    } catch (error) {
+                                      toast({
+                                        title: 'Error',
+                                        description: error.response?.data?.detail || 'Gagal memperbarui status',
+                                        variant: 'destructive',
+                                      });
+                                    }
+                                  }}
+                                >
+                                  <SelectTrigger className="h-8 text-xs">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {STATUS_OPTIONS.map((opt) => (
+                                      <SelectItem key={opt.value} value={opt.value} className="text-xs">
+                                        {opt.label}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </section>
         )}
       </main>
