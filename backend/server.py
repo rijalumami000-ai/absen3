@@ -778,6 +778,425 @@ async def get_current_monitoring_aliyah(credentials: HTTPAuthorizationCredential
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid authentication credentials")
 
+# ==================== PMQ MODELS ====================
+
+PMQ_TINGKATAN = [
+    {"key": "jet_tempur", "label": "Jet Tempur"},
+    {"key": "persiapan", "label": "Persiapan"},
+    {"key": "jazariyah", "label": "Jazariyah"},
+    {"key": "al_quran", "label": "Al-Qur'an"},
+]
+
+
+class PMQKelompok(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    tingkatan_key: str
+    nama: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class PMQKelompokCreate(BaseModel):
+    tingkatan_key: str
+    nama: str
+
+
+class PMQKelompokResponse(BaseModel):
+    id: str
+    tingkatan_key: str
+    nama: str
+    created_at: datetime
+
+
+class SiswaPMQ(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    nama: str
+    tingkatan_key: str
+    kelompok_id: Optional[str] = None
+    santri_id: Optional[str] = None
+    qr_code: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class SiswaPMQCreate(BaseModel):
+    nama: Optional[str] = None
+    tingkatan_key: str
+    kelompok_id: Optional[str] = None
+    santri_id: Optional[str] = None
+
+
+class SiswaPMQUpdate(BaseModel):
+    nama: Optional[str] = None
+    tingkatan_key: Optional[str] = None
+    kelompok_id: Optional[str] = None
+
+
+class SiswaPMQResponse(BaseModel):
+    id: str
+    nama: str
+    tingkatan_key: str
+    tingkatan_label: str
+    kelompok_id: Optional[str]
+    kelompok_nama: Optional[str] = None
+    santri_id: Optional[str]
+    has_qr: bool = False
+    created_at: datetime
+
+
+class PengabsenPMQ(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    nama: str
+    email_atau_hp: str
+    username: str
+    kode_akses: str
+    tingkatan_keys: List[str] = []
+    kelompok_ids: List[str] = []
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class PengabsenPMQCreate(BaseModel):
+    nama: str
+    email_atau_hp: str
+    username: str
+    tingkatan_keys: List[str]
+    kelompok_ids: List[str]
+
+
+class PengabsenPMQUpdate(BaseModel):
+    nama: Optional[str] = None
+    email_atau_hp: Optional[str] = None
+    username: Optional[str] = None
+    tingkatan_keys: Optional[List[str]] = None
+    kelompok_ids: Optional[List[str]] = None
+
+
+class PengabsenPMQResponse(BaseModel):
+    id: str
+    nama: str
+    email_atau_hp: str
+    username: str
+    kode_akses: str
+    tingkatan_keys: List[str]
+    kelompok_ids: List[str]
+    created_at: datetime
+
+
+# ==================== PMQ ENDPOINTS ====================
+
+@api_router.get("/pmq/tingkatan")
+async def get_pmq_tingkatan(_: dict = Depends(get_current_admin)):
+    """Daftar tingkatan PMQ statis."""
+    return PMQ_TINGKATAN
+
+
+@api_router.get("/pmq/kelompok", response_model=List[PMQKelompokResponse])
+async def get_pmq_kelompok(
+    tingkatan_key: Optional[str] = None,
+    _: dict = Depends(get_current_admin),
+):
+    query: dict = {}
+    if tingkatan_key:
+        query["tingkatan_key"] = tingkatan_key
+    docs = await db.pmq_kelompok.find(query, {"_id": 0}).to_list(1000)
+    return [PMQKelompokResponse(**doc) for doc in docs]
+
+
+@api_router.post("/pmq/kelompok", response_model=PMQKelompokResponse)
+async def create_pmq_kelompok(payload: PMQKelompokCreate, _: dict = Depends(get_current_admin)):
+    if payload.tingkatan_key not in [t["key"] for t in PMQ_TINGKATAN]:
+        raise HTTPException(status_code=400, detail="Tingkatan PMQ tidak valid")
+    kelompok = PMQKelompok(**payload.model_dump())
+    doc = kelompok.model_dump()
+    doc["created_at"] = doc["created_at"].isoformat()
+    await db.pmq_kelompok.insert_one(doc)
+    return PMQKelompokResponse(**kelompok.model_dump())
+
+
+@api_router.delete("/pmq/kelompok/{kelompok_id}")
+async def delete_pmq_kelompok(kelompok_id: str, _: dict = Depends(get_current_admin)):
+    result = await db.pmq_kelompok.delete_one({"id": kelompok_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Kelompok PMQ tidak ditemukan")
+    # Optionally, siswa_pmq yang refer ke kelompok ini bisa dibiarkan dengan kelompok_id None
+    await db.siswa_pmq.update_many({"kelompok_id": kelompok_id}, {"$set": {"kelompok_id": None}})
+    return {"message": "Kelompok PMQ berhasil dihapus"}
+
+
+@api_router.get("/pmq/siswa", response_model=List[SiswaPMQResponse])
+async def get_siswa_pmq(
+    search: Optional[str] = None,
+    tingkatan_key: Optional[str] = None,
+    kelompok_id: Optional[str] = None,
+    _: dict = Depends(get_current_admin),
+):
+    query: dict = {}
+    if tingkatan_key:
+        query["tingkatan_key"] = tingkatan_key
+    if kelompok_id:
+        query["kelompok_id"] = kelompok_id
+
+    docs = await db.siswa_pmq.find(query, {"_id": 0}).to_list(5000)
+
+    # Join kelompok & tingkatan label
+    kelompok_docs = await db.pmq_kelompok.find({}, {"_id": 0}).to_list(1000)
+    kelompok_map = {k["id"]: k for k in kelompok_docs}
+    tingkatan_map = {t["key"]: t["label"] for t in PMQ_TINGKATAN}
+
+    results: List[SiswaPMQResponse] = []
+    for doc in docs:
+        if search:
+            q = search.lower()
+            if q not in (doc.get("nama", "").lower()):
+                continue
+        kelompok = kelompok_map.get(doc.get("kelompok_id"))
+        results.append(
+            SiswaPMQResponse(
+                id=doc["id"],
+                nama=doc["nama"],
+                tingkatan_key=doc["tingkatan_key"],
+                tingkatan_label=tingkatan_map.get(doc["tingkatan_key"], doc["tingkatan_key"]),
+                kelompok_id=doc.get("kelompok_id"),
+                kelompok_nama=kelompok.get("nama") if kelompok else None,
+                santri_id=doc.get("santri_id"),
+                has_qr=bool(doc.get("qr_code")),
+                created_at=doc.get("created_at", datetime.now(timezone.utc)),
+            )
+        )
+
+    # Urutkan: tingkatan, kelompok, nama
+    results.sort(key=lambda x: (x.tingkatan_key, x.kelompok_nama or "", x.nama))
+    return results
+
+
+@api_router.get("/pmq/santri-available")
+async def get_santri_available_for_pmq(
+    search: Optional[str] = None,
+    _: dict = Depends(get_current_admin),
+):
+    siswa_docs = await db.siswa_pmq.find({}, {"_id": 0, "santri_id": 1}).to_list(5000)
+    used_santri_ids = {d["santri_id"] for d in siswa_docs if d.get("santri_id")}
+
+    santri_query: dict = {}
+    if search:
+        santri_query["nama"] = {"$regex": search, "$options": "i"}
+
+    santri_docs = await db.santri.find(santri_query, {"_id": 0}).to_list(5000)
+    available = [s for s in santri_docs if s["id"] not in used_santri_ids]
+    return available
+
+
+@api_router.post("/pmq/siswa", response_model=SiswaPMQResponse)
+async def create_siswa_pmq(payload: SiswaPMQCreate, _: dict = Depends(get_current_admin)):
+    if payload.tingkatan_key not in [t["key"] for t in PMQ_TINGKATAN]:
+        raise HTTPException(status_code=400, detail="Tingkatan PMQ tidak valid")
+
+    data = payload.model_dump()
+
+    # Jika link dari santri, ambil nama dari santri dan pastikan belum terdaftar
+    if data.get("santri_id"):
+        existing = await db.siswa_pmq.find_one({"santri_id": data["santri_id"]}, {"_id": 0})
+        if existing:
+            raise HTTPException(status_code=400, detail="Santri sudah terdaftar di PMQ")
+
+        santri = await db.santri.find_one({"id": data["santri_id"]}, {"_id": 0})
+        if not santri:
+            raise HTTPException(status_code=404, detail="Santri tidak ditemukan")
+        data["nama"] = santri["nama"]
+        # Opsional: gunakan QR santri jika ada
+        if santri.get("qr_code"):
+            data["qr_code"] = santri["qr_code"]
+    else:
+        if not data.get("nama"):
+            raise HTTPException(status_code=400, detail="Nama wajib diisi untuk siswa PMQ baru")
+
+    siswa = SiswaPMQ(**data)
+    doc = siswa.model_dump()
+    if isinstance(doc.get("created_at"), datetime):
+        doc["created_at"] = doc["created_at"].isoformat()
+    await db.siswa_pmq.insert_one(doc)
+
+    # Build response
+    tingkatan_map = {t["key"]: t["label"] for t in PMQ_TINGKATAN}
+    kelompok = None
+    if siswa.kelompok_id:
+        kelompok = await db.pmq_kelompok.find_one({"id": siswa.kelompok_id}, {"_id": 0})
+
+    return SiswaPMQResponse(
+        id=siswa.id,
+        nama=siswa.nama,
+        tingkatan_key=siswa.tingkatan_key,
+        tingkatan_label=tingkatan_map.get(siswa.tingkatan_key, siswa.tingkatan_key),
+        kelompok_id=siswa.kelompok_id,
+        kelompok_nama=kelompok.get("nama") if kelompok else None,
+        santri_id=siswa.santri_id,
+        has_qr=bool(siswa.qr_code),
+        created_at=siswa.created_at,
+    )
+
+
+@api_router.put("/pmq/siswa/{siswa_id}", response_model=SiswaPMQResponse)
+async def update_siswa_pmq(siswa_id: str, payload: SiswaPMQUpdate, _: dict = Depends(get_current_admin)):
+    siswa = await db.siswa_pmq.find_one({"id": siswa_id}, {"_id": 0})
+    if not siswa:
+        raise HTTPException(status_code=404, detail="Siswa PMQ tidak ditemukan")
+
+    data = payload.model_dump(exclude_unset=True)
+
+    # Jika link ke santri, nama tidak boleh diedit
+    if siswa.get("santri_id") and "nama" in data:
+        data.pop("nama")
+
+    if "tingkatan_key" in data and data["tingkatan_key"] not in [t["key"] for t in PMQ_TINGKATAN]:
+        raise HTTPException(status_code=400, detail="Tingkatan PMQ tidak valid")
+
+    if data:
+        await db.siswa_pmq.update_one({"id": siswa_id}, {"$set": data})
+        siswa.update(data)
+
+    tingkatan_map = {t["key"]: t["label"] for t in PMQ_TINGKATAN}
+    kelompok = None
+    if siswa.get("kelompok_id"):
+        kelompok = await db.pmq_kelompok.find_one({"id": siswa["kelompok_id"]}, {"_id": 0})
+
+    created_at_val = siswa.get("created_at")
+    if isinstance(created_at_val, str):
+        created_at_val = datetime.fromisoformat(created_at_val)
+
+    return SiswaPMQResponse(
+        id=siswa["id"],
+        nama=siswa["nama"],
+        tingkatan_key=siswa["tingkatan_key"],
+        tingkatan_label=tingkatan_map.get(siswa["tingkatan_key"], siswa["tingkatan_key"]),
+        kelompok_id=siswa.get("kelompok_id"),
+        kelompok_nama=kelompok.get("nama") if kelompok else None,
+        santri_id=siswa.get("santri_id"),
+        has_qr=bool(siswa.get("qr_code")),
+        created_at=created_at_val or datetime.now(timezone.utc),
+    )
+
+
+@api_router.delete("/pmq/siswa/{siswa_id}")
+async def delete_siswa_pmq(siswa_id: str, _: dict = Depends(get_current_admin)):
+    result = await db.siswa_pmq.delete_one({"id": siswa_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Siswa PMQ tidak ditemukan")
+    return {"message": "Siswa PMQ berhasil dihapus"}
+
+
+@api_router.get("/pmq/pengabsen", response_model=List[PengabsenPMQResponse])
+async def get_pengabsen_pmq(_: dict = Depends(get_current_admin)):
+    docs = await db.pengabsen_pmq.find({}, {"_id": 0}).to_list(1000)
+    results: List[PengabsenPMQResponse] = []
+    for doc in docs:
+        created_at_val = doc.get("created_at")
+        if isinstance(created_at_val, str):
+            created_at_val = datetime.fromisoformat(created_at_val)
+        results.append(
+            PengabsenPMQResponse(
+                id=doc["id"],
+                nama=doc["nama"],
+                email_atau_hp=doc.get("email_atau_hp", ""),
+                username=doc["username"],
+                kode_akses=doc.get("kode_akses", ""),
+                tingkatan_keys=doc.get("tingkatan_keys", []),
+                kelompok_ids=doc.get("kelompok_ids", []),
+                created_at=created_at_val or datetime.now(timezone.utc),
+            )
+        )
+    return results
+
+
+@api_router.post("/pmq/pengabsen", response_model=PengabsenPMQResponse)
+async def create_pengabsen_pmq(payload: PengabsenPMQCreate, _: dict = Depends(get_current_admin)):
+    # Validasi tingkatan
+    valid_keys = {t["key"] for t in PMQ_TINGKATAN}
+    if not set(payload.tingkatan_keys).issubset(valid_keys):
+        raise HTTPException(status_code=400, detail="Tingkatan PMQ tidak valid")
+
+    existing = await db.pengabsen_pmq.find_one({"username": payload.username}, {"_id": 0})
+    if existing:
+        raise HTTPException(status_code=400, detail="Username sudah digunakan")
+
+    data = payload.model_dump()
+    data["kode_akses"] = generate_kode_akses()
+    pengabsen = PengabsenPMQ(**data)
+    doc = pengabsen.model_dump()
+    if isinstance(doc.get("created_at"), datetime):
+        doc["created_at"] = doc["created_at"].isoformat()
+    await db.pengabsen_pmq.insert_one(doc)
+
+    return PengabsenPMQResponse(**pengabsen.model_dump())
+
+
+@api_router.put("/pmq/pengabsen/{pengabsen_id}", response_model=PengabsenPMQResponse)
+async def update_pengabsen_pmq(pengabsen_id: str, payload: PengabsenPMQUpdate, _: dict = Depends(get_current_admin)):
+    pengabsen = await db.pengabsen_pmq.find_one({"id": pengabsen_id}, {"_id": 0})
+    if not pengabsen:
+        raise HTTPException(status_code=404, detail="Pengabsen PMQ tidak ditemukan")
+
+    data = payload.model_dump(exclude_unset=True)
+
+    if "tingkatan_keys" in data:
+        valid_keys = {t["key"] for t in PMQ_TINGKATAN}
+        if not set(data["tingkatan_keys"]).issubset(valid_keys):
+            raise HTTPException(status_code=400, detail="Tingkatan PMQ tidak valid")
+
+    if data:
+        await db.pengabsen_pmq.update_one({"id": pengabsen_id}, {"$set": data})
+        pengabsen.update(data)
+
+    created_at_val = pengabsen.get("created_at")
+    if isinstance(created_at_val, str):
+        created_at_val = datetime.fromisoformat(created_at_val)
+
+    return PengabsenPMQResponse(
+        id=pengabsen["id"],
+        nama=pengabsen["nama"],
+        email_atau_hp=pengabsen.get("email_atau_hp", ""),
+        username=pengabsen["username"],
+        kode_akses=pengabsen.get("kode_akses", ""),
+        tingkatan_keys=pengabsen.get("tingkatan_keys", []),
+        kelompok_ids=pengabsen.get("kelompok_ids", []),
+        created_at=created_at_val or datetime.now(timezone.utc),
+    )
+
+
+@api_router.post("/pmq/pengabsen/{pengabsen_id}/regenerate-kode-akses", response_model=PengabsenPMQResponse)
+async def regenerate_kode_akses_pmq(pengabsen_id: str, _: dict = Depends(get_current_admin)):
+    pengabsen = await db.pengabsen_pmq.find_one({"id": pengabsen_id}, {"_id": 0})
+    if not pengabsen:
+        raise HTTPException(status_code=404, detail="Pengabsen PMQ tidak ditemukan")
+
+    new_kode = generate_kode_akses()
+    await db.pengabsen_pmq.update_one({"id": pengabsen_id}, {"$set": {"kode_akses": new_kode}})
+    pengabsen["kode_akses"] = new_kode
+
+    created_at_val = pengabsen.get("created_at")
+    if isinstance(created_at_val, str):
+        created_at_val = datetime.fromisoformat(created_at_val)
+
+    return PengabsenPMQResponse(
+        id=pengabsen["id"],
+        nama=pengabsen["nama"],
+        email_atau_hp=pengabsen.get("email_atau_hp", ""),
+        username=pengabsen["username"],
+        kode_akses=pengabsen.get("kode_akses", ""),
+        tingkatan_keys=pengabsen.get("tingkatan_keys", []),
+        kelompok_ids=pengabsen.get("kelompok_ids", []),
+        created_at=created_at_val or datetime.now(timezone.utc),
+    )
+
+
+@api_router.delete("/pmq/pengabsen/{pengabsen_id}")
+async def delete_pengabsen_pmq(pengabsen_id: str, _: dict = Depends(get_current_admin)):
+    result = await db.pengabsen_pmq.delete_one({"id": pengabsen_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Pengabsen PMQ tidak ditemukan")
+    return {"message": "Pengabsen PMQ berhasil dihapus"}
+
+
 
 
 
