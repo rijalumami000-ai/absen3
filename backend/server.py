@@ -1241,6 +1241,28 @@ async def update_pengabsen_pmq(pengabsen_id: str, payload: PengabsenPMQUpdate, _
 
 @api_router.post("/pmq/pengabsen/{pengabsen_id}/regenerate-kode-akses", response_model=PengabsenPMQResponse)
 async def regenerate_kode_akses_pmq(pengabsen_id: str, _: dict = Depends(get_current_admin)):
+    pengabsen = await db.pengabsen_pmq.find_one({"id": pengabsen_id}, {"_id": 0})
+    if not pengabsen:
+        raise HTTPException(status_code=404, detail="Pengabsen PMQ tidak ditemukan")
+
+    new_kode = generate_kode_akses()
+    await db.pengabsen_pmq.update_one({"id": pengabsen_id}, {"$set": {"kode_akses": new_kode}})
+    pengabsen["kode_akses"] = new_kode
+
+    created_at_val = pengabsen.get("created_at")
+    if isinstance(created_at_val, str):
+        created_at_val = datetime.fromisoformat(created_at_val)
+
+    return PengabsenPMQResponse(
+        id=pengabsen["id"],
+        nama=pengabsen["nama"],
+        email_atau_hp=pengabsen.get("email_atau_hp", ""),
+        username=pengabsen["username"],
+        kode_akses=pengabsen.get("kode_akses", ""),
+        tingkatan_keys=pengabsen.get("tingkatan_keys", []),
+        kelompok_ids=pengabsen.get("kelompok_ids", []),
+        created_at=created_at_val or datetime.now(timezone.utc),
+    )
 
 
 @api_router.get("/pmq/absensi/riwayat", response_model=PMQAbsensiRiwayatResponse)
