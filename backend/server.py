@@ -2063,6 +2063,18 @@ async def login(request: LoginRequest):
     # Pastikan setiap admin memiliki role (default superadmin jika belum ada)
     role = admin.get("role", "superadmin")
     if "role" not in admin:
+        await db.admins.update_one({"id": admin["id"]}, {"$set": {"role": role}})
+    
+    access_token = create_access_token(data={"sub": admin['id'], "role": role})
+    
+    user_data = dict(admin)
+    user_data.setdefault("role", role)
+    
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": AdminResponse(**user_data)
+    }
 
 
 # ==================== AUTH PENGABSEN PMQ (PWA) ====================
