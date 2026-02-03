@@ -84,6 +84,10 @@ const PengabsenPMQApp = () => {
     } catch (e) {
       // silent
     } finally {
+      setLoadingData(false);
+    }
+  };
+
   const tingkatanDefs = useMemo(
     () => [
       { key: 'jet_tempur', label: 'Jet Tempur', icon: Rocket, color: 'from-sky-500 to-emerald-400' },
@@ -104,11 +108,6 @@ const PengabsenPMQApp = () => {
     if (!selectedTingkatanKey) return null;
     return tingkatanDefs.find((t) => t.key === selectedTingkatanKey) || null;
   }, [selectedTingkatanKey, tingkatanDefs]);
-
-
-      setLoadingData(false);
-    }
-  };
 
   const handleStatusChange = async (siswaId, kelompokId, status) => {
     try {
