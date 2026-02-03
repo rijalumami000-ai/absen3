@@ -1099,12 +1099,14 @@ async def update_siswa_pmq(siswa_id: str, payload: SiswaPMQUpdate, _: dict = Dep
     return SiswaPMQResponse(
         id=siswa["id"],
         nama=siswa["nama"],
+        gender=siswa.get("gender"),
         tingkatan_key=siswa["tingkatan_key"],
         tingkatan_label=tingkatan_map.get(siswa["tingkatan_key"], siswa["tingkatan_key"]),
         kelompok_id=siswa.get("kelompok_id"),
         kelompok_nama=kelompok.get("nama") if kelompok else None,
         santri_id=siswa.get("santri_id"),
         has_qr=bool(siswa.get("qr_code")),
+        qr_code=siswa.get("qr_code"),
         created_at=created_at_val or datetime.now(timezone.utc),
     )
 
