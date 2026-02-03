@@ -5523,6 +5523,10 @@ async def update_pengabsen_kelas(pengabsen_id: str, data: PengabsenKelasUpdate, 
                 raise HTTPException(status_code=404, detail=f"Kelas {kelas_id} tidak ditemukan")
     
     if update_data:
+        await db.pengabsen_kelas.update_one({"id": pengabsen_id}, {"$set": update_data})
+        pengabsen.update(update_data)
+
+    return PengabsenKelasResponse(**pengabsen)
 
 
 # ==================== PENGABSEN PMQ PWA ABSENSI ====================
