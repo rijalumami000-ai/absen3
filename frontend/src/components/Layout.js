@@ -140,6 +140,7 @@ const Layout = ({ children }) => {
       allowedRoles: ['superadmin', 'admin'],
       items: [
         { path: '/pmq/pengabsen', icon: UserCheck, label: 'Pengabsen PMQ' },
+        { path: '/pmq/riwayat', icon: ClipboardList, label: 'Riwayat Absensi PMQ' },
       ],
     },
     { 

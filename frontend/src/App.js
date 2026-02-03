@@ -560,6 +560,14 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/pmq/riwayat"
+        element={
+          <ProtectedRoute>
+            <RiwayatAbsensiPMQ />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/akses-ditolak"
         element={
           <ProtectedRoute>
