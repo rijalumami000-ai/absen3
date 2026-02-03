@@ -912,6 +912,38 @@ class PengabsenPMQResponse(BaseModel):
 
 # ==================== PMQ ENDPOINTS ====================
 
+
+class PMQAbsensi(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    siswa_id: str
+    tanggal: str
+    sesi: Literal["pagi", "malam"]
+    status: Literal["hadir", "alfa", "sakit", "izin", "terlambat"]
+    pengabsen_id: Optional[str] = None
+    waktu_absen: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class PMQAbsensiRiwayatRow(BaseModel):
+    id: Optional[str]
+    siswa_id: str
+    siswa_nama: str
+    tingkatan_key: str
+    tingkatan_label: str
+    kelompok_id: Optional[str]
+    kelompok_nama: Optional[str]
+    tanggal: str
+    sesi: str
+    status: str
+    waktu_absen: Optional[str]
+
+
+class PMQAbsensiRiwayatResponse(BaseModel):
+    summary: Dict[str, int]
+    detail: List[PMQAbsensiRiwayatRow]
+
+
 @api_router.get("/pmq/tingkatan")
 async def get_pmq_tingkatan(_: dict = Depends(get_current_admin)):
     """Daftar tingkatan PMQ statis."""
