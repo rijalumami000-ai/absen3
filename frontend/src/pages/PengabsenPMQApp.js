@@ -193,8 +193,6 @@ const PengabsenPMQApp = () => {
     return historyItems.filter((row) => (row.siswa_nama || '').toLowerCase().includes(q));
   }, [historyItems, historySearchQuery]);
 
-  const groupedHistory = useMemo(() => {
-    return Object.values(
   // Tentukan tingkatan default pertama kali
   useEffect(() => {
     if (!selectedTingkatanKey && allowedTingkatanKeys.length) {
@@ -202,7 +200,8 @@ const PengabsenPMQApp = () => {
     }
   }, [allowedTingkatanKeys, selectedTingkatanKey]);
 
-
+  const groupedHistory = useMemo(() => {
+    return Object.values(
       historyFiltered.reduce((acc, row) => {
         const gId = row.kelompok_id || 'unknown';
         const gNama = row.kelompok_nama || 'Tanpa Kelompok';
