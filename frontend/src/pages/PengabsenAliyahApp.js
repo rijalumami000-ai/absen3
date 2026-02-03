@@ -587,6 +587,6 @@ const PengabsenAliyahApp = () => {
       </main>
     </div>
   );
-};
+}
 
 export default PengabsenAliyahApp;
