@@ -327,7 +327,14 @@ const SiswaPMQ = () => {
               <tbody className="divide-y divide-border">
                 {siswaList.map((s) => (
                   <tr key={s.id} className="hover:bg-muted/50">
-                    <td className="px-4 py-2 font-medium text-foreground">{s.nama}</td>
+                    <td className="px-4 py-2 font-medium text-foreground">
+                      <div className="flex flex-col">
+                        <span>{s.nama}</span>
+                        <span className="text-[11px] text-muted-foreground mt-0.5">
+                          {s.santri_id ? 'Siswa Link dari Santri' : 'Siswa Manual PMQ'}
+                        </span>
+                      </div>
+                    </td>
                     <td className="px-4 py-2 text-muted-foreground">{getGenderLabel(s.gender)}</td>
                     <td className="px-4 py-2 text-muted-foreground">{s.tingkatan_label}</td>
                     <td className="px-4 py-2 text-muted-foreground">{s.kelompok_nama || '-'}</td>
