@@ -53,8 +53,8 @@ const PengabsenPMQApp = () => {
   useEffect(() => {
     const loadSesi = async () => {
       try {
-        const resp = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/pmq/pengabsen/settings/waktu`);
-        const json = await resp.json();
+        const resp = await pengabsenPMQAppAPI.waktuSettings();
+        const json = resp.data;
         const sesi = (json?.sesi || []).filter((s) => s.active);
         setSesiList(sesi);
         if (sesi.length && !sesiKey) {

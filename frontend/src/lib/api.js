@@ -244,6 +244,10 @@ export const pengabsenPMQAppAPI = {
       params,
       headers: getPengabsenPMQAuthHeader(),
     }),
+  waktuSettings: () =>
+    axios.get(`${API}/pmq/pengabsen/settings/waktu`, {
+      headers: getPengabsenPMQAuthHeader(),
+    }),
 };
 
 // Settings API
