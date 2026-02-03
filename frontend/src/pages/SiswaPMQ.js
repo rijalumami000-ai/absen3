@@ -16,6 +16,7 @@ const SiswaPMQ = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterTingkatan, setFilterTingkatan] = useState('all');
   const [filterKelompok, setFilterKelompok] = useState('all');
+  const [filterGender, setFilterGender] = useState('all');
   const [loading, setLoading] = useState(true);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isLinkSantriOpen, setIsLinkSantriOpen] = useState(false);
