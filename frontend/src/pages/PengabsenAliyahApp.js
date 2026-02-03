@@ -194,6 +194,19 @@ const PengabsenAliyahApp = () => {
       (row.kelas_nama || '').toLowerCase().includes(q)
     );
   });
+  // Saat pertama kali load data hari ini, semua kelas dibuat ter-collaps dulu
+  useEffect(() => {
+    if (groupedData.length && Object.keys(collapsedGroups).length === 0) {
+      const initial = {};
+      groupedData.forEach((group) => {
+        const key = group.kelas_id || group.kelas_nama;
+        initial[key] = true; // true = collapsed
+      });
+      setCollapsedGroups(initial);
+    }
+  }, [groupedData]);
+
+
 
   const historyKelasOrderMap = new Map((kelasList || []).map((k, index) => [k.id, index]));
 
