@@ -155,6 +155,10 @@ const SiswaPMQ = () => {
       toast.success('Siswa PMQ berhasil dihapus');
       fetchSiswa();
     } catch (e) {
+      toast.error(e.response?.data?.detail || 'Gagal menghapus siswa PMQ');
+    }
+  };
+
   const handleDownloadSingleQR = (s) => {
     if (!s?.qr_code) return;
     try {
@@ -167,11 +171,6 @@ const SiswaPMQ = () => {
     } catch (e) {
       console.error(e);
       toast.error('Gagal mengunduh QR');
-    }
-  };
-
-
-      toast.error(e.response?.data?.detail || 'Gagal menghapus siswa PMQ');
     }
   };
 
