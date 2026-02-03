@@ -22,6 +22,7 @@ const SiswaPMQ = () => {
   const [isLinkSantriOpen, setIsLinkSantriOpen] = useState(false);
   const [formData, setFormData] = useState({
     nama: '',
+    gender: '',
     tingkatan_key: '',
     kelompok_id: '',
   });
