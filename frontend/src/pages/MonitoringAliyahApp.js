@@ -331,10 +331,10 @@ const MonitoringAliyahApp = () => {
 
         {activeTab === 'history' && (
           <section className="bg-white rounded-lg shadow p-4 space-y-4">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div className="flex flex-col gap-3">
               <div>
                 <p className="text-xs text-gray-500">Jenis Riwayat</p>
-                <div className="flex gap-2 mt-1">
+                <div className="flex gap-2 mt-1 flex-wrap">
                   <Button
                     type="button"
                     size="sm"
@@ -353,8 +353,16 @@ const MonitoringAliyahApp = () => {
                   </Button>
                 </div>
               </div>
-              <div className="flex flex-col md:flex-row gap-2 items-end">
-                <div className="flex gap-2">
+              <div className="flex flex-col md:flex-row gap-3">
+                <div className="w-full md:w-64">
+                  <p className="text-xs text-gray-500 mb-1">Cari Nama / Kelas</p>
+                  <Input
+                    placeholder="Cari di riwayat..."
+                    value={historySearchQuery}
+                    onChange={(e) => setHistorySearchQuery(e.target.value)}
+                  />
+                </div>
+                <div className="flex gap-2 items-end">
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Tanggal Mulai</p>
                     <Input type="date" value={historyStart} onChange={(e) => setHistoryStart(e.target.value)} />
@@ -363,20 +371,19 @@ const MonitoringAliyahApp = () => {
                     <p className="text-xs text-gray-500 mb-1">Tanggal Akhir</p>
                     <Input type="date" value={historyEnd} onChange={(e) => setHistoryEnd(e.target.value)} />
                   </div>
-                  <Button type="button" size="sm" onClick={async () => {
-                    await loadHistory();
-                    setCollapsedHistoryGroups({});
-                  }}>
-                    Tampilkan
-                  </Button>
-                </div>
-                <div className="w-full md:w-64">
-                  <p className="text-xs text-gray-500 mb-1">Cari Nama / Kelas</p>
-                  <Input
-                    placeholder="Cari di riwayat..."
-                    value={historySearchQuery}
-                    onChange={(e) => setHistorySearchQuery(e.target.value)}
-                  />
+                  <div className="pt-5">
+                    <Button
+                      type="button"
+                      size="sm"
+                      className="w-full md:w-auto"
+                      onClick={async () => {
+                        await loadHistory();
+                        setCollapsedHistoryGroups({});
+                      }}
+                    >
+                      Tampilkan
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
