@@ -355,6 +355,21 @@ const SiswaPMQ = () => {
               />
             </div>
             <div>
+              <Label>Gender</Label>
+              <Select
+                value={formData.gender}
+                onValueChange={(val) => setFormData({ ...formData, gender: val })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Pilih gender" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="putra">Putra</SelectItem>
+                  <SelectItem value="putri">Putri</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
               <Label>Tingkatan PMQ</Label>
               <Select
                 value={formData.tingkatan_key}
