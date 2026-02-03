@@ -457,7 +457,7 @@ const SiswaPMQ = () => {
                 <SelectContent>
                   {availableSantri.map((s) => (
                     <SelectItem key={s.id} value={s.id}>
-                      {s.nama}
+                      {s.nama} ({getGenderLabel(s.gender)})
                     </SelectItem>
                   ))}
                 </SelectContent>
