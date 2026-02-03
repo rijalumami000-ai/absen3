@@ -73,6 +73,7 @@ const SiswaPMQ = () => {
 
   const openCreate = () => {
     setFormData({ nama: '', gender: '', tingkatan_key: '', kelompok_id: '' });
+    setEditingId(null);
     setIsCreateOpen(true);
   };
 
