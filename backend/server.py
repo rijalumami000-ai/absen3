@@ -3805,6 +3805,8 @@ async def update_pmq_waktu_settings(data: PMQWaktuSettings, _: dict = Depends(ge
 
     await db.settings.update_one({"id": "pmq_waktu"}, {"$set": payload}, upsert=True)
     return {"message": "Pengaturan waktu PMQ berhasil disimpan"}
+
+
         waktu = a.get("waktu_sholat")
         status = a.get("status")
         santri_id = a.get("santri_id")
