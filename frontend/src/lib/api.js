@@ -215,6 +215,37 @@ export const pmqAbsensiAPI = {
     }),
 };
 
+// Pengabsen PMQ PWA API
+const getPengabsenPMQAuthHeader = () => {
+  const token = localStorage.getItem('pengabsen_pmq_token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
+export const pengabsenPMQAppAPI = {
+  login: (username, kode_akses) =>
+    axios.post(`${API}/pmq/pengabsen/login`, { username, kode_akses }),
+  me: () => axios.get(`${API}/pmq/pengabsen/me`, { headers: getPengabsenPMQAuthHeader() }),
+  absensiHariIni: (params) =>
+    axios.get(`${API}/pmq/pengabsen/absensi-hari-ini`, {
+      params,
+      headers: getPengabsenPMQAuthHeader(),
+    }),
+  upsertAbsensi: (payload) =>
+    axios.post(`${API}/pmq/pengabsen/absensi`, payload, {
+      headers: getPengabsenPMQAuthHeader(),
+    }),
+  scanAbsensi: (payload, params) =>
+    axios.post(`${API}/pmq/pengabsen/absensi/scan`, payload, {
+      params,
+      headers: getPengabsenPMQAuthHeader(),
+    }),
+  riwayat: (params) =>
+    axios.get(`${API}/pmq/pengabsen/riwayat`, {
+      params,
+      headers: getPengabsenPMQAuthHeader(),
+    }),
+};
+
 // Settings API
 export const settingsAPI = {
   getWaliNotifikasi: () => axios.get(`${API}/settings/wali-notifikasi`, { headers: getAuthHeader() }),
