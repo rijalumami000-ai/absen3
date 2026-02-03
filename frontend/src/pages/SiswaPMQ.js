@@ -215,11 +215,11 @@ const SiswaPMQ = () => {
           </Select>
         </div>
         <div>
-          <Label className="text-xs text-muted-foreground">Filter Kelompok</Label>
+          <Label className="text-xs text-muted-foreground">Filter Gender</Label>
           <Select
-            value={filterKelompok}
+            value={filterGender}
             onValueChange={(val) => {
-              setFilterKelompok(val);
+              setFilterGender(val);
               fetchSiswa();
             }}
           >
