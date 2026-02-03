@@ -3878,11 +3878,6 @@ class PMQSesi(BaseModel):
     start_time: str  # HH:MM
     end_time: str  # HH:MM
     active: bool = True
-    key: str
-    label: str
-    start_time: str  # HH:MM
-    end_time: str  # HH:MM
-    active: bool = True
 
 
 class PMQWaktuSettings(BaseModel):
