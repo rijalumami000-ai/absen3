@@ -195,6 +195,14 @@ const PengabsenPMQApp = () => {
 
   const groupedHistory = useMemo(() => {
     return Object.values(
+  // Tentukan tingkatan default pertama kali
+  useEffect(() => {
+    if (!selectedTingkatanKey && allowedTingkatanKeys.length) {
+      setSelectedTingkatanKey(allowedTingkatanKeys[0].key);
+    }
+  }, [allowedTingkatanKeys, selectedTingkatanKey]);
+
+
       historyFiltered.reduce((acc, row) => {
         const gId = row.kelompok_id || 'unknown';
         const gNama = row.kelompok_nama || 'Tanpa Kelompok';
