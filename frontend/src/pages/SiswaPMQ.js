@@ -432,7 +432,7 @@ const SiswaPMQ = () => {
               </Select>
             </div>
             <Button className="w-full" onClick={handleCreate}>
-              Simpan
+              {editingId ? 'Perbarui' : 'Simpan'}
             </Button>
           </div>
         </DialogContent>
