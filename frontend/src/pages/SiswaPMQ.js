@@ -224,6 +224,25 @@ const SiswaPMQ = () => {
             }}
           >
             <SelectTrigger className="mt-1">
+              <SelectValue placeholder="Semua Gender" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Semua Gender</SelectItem>
+              <SelectItem value="putra">Putra</SelectItem>
+              <SelectItem value="putri">Putri</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label className="text-xs text-muted-foreground">Filter Kelompok</Label>
+          <Select
+            value={filterKelompok}
+            onValueChange={(val) => {
+              setFilterKelompok(val);
+              fetchSiswa();
+            }}
+          >
+            <SelectTrigger className="mt-1">
               <SelectValue placeholder="Semua Kelompok" />
             </SelectTrigger>
             <SelectContent>
