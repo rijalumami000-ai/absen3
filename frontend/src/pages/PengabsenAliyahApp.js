@@ -534,7 +534,7 @@ const PengabsenAliyahApp = () => {
                                 <div>
                                   <p className="text-sm font-medium text-gray-800">{row.siswa_nama}</p>
                                   <p className="text-xs text-gray-500">
-                                    {row.kelas_nama} d {row.tanggal}
+                                    {row.kelas_nama} • {row.tanggal}
                                   </p>
                                 </div>
                                 <div className="w-32">
