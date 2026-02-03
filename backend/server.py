@@ -3872,6 +3872,12 @@ class AliyahAbsensiPagiSettings(BaseModel):
     updated_at: Optional[str] = None
 
 
+class PMQWaktuSettings(BaseModel):
+    id: str = Field(default="pmq_waktu")
+    sesi: List[Dict[str, Any]]
+    updated_at: Optional[str] = None
+
+
 class PMQSesi(BaseModel):
     key: str
     label: str
