@@ -32,6 +32,7 @@ const SiswaPMQ = () => {
     kelompok_id: '',
   });
   const [availableSantri, setAvailableSantri] = useState([]);
+  const [editingId, setEditingId] = useState(null);
 
   useEffect(() => {
     fetchMaster();
