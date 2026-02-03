@@ -95,12 +95,22 @@ const SiswaPMQ = () => {
         toast.error('Nama dan Tingkatan wajib diisi');
         return;
       }
-      await api.post('/pmq/siswa', formData);
-      toast.success('Siswa PMQ berhasil ditambahkan');
+      
+      if (editingId) {
+        // Update existing siswa
+        await api.put(`/pmq/siswa/${editingId}`, formData);
+        toast.success('Siswa PMQ berhasil diperbarui');
+      } else {
+        // Create new siswa
+        await api.post('/pmq/siswa', formData);
+        toast.success('Siswa PMQ berhasil ditambahkan');
+      }
+      
       setIsCreateOpen(false);
+      setEditingId(null);
       fetchSiswa();
     } catch (e) {
-      toast.error(e.response?.data?.detail || 'Gagal menambah siswa PMQ');
+      toast.error(e.response?.data?.detail || `Gagal ${editingId ? 'memperbarui' : 'menambah'} siswa PMQ`);
     }
   };
 
