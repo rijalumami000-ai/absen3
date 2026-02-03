@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Scanner } from '@yudiel/react-qr-scanner';
-import { BookOpen, Rocket, Sparkles, MoonStar, ClockHistory } from 'lucide-react';
+import { BookOpen, Rocket, Sparkles, MoonStar, History } from 'lucide-react';
 
 const STATUS_OPTIONS = [
   { value: 'null', label: 'Belum' },
@@ -553,7 +553,7 @@ const PengabsenPMQApp = () => {
             }`}
           >
             <div className="w-7 h-7 rounded-full bg-slate-800 flex items-center justify-center text-white mb-1 shadow-sm">
-              <ClockHistory className="w-4 h-4" />
+              <History className="w-4 h-4" />
             </div>
             <span>Riwayat</span>
           </button>
