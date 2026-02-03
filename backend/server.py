@@ -5523,6 +5523,209 @@ async def update_pengabsen_kelas(pengabsen_id: str, data: PengabsenKelasUpdate, 
                 raise HTTPException(status_code=404, detail=f"Kelas {kelas_id} tidak ditemukan")
     
     if update_data:
+
+
+# ==================== PENGABSEN PMQ PWA ABSENSI ====================
+
+
+@api_router.get("/pmq/pengabsen/absensi-hari-ini")
+async def get_pmq_pengabsen_absensi_hari_ini(
+    tanggal: str,
+    sesi: str,
+    current_pengabsen: dict = Depends(get_current_pengabsen_pmq),
+):
+    """Data absensi hari ini per siswa untuk pengabsen PMQ.
+
+    Hanya mengembalikan siswa di kelompok yang dimiliki pengabsen.
+    """
+    kelompok_ids = current_pengabsen.get("kelompok_ids", []) or []
+    if not kelompok_ids:
+        return {"data": []}
+
+    # Ambil siswa PMQ di kelompok tersebut
+    siswa_list = await db.siswa_pmq.find(
+        {"kelompok_id": {"$in": kelompok_ids}},
+        {"_id": 0},
+    ).to_list(5000)
+
+    if not siswa_list:
+        return {"data": []}
+
+    siswa_ids = [s["id"] for s in siswa_list]
+
+    # Ambil absensi existing
+    absensi_list = await db.absensi_pmq.find(
+        {"siswa_id": {"$in": siswa_ids}, "tanggal": tanggal, "sesi": sesi},
+        {"_id": 0},
+    ).to_list(20000)
+    abs_map = {(a["siswa_id"], a.get("kelompok_id")): a for a in absensi_list}
+
+    # Map kelompok & tingkatan untuk label
+    kelompok_docs = await db.pmq_kelompok.find({"id": {"$in": kelompok_ids}}, {"_id": 0}).to_list(1000)
+    kelompok_map = {k["id"]: k for k in kelompok_docs}
+    tingkatan_map = {t["key"]: t["label"] for t in PMQ_TINGKATAN}
+
+    result = []
+    for s in siswa_list:
+        k_id = s.get("kelompok_id")
+        a = abs_map.get((s["id"], k_id))
+        kelompok = kelompok_map.get(k_id)
+
+        result.append(
+            {
+                "siswa_id": s["id"],
+                "nama": s.get("nama", "-"),
+                "tingkatan_key": s.get("tingkatan_key", ""),
+                "tingkatan_label": tingkatan_map.get(s.get("tingkatan_key", ""), s.get("tingkatan_key", "")),
+                "kelompok_id": k_id,
+                "kelompok_nama": kelompok.get("nama") if kelompok else None,
+                "status": a.get("status") if a else None,
+            }
+        )
+
+    return {"data": result}
+
+
+@api_router.post("/pmq/pengabsen/absensi")
+async def upsert_pmq_pengabsen_absensi(
+    data: PMQAbsensi,
+    current_pengabsen: dict = Depends(get_current_pengabsen_pmq),
+):
+    """Upsert absensi PMQ untuk satu siswa pada tanggal + sesi tertentu."""
+    if data.kelompok_id and data.kelompok_id not in (current_pengabsen.get("kelompok_ids") or []):
+        raise HTTPException(status_code=403, detail="Tidak boleh mengakses kelompok ini")
+
+    # Upsert by siswa + tanggal + sesi
+    query = {"siswa_id": data.siswa_id, "tanggal": data.tanggal, "sesi": data.sesi}
+    update = {
+        "$set": {
+            "status": data.status,
+            "kelompok_id": data.kelompok_id,
+            "pengabsen_id": current_pengabsen["id"],
+            "waktu_absen": datetime.now(timezone.utc).isoformat(),
+        }
+    }
+
+    await db.absensi_pmq.update_one(query, update, upsert=True)
+
+    return {"message": "Absensi berhasil disimpan"}
+
+
+@api_router.post("/pmq/pengabsen/absensi/scan")
+async def scan_pmq_pengabsen_absensi(
+    payload: Dict[str, Any],
+    sesi: str,
+    current_pengabsen: dict = Depends(get_current_pengabsen_pmq),
+):
+    """Catat absensi via scan QR.
+
+    QR bisa berupa:
+    - {{"type": "siswa_pmq", "id": <siswa_pmq_id>}}
+    - QR santri biasa (berisi santri_id) → cari siswa_pmq dengan santri_id tsb.
+    """
+    tanggal = datetime.now(timezone.utc).date().isoformat()
+
+    siswa_id = None
+    kelompok_id = None
+
+    if payload.get("type") == "siswa_pmq":
+        siswa = await db.siswa_pmq.find_one({"id": payload.get("id")}, {"_id": 0})
+    else:
+        # Asumsikan santri QR → cari siswa_pmq yang link dengan santri_id
+        santri_id = payload.get("santri_id") or payload.get("id")
+        siswa = await db.siswa_pmq.find_one({"santri_id": santri_id}, {"_id": 0})
+
+    if not siswa:
+        raise HTTPException(status_code=404, detail="Siswa PMQ tidak ditemukan")
+
+    siswa_id = siswa["id"]
+    kelompok_id = siswa.get("kelompok_id")
+
+    if kelompok_id and kelompok_id not in (current_pengabsen.get("kelompok_ids") or []):
+        raise HTTPException(status_code=403, detail="Siswa bukan bagian dari kelompok Anda")
+
+    query = {"siswa_id": siswa_id, "tanggal": tanggal, "sesi": sesi}
+    update = {
+        "$set": {
+            "status": "hadir",
+            "kelompok_id": kelompok_id,
+            "pengabsen_id": current_pengabsen["id"],
+            "waktu_absen": datetime.now(timezone.utc).isoformat(),
+        }
+    }
+
+    await db.absensi_pmq.update_one(query, update, upsert=True)
+
+    return {"message": "Absensi via scan berhasil disimpan"}
+
+
+@api_router.get("/pmq/pengabsen/riwayat")
+async def get_pmq_pengabsen_riwayat(
+    tanggal_start: str,
+    tanggal_end: Optional[str] = None,
+    sesi: Optional[str] = None,
+    current_pengabsen: dict = Depends(get_current_pengabsen_pmq),
+):
+    """Riwayat absensi PMQ untuk pengabsen (hanya kelompok yang dimiliki)."""
+    if not tanggal_end:
+        tanggal_end = tanggal_start
+
+    kelompok_ids = current_pengabsen.get("kelompok_ids", []) or []
+    if not kelompok_ids:
+        return {"detail": []}
+
+    query: Dict[str, Any] = {
+        "tanggal": {"$gte": tanggal_start, "$lte": tanggal_end},
+        "kelompok_id": {"$in": kelompok_ids},
+    }
+    if sesi:
+        query["sesi"] = sesi
+
+    absensi_list = await db.absensi_pmq.find(query, {"_id": 0}).to_list(20000)
+
+    if not absensi_list:
+        return {"detail": []}
+
+    siswa_ids = list({a["siswa_id"] for a in absensi_list})
+    siswa_list = await db.siswa_pmq.find({"id": {"$in": siswa_ids}}, {"_id": 0}).to_list(5000)
+    siswa_map = {s["id"]: s for s in siswa_list}
+
+    kelompok_docs = await db.pmq_kelompok.find({"id": {"$in": kelompok_ids}}, {"_id": 0}).to_list(1000)
+    kelompok_map = {k["id"]: k for k in kelompok_docs}
+
+    tingkatan_map = {t["key"]: t["label"] for t in PMQ_TINGKATAN}
+
+    detail: List[Dict[str, Any]] = []
+    for a in absensi_list:
+        siswa = siswa_map.get(a["siswa_id"])
+        if not siswa:
+            continue
+        k_id = a.get("kelompok_id")
+        kelompok = kelompok_map.get(k_id)
+
+        detail.append(
+            {
+                "id": a.get("id"),
+                "siswa_id": a["siswa_id"],
+                "siswa_nama": siswa.get("nama", "-"),
+                "tingkatan_key": siswa.get("tingkatan_key", ""),
+                "tingkatan_label": tingkatan_map.get(
+                    siswa.get("tingkatan_key", ""), siswa.get("tingkatan_key", "")
+                ),
+                "kelompok_id": k_id,
+                "kelompok_nama": kelompok.get("nama") if kelompok else None,
+                "tanggal": a.get("tanggal", ""),
+                "sesi": a.get("sesi", ""),
+                "status": a.get("status", ""),
+                "waktu_absen": a.get("waktu_absen"),
+            }
+        )
+
+    # Urutkan agar rapih
+    detail.sort(key=lambda x: (x["tanggal"], x["kelompok_nama"] or "", x["siswa_nama"]))
+
+    return {"detail": detail}
+
         await db.pengabsen_kelas.update_one({"id": pengabsen_id}, {"$set": update_data})
     
     updated = await db.pengabsen_kelas.find_one({"id": pengabsen_id}, {"_id": 0})
