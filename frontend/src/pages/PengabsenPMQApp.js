@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Scanner } from '@yudiel/react-qr-scanner';
+import { BookOpen, Rocket, Sparkles, MoonStar, ClockHistory } from 'lucide-react';
 
 const STATUS_OPTIONS = [
   { value: 'null', label: 'Belum' },
@@ -27,6 +28,7 @@ const getTodayLocalYMD = () => {
 const PengabsenPMQApp = () => {
   const { user, loading, logout } = usePengabsenPMQAuth();
   const [activeTab, setActiveTab] = useState('today');
+  const [selectedTingkatanKey, setSelectedTingkatanKey] = useState('');
   const [tanggal, setTanggal] = useState(getTodayLocalYMD());
   const [sesiList, setSesiList] = useState([]);
   const [sesiKey, setSesiKey] = useState('');
