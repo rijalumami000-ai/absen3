@@ -580,8 +580,7 @@ const PengabsenAliyahApp = () => {
                     );
                   })}
                 </div>
-              );
-            })()}
+              )}
           </section>
         )}
       </main>
