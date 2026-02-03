@@ -1241,6 +1241,89 @@ async def update_pengabsen_pmq(pengabsen_id: str, payload: PengabsenPMQUpdate, _
 
 @api_router.post("/pmq/pengabsen/{pengabsen_id}/regenerate-kode-akses", response_model=PengabsenPMQResponse)
 async def regenerate_kode_akses_pmq(pengabsen_id: str, _: dict = Depends(get_current_admin)):
+
+
+@api_router.get("/pmq/absensi/riwayat", response_model=PMQAbsensiRiwayatResponse)
+async def get_pmq_absensi_riwayat(
+    tanggal_start: str,
+    tanggal_end: Optional[str] = None,
+    tingkatan_key: Optional[str] = None,
+    kelompok_id: Optional[str] = None,
+    sesi: Optional[str] = None,
+    _: dict = Depends(get_current_admin),
+):
+    """Riwayat absensi PMQ untuk admin.
+
+    Mengembalikan summary per status dan detail list absensi per siswa.
+    """
+    if not tanggal_end:
+        tanggal_end = tanggal_start
+
+    query: Dict[str, Any] = {
+        "tanggal": {"$gte": tanggal_start, "$lte": tanggal_end},
+    }
+    if tingkatan_key:
+        query["tingkatan_key"] = tingkatan_key
+    if kelompok_id:
+        query["kelompok_id"] = kelompok_id
+    if sesi in ["pagi", "malam"]:
+        query["sesi"] = sesi
+
+    # Ambil data absensi PMQ mentah
+    raw_list = await db.absensi_pmq.find(query, {"_id": 0}).to_list(10000)
+
+    if not raw_list:
+        return PMQAbsensiRiwayatResponse(
+            summary={"hadir": 0, "alfa": 0, "sakit": 0, "izin": 0, "terlambat": 0},
+            detail=[],
+        )
+
+    # Ambil siswa & kelompok untuk enrichment
+    siswa_ids = list({a["siswa_id"] for a in raw_list if a.get("siswa_id")})
+    siswa_list = await db.siswa_pmq.find({"id": {"$in": siswa_ids}}, {"_id": 0}).to_list(5000)
+    siswa_map = {s["id"]: s for s in siswa_list}
+
+    kelompok_ids = list({a.get("kelompok_id") for a in raw_list if a.get("kelompok_id")})
+    kelompok_list = await db.pmq_kelompok.find({"id": {"$in": kelompok_ids}}, {"_id": 0}).to_list(1000)
+    kelompok_map = {k["id"]: k for k in kelompok_list}
+
+    tingkatan_map = {t["key"]: t["label"] for t in PMQ_TINGKATAN}
+
+    summary: Dict[str, int] = {"hadir": 0, "alfa": 0, "sakit": 0, "izin": 0, "terlambat": 0}
+    detail: List[PMQAbsensiRiwayatRow] = []
+
+    for a in raw_list:
+        siswa = siswa_map.get(a["siswa_id"])
+        if not siswa:
+            continue
+
+        status = a.get("status") or ""
+        if status in summary:
+            summary[status] += 1
+
+        k_id = a.get("kelompok_id")
+        kelompok = kelompok_map.get(k_id)
+
+        row = PMQAbsensiRiwayatRow(
+            id=a.get("id"),
+            siswa_id=a["siswa_id"],
+            siswa_nama=siswa.get("nama", "-"),
+            tingkatan_key=siswa.get("tingkatan_key", ""),
+            tingkatan_label=tingkatan_map.get(siswa.get("tingkatan_key", ""), siswa.get("tingkatan_key", "")),
+            kelompok_id=k_id,
+            kelompok_nama=kelompok.get("nama") if kelompok else None,
+            tanggal=a.get("tanggal", ""),
+            sesi=a.get("sesi", ""),
+            status=status,
+            waktu_absen=a.get("waktu_absen"),
+        )
+        detail.append(row)
+
+    # Urutkan berdasarkan tanggal, tingkatan, kelompok, nama
+    detail.sort(key=lambda r: (r.tanggal, r.tingkatan_key, r.kelompok_nama or "", r.siswa_nama))
+
+    return PMQAbsensiRiwayatResponse(summary=summary, detail=detail)
+
     pengabsen = await db.pengabsen_pmq.find_one({"id": pengabsen_id}, {"_id": 0})
     if not pengabsen:
         raise HTTPException(status_code=404, detail="Pengabsen PMQ tidak ditemukan")
