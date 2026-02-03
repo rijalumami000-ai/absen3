@@ -121,6 +121,16 @@ const SiswaPMQ = () => {
     }
   };
 
+  const handleEdit = (siswa) => {
+    setFormData({
+      nama: siswa.nama,
+      gender: siswa.gender,
+      tingkatan_key: siswa.tingkatan_key,
+      kelompok_id: siswa.kelompok_id || '',
+    });
+    setIsCreateOpen(true);
+  };
+
   const handleDelete = async (id) => {
     if (!window.confirm('Yakin ingin menghapus siswa PMQ ini?')) return;
     try {
