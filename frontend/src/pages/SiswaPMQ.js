@@ -284,21 +284,45 @@ const SiswaPMQ = () => {
                 {siswaList.map((s) => (
                   <tr key={s.id} className="hover:bg-muted/50">
                     <td className="px-4 py-2 font-medium text-foreground">{s.nama}</td>
+                    <td className="px-4 py-2 text-muted-foreground">{getGenderLabel(s.gender)}</td>
                     <td className="px-4 py-2 text-muted-foreground">{s.tingkatan_label}</td>
                     <td className="px-4 py-2 text-muted-foreground">{s.kelompok_nama || '-'}</td>
-                    <td className="px-4 py-2 text-muted-foreground">
-                      {s.santri_id ? 'Link Santri' : 'Manual'}
+                    <td className="px-4 py-2">
+                      {s.qr_code ? (
+                        <div className="flex items-center gap-2">
+                          <div className="w-12 h-12 bg-white border border-border rounded flex items-center justify-center overflow-hidden">
+                            <img
+                              src={`data:image/png;base64,${s.qr_code}`}
+                              alt="QR PMQ"
+                              className="w-full h-full object-contain"
+                            />
+                          </div>
+                          <span className="text-xs text-muted-foreground">QR {s.santri_id ? 'Santri' : 'PMQ'}</span>
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground text-xs">Belum ada QR</span>
+                      )}
                     </td>
-                    <td className="px-4 py-2 text-muted-foreground">{s.has_qr ? 'Ya' : 'Tidak'}</td>
                     <td className="px-4 py-2 text-muted-foreground">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-red-500 hover:text-red-600"
-                        onClick={() => handleDelete(s.id)}
-                      >
-                        Hapus
-                      </Button>
+                      <div className="flex gap-2">
+                        {!s.santri_id && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEdit(s)}
+                          >
+                            Edit
+                          </Button>
+                        )}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-red-500 border-red-200 hover:bg-red-50"
+                          onClick={() => handleDelete(s.id)}
+                        >
+                          Hapus
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                 ))}
