@@ -10,6 +10,7 @@ const Dashboard = () => {
   const [totalSiswaMadin, setTotalSiswaMadin] = useState(0);
   const [totalSiswaAliyah, setTotalSiswaAliyah] = useState(0);
   const [totalSiswaPMQ, setTotalSiswaPMQ] = useState(0);
+  const [totalSiswaPMQ, setTotalSiswaPMQ] = useState(0);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
