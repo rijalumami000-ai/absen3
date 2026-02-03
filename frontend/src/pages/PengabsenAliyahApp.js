@@ -46,6 +46,8 @@ const PengabsenAliyahApp = () => {
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [kelasList, setKelasList] = useState([]);
   const [collapsedGroups, setCollapsedGroups] = useState({});
+  const [selectedMenu, setSelectedMenu] = useState('pagi'); // 'pagi' | 'dzuhur' | 'history'
+
   const [collapsedHistoryGroups, setCollapsedHistoryGroups] = useState({});
 
 
