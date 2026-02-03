@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Scanner } from '@yudiel/react-qr-scanner';
+import { Sun, CloudSun, History } from 'lucide-react';
 
 const STATUS_OPTIONS = [
   { value: 'null', label: 'Belum' },
@@ -230,32 +231,7 @@ const PengabsenAliyahApp = () => {
         </Button>
       </header>
 
-      <main className="flex-1 p-4 space-y-4 max-w-4xl mx-auto w-full">
-        <div className="flex gap-2 mb-4">
-          <button
-            type="button"
-            onClick={() => setActiveTab('today')}
-            className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
-              activeTab === 'today'
-                ? 'bg-emerald-500 text-white border-emerald-500'
-                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-            }`}
-          >
-            Absensi Hari Ini
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('history')}
-            className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
-              activeTab === 'history'
-                ? 'bg-emerald-500 text-white border-emerald-500'
-                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-            }`}
-          >
-            Riwayat Absensi
-          </button>
-        </div>
-
+      <main className="flex-1 p-4 space-y-4 max-w-4xl mx-auto w-full pb-24">
         {activeTab === 'today' && (
           <>
             <section className="bg-white rounded-lg shadow p-4 space-y-4">
