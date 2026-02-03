@@ -244,7 +244,7 @@ const PengabsenPMQApp = () => {
         </Button>
       </header>
 
-      <main className="flex-1 p-4 space-y-4 max-w-4xl mx-auto w-full pb-20">
+      <main className="flex-1 p-4 space-y-4 max-w-4xl mx-auto w-full pb-24">
         {activeTab === 'today' && (
           <section className="bg-white rounded-lg shadow p-4 space-y-4">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
@@ -525,7 +525,10 @@ const PengabsenPMQApp = () => {
               <button
                 key={t.key}
                 type="button"
-                onClick={() => setSelectedTingkatanKey(t.key)}
+                onClick={() => {
+                  setSelectedTingkatanKey(t.key);
+                  setActiveTab('today');
+                }}
                 className={`flex flex-col items-center justify-center min-w-[70px] px-2 py-1 rounded-xl border text-[11px] transition-colors ${
                   isActive
                     ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
