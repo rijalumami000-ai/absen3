@@ -778,6 +778,28 @@ async def get_current_monitoring_aliyah(credentials: HTTPAuthorizationCredential
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid authentication credentials")
 
+
+
+async def get_current_admin(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
+    try:
+        token = credentials.credentials
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        admin_id: str = payload.get("sub")
+        if admin_id is None:
+            raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+
+        admin = await db.admins.find_one({"id": admin_id}, {"_id": 0})
+        if admin is None:
+            raise HTTPException(status_code=401, detail="Admin not found")
+
+        # Pastikan field role selalu ada di objek admin yang dikembalikan
+        if "role" not in admin:
+            admin["role"] = payload.get("role", "superadmin")
+
+        return admin
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+
 # ==================== PMQ MODELS ====================
 
 PMQ_TINGKATAN = [
@@ -1529,25 +1551,7 @@ async def get_current_pengabsen(credentials: HTTPAuthorizationCredentials = Depe
         raise HTTPException(status_code=401, detail="Invalid authentication credentials")
 
 
-async def get_current_admin(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
-    try:
-        token = credentials.credentials
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        admin_id: str = payload.get("sub")
-        if admin_id is None:
-            raise HTTPException(status_code=401, detail="Invalid authentication credentials")
-        
-        admin = await db.admins.find_one({"id": admin_id}, {"_id": 0})
-        if admin is None:
-            raise HTTPException(status_code=401, detail="Admin not found")
-        
-        # Pastikan field role selalu ada di objek admin yang dikembalikan
-        if "role" not in admin:
-            admin["role"] = payload.get("role", "superadmin")
-        
-        return admin
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+
 
 
 async def get_current_pengabsen_kelas(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
