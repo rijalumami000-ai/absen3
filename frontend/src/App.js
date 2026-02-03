@@ -221,6 +221,25 @@ const MonitoringAliyahProtectedRoute = ({ children }) => {
     return <Navigate to="/monitoring-aliyah-app/login" replace />;
   }
 
+const PengabsenPMQProtectedRoute = ({ children }) => {
+  const { user, loading } = usePengabsenPMQAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-gray-500">Memuat...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/pengabsen-pmq-app/login" replace />;
+  }
+
+  return children;
+};
+
+
   return children;
 };
 
