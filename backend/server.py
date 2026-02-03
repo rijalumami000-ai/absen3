@@ -3756,6 +3756,37 @@ async def get_absensi_riwayat(
 
     # Process absensi data
     for a in absensi_list:
+        waktu = a.get("waktu_sholat")
+        status = a.get("status")
+        santri_id = a.get("santri_id")
+
+        if (
+            waktu in waktu_sholat_list
+            and status in status_list
+            and santri_id in santri_dict
+        ):
+            # Update summary
+            summary["by_waktu"][waktu][status] += 1
+
+            # Add to detail
+            pengabsen_id = a.get("pengabsen_id")
+            santri = santri_dict[santri_id]
+
+            detail[waktu][status].append(
+                {
+                    "santri_id": santri_id,
+                    "nama": santri["nama"],
+                    "nis": santri["nis"],
+                    "asrama_id": santri["asrama_id"],
+                    "tanggal": a.get("tanggal"),
+                    "pengabsen_id": pengabsen_id,
+                    "pengabsen_nama": pengabsen_map.get(pengabsen_id, "-")
+                    if pengabsen_id
+                    else "-",
+                }
+            )
+
+    return {"summary": summary, "detail": detail}
 
 
 @api_router.get("/pmq/settings/waktu")
