@@ -83,7 +83,7 @@ const SettingWaktuPMQ = () => {
           </div>
           <div>
             <h1 className="text-2xl md:text-3xl font-display font-bold text-foreground">Setting Waktu PMQ</h1>
-            <p className="text-sm text-muted-foreground mt-1">Atur sesi waktu absensi untuk Pendidikan Murottilil Qur'an</p>
+            <p className="text-sm text-muted-foreground mt-1">Atur sesi waktu absensi untuk Pendidikan Murottilil Qur&apos;an</p>
           </div>
         </div>
         <Button onClick={handleSave} disabled={saving || loading} className="gap-2">
