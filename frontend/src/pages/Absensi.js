@@ -27,6 +27,7 @@ const Absensi = () => {
   const [filterPeriode, setFilterPeriode] = useState('hari');
   const [tanggalStart, setTanggalStart] = useState(getTodayLocalYMD());
   const [tanggalEnd, setTanggalEnd] = useState(getTodayLocalYMD());
+  const [activeWaktu, setActiveWaktu] = useState('subuh');
   const { toast } = useToast();
 
   const getPeriodeLabel = () => {
