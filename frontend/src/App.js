@@ -373,6 +373,24 @@ function AppRoutes() {
           </MonitoringAliyahAuthProvider>
         }
       />
+      <Route
+        path="/pengabsen-pmq-app/login"
+        element={
+          <PengabsenPMQAuthProvider>
+            <PengabsenPMQAppLogin />
+          </PengabsenPMQAuthProvider>
+        }
+      />
+      <Route
+        path="/pengabsen-pmq-app"
+        element={
+          <PengabsenPMQAuthProvider>
+            <PengabsenPMQProtectedRoute>
+              <PengabsenPMQApp />
+            </PengabsenPMQProtectedRoute>
+          </PengabsenPMQAuthProvider>
+        }
+      />
       
       {/* Admin Routes */}
       <Route
