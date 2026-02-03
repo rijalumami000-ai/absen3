@@ -332,6 +332,28 @@ class PengabsenAliyahMeResponse(BaseModel):
     created_at: datetime
 
 
+class PengabsenPMQLoginRequest(BaseModel):
+    username: str
+    kode_akses: str
+
+
+class PengabsenPMQMeResponse(BaseModel):
+    id: str
+    nama: str
+    username: str
+    email_atau_hp: Optional[str] = ""
+    tingkatan_keys: List[str] = []
+    kelompok_ids: List[str] = []
+    created_at: datetime
+
+
+class PengabsenPMQTokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: PengabsenPMQMeResponse
+
+
+
 class PengabsenAliyahTokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
@@ -2041,6 +2063,57 @@ async def login(request: LoginRequest):
     # Pastikan setiap admin memiliki role (default superadmin jika belum ada)
     role = admin.get("role", "superadmin")
     if "role" not in admin:
+
+
+# ==================== AUTH PENGABSEN PMQ (PWA) ====================
+
+
+async def get_current_pengabsen_pmq(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
+    try:
+        token = credentials.credentials
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        pengabsen_id: str = payload.get("sub")
+        if pengabsen_id is None:
+            raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+
+        pengabsen = await db.pengabsen_pmq.find_one({"id": pengabsen_id}, {"_id": 0})
+        if pengabsen is None:
+            raise HTTPException(status_code=401, detail="Pengabsen PMQ not found")
+
+        return pengabsen
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+
+
+@api_router.post("/pmq/pengabsen/login", response_model=PengabsenPMQTokenResponse)
+async def login_pengabsen_pmq(request: PengabsenPMQLoginRequest):
+    pengabsen = await db.pengabsen_pmq.find_one({"username": request.username}, {"_id": 0})
+
+    if not pengabsen or pengabsen.get("kode_akses") != request.kode_akses:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Username atau kode akses salah",
+        )
+
+    access_token = create_access_token(data={"sub": pengabsen["id"], "role": "pengabsen_pmq"})
+
+    user_data = PengabsenPMQMeResponse(
+        id=pengabsen["id"],
+        nama=pengabsen["nama"],
+        username=pengabsen["username"],
+        email_atau_hp=pengabsen.get("email_atau_hp", ""),
+        tingkatan_keys=pengabsen.get("tingkatan_keys", []),
+        kelompok_ids=pengabsen.get("kelompok_ids", []),
+        created_at=pengabsen["created_at"],
+    )
+
+    return PengabsenPMQTokenResponse(access_token=access_token, user=user_data)
+
+
+@api_router.get("/pmq/pengabsen/me", response_model=PengabsenPMQMeResponse)
+async def get_pengabsen_pmq_me(current_pengabsen: dict = Depends(get_current_pengabsen_pmq)):
+    return PengabsenPMQMeResponse(**current_pengabsen)
+
         await db.admins.update_one({"id": admin["id"]}, {"$set": {"role": role}})
     
     access_token = create_access_token(data={"sub": admin['id'], "role": role})
