@@ -23,7 +23,8 @@ import {
   ClipboardCheck,
   Eye,
   Database,
-  Layers
+  Layers,
+  MessageCircle
 } from 'lucide-react';
 
 const LOGO_AL_HAMID = 'https://customer-assets.emergentagent.com/job_pesantren-app-3/artifacts/443f4wsk_Logo%20Al%20Hamid.jpg';
