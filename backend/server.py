@@ -404,6 +404,17 @@ class AbsensiResponse(BaseModel):
     pengabsen_id: Optional[str]
     created_at: datetime
 
+
+class WhatsAppRekapItem(BaseModel):
+    santri_id: str
+    nama_santri: str
+    nama_wali: str
+    nomor_hp_wali: str
+    asrama_id: str
+    asrama_nama: str
+    gender: str
+    rekap: Dict[str, str]
+
 # Waktu Sholat Models
 class WaktuSholat(BaseModel):
     model_config = ConfigDict(extra="ignore")
