@@ -425,8 +425,8 @@ class WhatsAppHistoryItem(BaseModel):
     id: str
     santri_id: str
     nama_santri: str
-    nama_wali: str
-    nomor_hp_wali: str
+    nama_wali: str = "-"
+    nomor_hp_wali: str = ""
     asrama_id: str
     asrama_nama: str
     gender: str
