@@ -32,6 +32,11 @@ const SiswaPMQ = () => {
     tingkatan_key: '',
     kelompok_id: '',
   });
+  const [linkSantriSearch, setLinkSantriSearch] = useState('');
+  const [editingSiswa, setEditingSiswa] = useState(null);
+  const [qrPreview, setQrPreview] = useState({ open: false, siswa: null });
+  const [availableSantri, setAvailableSantri] = useState([]);
+  const [editingId, setEditingId] = useState(null);
 
   const filteredAvailableSantri = availableSantri.filter((s) => {
     const q = linkSantriSearch.toLowerCase();
@@ -41,7 +46,6 @@ const SiswaPMQ = () => {
       (s.nis && s.nis.toLowerCase().includes(q))
     );
   });
-  const [editingSiswa, setEditingSiswa] = useState(null);
   const [qrPreview, setQrPreview] = useState({ open: false, siswa: null });
   const [availableSantri, setAvailableSantri] = useState([]);
   const [editingId, setEditingId] = useState(null);
