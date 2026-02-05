@@ -293,6 +293,13 @@ const SiswaAliyah = () => {
               </DialogHeader>
               <div className="space-y-4">
                 <div>
+                  <Label>Cari Santri</Label>
+                  <Input
+                    placeholder="Ketik nama atau NIS santri..."
+                    value={linkSantriSearch}
+                    onChange={(e) => setLinkSantriSearch(e.target.value)}
+                    className="mb-2"
+                  />
                   <Label>Pilih Santri</Label>
                   <Select
                     value={formData.santri_id}
@@ -311,7 +318,7 @@ const SiswaAliyah = () => {
                       <SelectValue placeholder="Pilih santri" />
                     </SelectTrigger>
                     <SelectContent>
-                      {availableSantri.map((santri) => (
+                      {filteredAvailableSantri.map((santri) => (
                         <SelectItem key={santri.id} value={santri.id}>
                           {santri.nama} - {santri.nis}
                         </SelectItem>
