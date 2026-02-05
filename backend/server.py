@@ -415,6 +415,24 @@ class WhatsAppRekapItem(BaseModel):
     gender: str
     rekap: Dict[str, str]
 
+
+class WhatsAppSendRequest(BaseModel):
+    santri_id: str
+    tanggal: str
+
+
+class WhatsAppHistoryItem(BaseModel):
+    id: str
+    santri_id: str
+    nama_santri: str
+    asrama_id: str
+    asrama_nama: str
+    gender: str
+    tanggal: str
+    sent_at: datetime
+    admin_id: str
+    admin_nama: str
+
 # Waktu Sholat Models
 class WaktuSholat(BaseModel):
     model_config = ConfigDict(extra="ignore")
