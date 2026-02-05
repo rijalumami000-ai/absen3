@@ -30,6 +30,8 @@ import TingkatanPMQ from '@/pages/TingkatanPMQ';
 import PengabsenPMQ from '@/pages/PengabsenPMQ';
 import RiwayatAbsensiPMQ from '@/pages/RiwayatAbsensiPMQ';
 import SettingWaktuPMQ from '@/pages/SettingWaktuPMQ';
+import WhatsAppRekap from '@/pages/WhatsAppRekap';
+import WhatsAppTemplateSettings from '@/pages/WhatsAppTemplateSettings';
 import PengabsenAliyahApp from '@/pages/PengabsenAliyahApp';
 import MonitoringAliyahApp from '@/pages/MonitoringAliyahApp';
 import MonitoringAliyahAppLogin from '@/pages/MonitoringAliyahAppLogin';
@@ -527,6 +529,22 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <Settings />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/whatsapp/rekap"
+        element={
+          <ProtectedRoute>
+            <WhatsAppRekap />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/whatsapp/template"
+        element={
+          <ProtectedRoute>
+            <WhatsAppTemplateSettings />
           </ProtectedRoute>
         }
       />
