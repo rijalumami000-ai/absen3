@@ -622,7 +622,8 @@ function AppContent() {
                      location.pathname.startsWith('/monitoring-kelas-app') ||
                      location.pathname.startsWith('/pengabsen-aliyah-app') ||
                      location.pathname.startsWith('/monitoring-aliyah-app') ||
-                     location.pathname.startsWith('/pengabsen-pmq-app');
+                     location.pathname.startsWith('/pengabsen-pmq-app') ||
+                     location.pathname.startsWith('/pengabsen-portal');
   
   // If it's a PWA route, don't wrap with AuthProvider
   if (isPWARoute) {
