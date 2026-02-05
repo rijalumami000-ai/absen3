@@ -114,6 +114,8 @@ const SiswaPMQ = () => {
         await api.put(`/pmq/siswa/${editingId}`, formData);
         toast.success('Siswa PMQ berhasil diperbarui');
       } else {
+  const [linkSantriSearch, setLinkSantriSearch] = useState('');
+
         // Create new siswa
         await api.post('/pmq/siswa', formData);
         toast.success('Siswa PMQ berhasil ditambahkan');
