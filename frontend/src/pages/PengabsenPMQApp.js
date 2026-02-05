@@ -114,6 +114,14 @@ const PengabsenPMQApp = () => {
 
   const handleStatusChange = async (siswaId, kelompokId, status) => {
     try {
+      if (!sesiKey) {
+        toast({
+          title: 'Sesi belum dipilih',
+          description: 'Silakan pilih sesi terlebih dahulu.',
+          variant: 'destructive',
+        });
+        return;
+      }
       const newStatus = status === 'null' ? null : status;
       const normalizedKelompokId = kelompokId === 'unknown' ? null : kelompokId;
       await pengabsenPMQAppAPI.upsertAbsensi({
