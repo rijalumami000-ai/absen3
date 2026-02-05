@@ -32,6 +32,7 @@ import RiwayatAbsensiPMQ from '@/pages/RiwayatAbsensiPMQ';
 import SettingWaktuPMQ from '@/pages/SettingWaktuPMQ';
 import WhatsAppRekap from '@/pages/WhatsAppRekap';
 import WhatsAppTemplateSettings from '@/pages/WhatsAppTemplateSettings';
+import WhatsAppHistory from '@/pages/WhatsAppHistory';
 import PengabsenAliyahApp from '@/pages/PengabsenAliyahApp';
 import MonitoringAliyahApp from '@/pages/MonitoringAliyahApp';
 import MonitoringAliyahAppLogin from '@/pages/MonitoringAliyahAppLogin';
@@ -545,6 +546,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <WhatsAppTemplateSettings />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/whatsapp/history"
+        element={
+          <ProtectedRoute>
+            <WhatsAppHistory />
           </ProtectedRoute>
         }
       />
