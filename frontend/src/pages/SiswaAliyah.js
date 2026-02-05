@@ -218,6 +218,11 @@ const SiswaAliyah = () => {
     return matchKelas && matchSearch;
   });
 
+  // Filter santri yang belum di-link ke Aliyah
+  const availableSantri = santriList.filter(
+    (santri) => !siswaList.some((siswa) => siswa.santri_id === santri.id)
+  );
+
   const filteredAvailableSantri = availableSantri.filter((santri) => {
     const q = linkSantriSearch.toLowerCase();
     if (!q) return true;
@@ -229,11 +234,6 @@ const SiswaAliyah = () => {
 
   const totalFiltered = filteredSiswa.length;
   const totalBelumAdaKelas = filteredSiswa.filter((siswa) => !siswa.kelas_id).length;
-
-  // Filter santri yang belum di-link ke Aliyah
-  const availableSantri = santriList.filter(
-    (santri) => !siswaList.some((siswa) => siswa.santri_id === santri.id)
-  );
 
   return (
     <div className="space-y-6 animate-fade-in">
