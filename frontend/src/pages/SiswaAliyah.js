@@ -38,10 +38,9 @@ const SiswaAliyah = () => {
   const [isQrPreviewOpen, setIsQrPreviewOpen] = useState(false);
   const [qrPreviewUrl, setQrPreviewUrl] = useState('');
   const [qrPreviewSiswa, setQrPreviewSiswa] = useState(null);
+  const [linkSantriSearch, setLinkSantriSearch] = useState('');
   const [formData, setFormData] = useState({
     nama: '',
-  const [linkSantriSearch, setLinkSantriSearch] = useState('');
-
     nis: '',
     gender: 'putra',
     kelas_id: '',
