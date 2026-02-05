@@ -216,23 +216,56 @@ const RiwayatAbsensiPMQ = () => {
   const pageData = detail.slice(startIndex, endIndex);
 
   return (
-    <div className="animate-fade-in">
-      <div className="mb-6 animate-slide-in-left">
-        <h1 className="text-3xl font-bold text-gray-800 flex items-center font-display">
+    <div className="animate-fade-in" data-testid="riwayat-pmq-page">
+      <div className="mb-6 animate-slide-in-left" data-testid="riwayat-pmq-header">
+        <h1 className="text-3xl font-bold text-gray-800 flex items-center font-display" data-testid="riwayat-pmq-title">
           <div className="w-12 h-12 bg-gradient-to-br from-emerald-600 to-cyan-600 rounded-xl flex items-center justify-center mr-3 shadow-lg">
             <ClipboardList className="text-white" size={24} />
           </div>
           Riwayat Absensi PMQ
         </h1>
-        <p className="text-gray-600 mt-2 ml-15">Ringkasan dan detail kehadiran siswa PMQ</p>
+        <p className="text-gray-600 mt-2 ml-15" data-testid="riwayat-pmq-subtitle">
+          Ringkasan dan detail kehadiran siswa PMQ
+        </p>
       </div>
 
+      {summary && (
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6" data-testid="pmq-status-cards">
+          {statusCards.map((item) => {
+            const Icon = item.icon;
+            const isActive = filterStatus === item.key;
+            return (
+              <Card
+                key={item.key}
+                className={`shadow-card animate-scale-in cursor-pointer transition-transform ${
+                  isActive ? 'ring-2 ring-emerald-500 scale-[1.02]' : 'hover:scale-[1.01]'
+                }`}
+                onClick={() => handleStatusCardClick(item.key)}
+                data-testid={`pmq-status-card-${item.key}`}
+              >
+                <CardContent className="p-4 flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-muted-foreground">{item.label}</p>
+                    <p className="text-2xl font-bold text-foreground" data-testid={`pmq-status-count-${item.key}`}>
+                      {summary[item.key] ?? 0}
+                    </p>
+                  </div>
+                  <div className={`${item.bg} ${item.color} p-2 rounded-lg`}>
+                    <Icon className="w-5 h-5" />
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      )}
+
       {/* Filter bar atas */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4" data-testid="pmq-filter-top">
         <div>
           <Label>Periode</Label>
           <Select value={filterPeriode} onValueChange={setFilterPeriode}>
-            <SelectTrigger>
+            <SelectTrigger data-testid="pmq-filter-periode-select">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -251,23 +284,38 @@ const RiwayatAbsensiPMQ = () => {
         </div>
         <div>
           <Label>Tanggal Referensi</Label>
-          <Input type="date" value={filterTanggal} onChange={(e) => setFilterTanggal(e.target.value)} />
+          <Input
+            type="date"
+            value={filterTanggal}
+            onChange={(e) => setFilterTanggal(e.target.value)}
+            data-testid="pmq-filter-tanggal-input"
+          />
         </div>
         <div>
           <Label>Tanggal Mulai</Label>
-          <Input type="date" value={tanggalStart} onChange={(e) => setTanggalStart(e.target.value)} />
+          <Input
+            type="date"
+            value={tanggalStart}
+            onChange={(e) => setTanggalStart(e.target.value)}
+            data-testid="pmq-filter-start-input"
+          />
         </div>
         <div>
           <Label>Tanggal Selesai</Label>
-          <Input type="date" value={tanggalEnd} onChange={(e) => setTanggalEnd(e.target.value)} />
+          <Input
+            type="date"
+            value={tanggalEnd}
+            onChange={(e) => setTanggalEnd(e.target.value)}
+            data-testid="pmq-filter-end-input"
+          />
         </div>
       </div>
 
       {/* Filter bar bawah */}
-      <Card className="mb-4 shadow-card">
+      <Card className="mb-4 shadow-card" data-testid="pmq-filter-card">
         <CardContent className="p-4 space-y-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-muted-foreground" data-testid="pmq-filter-summary">
               <div>{getPeriodeLabel()}</div>
               <div>{`Periode tanggal: ${tanggalStart} s.d. ${tanggalEnd}`}</div>
               <div>{`Tingkatan: ${getTingkatanLabel() || 'Semua'}`}</div>
@@ -287,6 +335,7 @@ const RiwayatAbsensiPMQ = () => {
                   })
                 }
                 disabled={!detail.length}
+                data-testid="pmq-download-pdf-button"
               >
                 <FileDown className="w-4 h-4 mr-2" />
                 Download PDF
@@ -294,7 +343,7 @@ const RiwayatAbsensiPMQ = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4" data-testid="pmq-filter-selects">
             <div>
               <Label>Tingkatan PMQ</Label>
               <Select
@@ -304,7 +353,7 @@ const RiwayatAbsensiPMQ = () => {
                   setFilterKelompok('all');
                 }}
               >
-                <SelectTrigger>
+                <SelectTrigger data-testid="pmq-filter-tingkatan-select">
                   <SelectValue placeholder="Semua Tingkatan" />
                 </SelectTrigger>
                 <SelectContent>
@@ -325,7 +374,7 @@ const RiwayatAbsensiPMQ = () => {
                   setFilterKelompok(val);
                 }}
               >
-                <SelectTrigger>
+                <SelectTrigger data-testid="pmq-filter-kelompok-select">
                   <SelectValue placeholder="Semua Kelompok" />
                 </SelectTrigger>
                 <SelectContent>
@@ -347,7 +396,7 @@ const RiwayatAbsensiPMQ = () => {
             <div>
               <Label>Sesi</Label>
               <Select value={filterSesi} onValueChange={setFilterSesi}>
-                <SelectTrigger>
+                <SelectTrigger data-testid="pmq-filter-sesi-select">
                   <SelectValue placeholder="Semua Sesi" />
                 </SelectTrigger>
                 <SelectContent>
@@ -357,41 +406,17 @@ const RiwayatAbsensiPMQ = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="md:col-span-2">
-              <Label>Status</Label>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-2 mt-2">
-                {statusCards.map((card) => {
-                  const Icon = card.icon;
-                  const isActive = filterStatus === card.key;
-                  const count = summary?.[card.key] || 0;
-                  return (
-                    <button
-                      key={card.key}
-                      type="button"
-                      onClick={() => handleStatusCardClick(card.key)}
-                      className={`flex items-center gap-2 rounded-lg border px-2 py-1.5 text-xs transition-colors ${
-                        isActive ? `${card.bg} ${card.color} border-current` : 'bg-muted text-muted-foreground'
-                      }`}
-                    >
-                      <Icon className="w-4 h-4" />
-                      <span className="flex-1 text-left">{card.label}</span>
-                      <span className="font-semibold">{count}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Tabel detail */}
-      <Card className="shadow-card">
+      <Card className="shadow-card" data-testid="pmq-detail-table">
         <CardHeader>
           <CardTitle className="text-base flex items-center justify-between">
             <span>Detail Riwayat Absensi PMQ</span>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <span>Jumlah data: {total}</span>
+              <span data-testid="pmq-total-count">Jumlah data: {total}</span>
               <select
                 className="border border-border rounded px-2 py-1 bg-background"
                 value={pageSize}
@@ -400,6 +425,7 @@ const RiwayatAbsensiPMQ = () => {
                   setPageSize(val);
                   setPage(1);
                 }}
+                data-testid="pmq-page-size-select"
               >
                 <option value={30}>30 / halaman</option>
                 <option value={50}>50 / halaman</option>
@@ -411,12 +437,16 @@ const RiwayatAbsensiPMQ = () => {
         </CardHeader>
         <CardContent className="p-0">
           {loading ? (
-            <div className="py-10 text-center text-muted-foreground text-sm">Memuat data riwayat absensi PMQ...</div>
+            <div className="py-10 text-center text-muted-foreground text-sm" data-testid="pmq-loading">
+              Memuat data riwayat absensi PMQ...
+            </div>
           ) : pageData.length === 0 ? (
-            <div className="py-10 text-center text-muted-foreground text-sm">Tidak ada data ditemukan</div>
+            <div className="py-10 text-center text-muted-foreground text-sm" data-testid="pmq-empty">
+              Tidak ada data ditemukan
+            </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-xs">
+              <table className="w-full text-xs" data-testid="pmq-detail-table-content">
                 <thead className="bg-muted">
                   <tr>
                     <th className="px-3 py-2 text-left font-semibold text-foreground">No</th>
@@ -431,7 +461,11 @@ const RiwayatAbsensiPMQ = () => {
                 </thead>
                 <tbody className="divide-y divide-border">
                   {pageData.map((row, idx) => (
-                    <tr key={row.id || `${row.siswa_id}-${row.tanggal}-${idx}`} className="hover:bg-muted/40">
+                    <tr
+                      key={row.id || `${row.siswa_id}-${row.tanggal}-${idx}`}
+                      className="hover:bg-muted/40"
+                      data-testid={`pmq-detail-row-${row.id || `${row.siswa_id}-${idx}`}`}
+                    >
                       <td className="px-3 py-1.5 align-top">{startIndex + idx + 1}</td>
                       <td className="px-3 py-1.5 align-top">{row.tanggal || '-'}</td>
                       <td className="px-3 py-1.5 align-top capitalize">{row.sesi || '-'}</td>
@@ -456,7 +490,10 @@ const RiwayatAbsensiPMQ = () => {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between px-4 py-3 border-t border-border text-xs text-muted-foreground">
+            <div
+              className="flex items-center justify-between px-4 py-3 border-t border-border text-xs text-muted-foreground"
+              data-testid="pmq-pagination"
+            >
               <div>
                 Halaman {currentPage} dari {totalPages}
               </div>
@@ -466,6 +503,7 @@ const RiwayatAbsensiPMQ = () => {
                   size="sm"
                   disabled={currentPage === 1}
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  data-testid="pmq-pagination-prev"
                 >
                   Sebelumnya
                 </Button>
@@ -474,6 +512,7 @@ const RiwayatAbsensiPMQ = () => {
                   size="sm"
                   disabled={currentPage === totalPages}
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  data-testid="pmq-pagination-next"
                 >
                   Berikutnya
                 </Button>
