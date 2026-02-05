@@ -74,6 +74,8 @@ const Layout = ({ children }) => {
         { path: '/pengabsen', icon: UserCheck, label: 'Pengabsen Sholat' },
         { path: '/pembimbing', icon: UserCog, label: 'Monitoring Sholat' },
         { path: '/absensi', icon: ClipboardList, label: 'Riwayat Absensi Sholat' },
+        { path: '/whatsapp/rekap', icon: MessageCircle, label: 'Kirim WA Wali' },
+        { path: '/whatsapp/template', icon: Settings, label: 'Template WA Wali' },
         { path: '/waktu-sholat', icon: Clock, label: 'Waktu Sholat' },
       ]
     },
