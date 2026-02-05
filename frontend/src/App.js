@@ -243,14 +243,8 @@ function AppRoutes() {
   return (
     <Routes>
       {/* PWA Routes - PRIORITAS PERTAMA */}
-      <Route
-        path="/pengabsen-app/login"
-        element={
-          <PengabsenAuthProvider>
-            <PengabsenAppLogin />
-          </PengabsenAuthProvider>
-        }
-      />
+      <Route path="/pengabsen-portal" element={<PengabsenPortal />} />
+      <Route path="/pengabsen-app/login" element={<Navigate to="/pengabsen-portal" replace />} />
       <Route
         path="/pengabsen-app"
         element={
