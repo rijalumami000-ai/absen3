@@ -5,6 +5,9 @@ import { Users, Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const Dashboard = () => {
+  const LOGO_PESANTREN_MADIN = 'https://customer-assets.emergentagent.com/job_pesantren-app-3/artifacts/pjy9w2wa_Pesantren%20dan%20Madin.jpg';
+  const LOGO_PMQ = 'https://customer-assets.emergentagent.com/job_pesantren-app-3/artifacts/9xgnnnsa_LOGO%20PMQ.png';
+  const LOGO_ALIYAH = 'https://customer-assets.emergentagent.com/job_pesantren-app-3/artifacts/89w18wrw_Madrasah%20Aliyah.jpg';
   const [stats, setStats] = useState(null);
   const [totalSantri, setTotalSantri] = useState(0);
   const [totalSiswaMadin, setTotalSiswaMadin] = useState(0);
@@ -59,6 +62,7 @@ const Dashboard = () => {
       icon: Users,
       color: 'text-blue-600',
       bgColor: 'bg-blue-50',
+      logo: LOGO_PESANTREN_MADIN,
     },
     {
       title: 'Total Siswa Madrasah Diniyah',
@@ -66,6 +70,7 @@ const Dashboard = () => {
       icon: Users,
       color: 'text-emerald-600',
       bgColor: 'bg-emerald-50',
+      logo: LOGO_PESANTREN_MADIN,
     },
     {
       title: 'Total Siswa Madrasah Aliyah',
@@ -73,6 +78,7 @@ const Dashboard = () => {
       icon: Users,
       color: 'text-indigo-600',
       bgColor: 'bg-indigo-50',
+      logo: LOGO_ALIYAH,
     },
     {
       title: 'Total Siswa PMQ',
@@ -80,6 +86,7 @@ const Dashboard = () => {
       icon: Users,
       color: 'text-purple-600',
       bgColor: 'bg-purple-50',
+      logo: LOGO_PMQ,
     },
   ];
 
@@ -109,8 +116,24 @@ const Dashboard = () => {
                       <p className="text-xs text-gray-500 mt-1">{stat.subtitle}</p>
                     )}
                   </div>
-                  <div className={`${stat.bgColor} ${stat.color} p-3 rounded-lg transition-transform hover:scale-110 transition-smooth`}>
-                    <Icon size={24} />
+                  <div className="flex flex-col items-end gap-3">
+                    <div
+                      className={`${stat.bgColor} ${stat.color} p-3 rounded-lg transition-transform hover:scale-110 transition-smooth`}
+                      data-testid={`stat-card-icon-${index}`}
+                    >
+                      <Icon size={24} />
+                    </div>
+                    <div
+                      className="w-12 h-12 rounded-xl border border-emerald-100 bg-white/80 flex items-center justify-center p-1 shadow-sm"
+                      data-testid={`stat-card-logo-frame-${index}`}
+                    >
+                      <img
+                        src={stat.logo}
+                        alt={`Logo ${stat.title}`}
+                        className="w-full h-full object-contain mix-blend-multiply"
+                        data-testid={`stat-card-logo-${index}`}
+                      />
+                    </div>
                   </div>
                 </div>
               </CardContent>
