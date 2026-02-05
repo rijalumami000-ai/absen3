@@ -66,6 +66,7 @@ Bangun sistem absensi terpadu untuk pesantren yang mencakup absensi sholat, Madr
 - **2026-02-05**: History WhatsApp kini bisa kirim ulang + tombol kembali ke rekap.
 - **2026-02-05**: Login admin diperbarui (judul/subjudul) + logo institusi.
 - **2026-02-05**: Logo login diperbesar + transparansi logo Al-Hamid diperkuat; history WA bisa kirim ulang.
+- **2026-02-05**: Resend WhatsApp history diperbaiki + logo login diperbesar & di-crop agar lebih transparan.
 - **2026-02-05**: Layout Kelas Aliyah disamakan dengan Kelas Madrasah Diniyah (card grid).
 - **2026-02-05**: Edit Kelompok PMQ (UI + endpoint PUT /pmq/kelompok/{id}).
 - **2026-02-05**: Filter status Riwayat PMQ dipindah ke atas tabel (seperti Aliyah).
