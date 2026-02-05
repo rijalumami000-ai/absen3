@@ -4036,10 +4036,20 @@ async def record_whatsapp_send(
     asrama = await db.asrama.find_one({"id": santri.get("asrama_id")}, {"_id": 0})
     asrama_nama = asrama.get("nama", "-") if asrama else "-"
 
+    absensi_list = await db.absensi.find(
+        {"tanggal": payload.tanggal, "santri_id": payload.santri_id},
+        {"_id": 0, "waktu_sholat": 1, "status": 1},
+    ).to_list(100)
+    absensi_map = {a.get("waktu_sholat"): a.get("status", "belum") for a in absensi_list}
+    waktu_order = ["dzuhur", "ashar", "maghrib", "isya", "subuh"]
+    rekap = {w: absensi_map.get(w, "belum") for w in waktu_order}
+
     record = {
         "id": str(uuid.uuid4()),
         "santri_id": santri["id"],
         "nama_santri": santri.get("nama", "-"),
+        "nama_wali": santri.get("nama_wali", "-"),
+        "nomor_hp_wali": santri.get("nomor_hp_wali", ""),
         "asrama_id": santri.get("asrama_id", ""),
         "asrama_nama": asrama_nama,
         "gender": santri.get("gender", ""),
@@ -4047,6 +4057,7 @@ async def record_whatsapp_send(
         "sent_at": datetime.now(timezone.utc),
         "admin_id": current_admin.get("id", ""),
         "admin_nama": current_admin.get("nama") or current_admin.get("username", "admin"),
+        "rekap": rekap,
     }
 
     await db.whatsapp_history.insert_one({**record, "sent_at": record["sent_at"].isoformat()})
