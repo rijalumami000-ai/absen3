@@ -26,6 +26,9 @@ import {
   Layers
 } from 'lucide-react';
 
+const LOGO_AL_HAMID = 'https://customer-assets.emergentagent.com/job_pesantren-app-3/artifacts/443f4wsk_Logo%20Al%20Hamid.jpg';
+const LOGO_YAYASAN = 'https://customer-assets.emergentagent.com/job_pesantren-app-3/artifacts/l73l3ek6_LOGO%20YAYASAN.png';
+
 const Layout = ({ children }) => {
   const { user, logout } = useAuth();
   const role = user?.role || 'superadmin';
@@ -165,15 +168,30 @@ const Layout = ({ children }) => {
       <aside className="hidden md:flex w-64 bg-card border-r border-border h-screen fixed left-0 top-0 z-40 flex-col shadow-sm">
         {/* Logo */}
         <div className="p-6 border-b border-border">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary-700 rounded-xl flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2L3 7v2h18V7L12 2zM5 11v7c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-7H5zm7 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
-              </svg>
+          <div className="flex items-center gap-3" data-testid="admin-branding">
+            <div className="flex items-center gap-2">
+              {[LOGO_AL_HAMID, LOGO_YAYASAN].map((src, idx) => (
+                <div
+                  key={src}
+                  className="w-10 h-10 rounded-xl border border-emerald-100 bg-white/80 flex items-center justify-center p-1 shadow-sm"
+                  data-testid={`admin-logo-frame-${idx}`}
+                >
+                  <img
+                    src={src}
+                    alt={`Logo ${idx + 1}`}
+                    className="w-full h-full object-contain mix-blend-multiply"
+                    data-testid={`admin-logo-${idx}`}
+                  />
+                </div>
+              ))}
             </div>
             <div>
-              <h1 className="font-display font-bold text-foreground">Absensi Sholat</h1>
-              <p className="text-xs text-muted-foreground">Admin Panel</p>
+              <h1 className="font-display font-bold text-foreground" data-testid="admin-brand-title">
+                Master Absensi
+              </h1>
+              <p className="text-xs text-muted-foreground" data-testid="admin-brand-subtitle">
+                Admin Panel
+              </p>
             </div>
           </div>
         </div>
@@ -322,13 +340,26 @@ const Layout = ({ children }) => {
 
       {/* Mobile Header */}
       <header className="md:hidden fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-b border-border h-16 flex items-center justify-between px-4">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-primary-700 rounded-lg flex items-center justify-center">
-            <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2L3 7v2h18V7L12 2zM5 11v7c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-7H5zm7 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
-            </svg>
+        <div className="flex items-center gap-3" data-testid="admin-mobile-branding">
+          <div className="flex items-center gap-2">
+            {[LOGO_AL_HAMID, LOGO_YAYASAN].map((src, idx) => (
+              <div
+                key={src}
+                className="w-8 h-8 rounded-lg border border-emerald-100 bg-white/80 flex items-center justify-center p-1 shadow-sm"
+                data-testid={`admin-mobile-logo-frame-${idx}`}
+              >
+                <img
+                  src={src}
+                  alt={`Logo ${idx + 1}`}
+                  className="w-full h-full object-contain mix-blend-multiply"
+                  data-testid={`admin-mobile-logo-${idx}`}
+                />
+              </div>
+            ))}
           </div>
-          <span className="font-display font-bold text-foreground">Absensi Sholat</span>
+          <span className="font-display font-bold text-foreground" data-testid="admin-mobile-title">
+            Master Absensi
+          </span>
         </div>
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -353,13 +384,26 @@ const Layout = ({ children }) => {
         }`}
       >
         <div className="p-6 border-b border-border flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary-700 rounded-xl flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2L3 7v2h18V7L12 2zM5 11v7c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-7H5zm7 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
-              </svg>
+          <div className="flex items-center gap-3" data-testid="admin-mobile-sidebar-branding">
+            <div className="flex items-center gap-2">
+              {[LOGO_AL_HAMID, LOGO_YAYASAN].map((src, idx) => (
+                <div
+                  key={src}
+                  className="w-9 h-9 rounded-xl border border-emerald-100 bg-white/80 flex items-center justify-center p-1 shadow-sm"
+                  data-testid={`admin-mobile-sidebar-logo-frame-${idx}`}
+                >
+                  <img
+                    src={src}
+                    alt={`Logo ${idx + 1}`}
+                    className="w-full h-full object-contain mix-blend-multiply"
+                    data-testid={`admin-mobile-sidebar-logo-${idx}`}
+                  />
+                </div>
+              ))}
             </div>
-            <span className="font-display font-bold text-foreground">Admin Panel</span>
+            <span className="font-display font-bold text-foreground" data-testid="admin-mobile-sidebar-title">
+              Master Absensi
+            </span>
           </div>
           <button onClick={() => setSidebarOpen(false)} className="p-2 rounded-lg hover:bg-muted">
             <X className="w-5 h-5" />
