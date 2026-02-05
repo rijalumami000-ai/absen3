@@ -223,17 +223,24 @@ const MadrasahDiniyah = () => {
               </DialogHeader>
               <div className="space-y-4">
                 <div>
+                  <Label>Cari Santri</Label>
+                  <Input
+                    placeholder="Ketik nama atau NIS santri..."
+                    value={linkSantriSearch}
+                    onChange={(e) => setLinkSantriSearch(e.target.value)}
+                    className="mb-2"
+                  />
                   <Label>Pilih Santri</Label>
                   <Select
                     value={formData.santri_id}
                     onValueChange={(value) => {
-                      const santri = santriList.find(s => s.id === value);
+                      const santri = santriList.find((s) => s.id === value);
                       setFormData({
                         ...formData,
                         santri_id: value,
                         nama: santri?.nama || '',
                         gender: santri?.gender || 'putra',
-                        nis: santri?.nis || ''
+                        nis: santri?.nis || '',
                       });
                     }}
                   >
@@ -241,7 +248,7 @@ const MadrasahDiniyah = () => {
                       <SelectValue placeholder="Pilih santri" />
                     </SelectTrigger>
                     <SelectContent>
-                      {availableSantri.map(santri => (
+                      {filteredAvailableSantri.map((santri) => (
                         <SelectItem key={santri.id} value={santri.id}>
                           {santri.nama} - {santri.nis}
                         </SelectItem>
