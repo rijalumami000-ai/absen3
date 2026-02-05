@@ -191,9 +191,19 @@ const MadrasahDiniyah = () => {
   });
 
   // Filter santri yang belum di-link
-  const availableSantri = santriList.filter(santri => 
-    !siswaList.some(siswa => siswa.santri_id === santri.id)
+  const availableSantri = santriList.filter((santri) =>
+    !siswaList.some((siswa) => siswa.santri_id === santri.id)
   );
+
+  // Filter santri sesuai pencarian di dialog Link dari Santri
+  const filteredAvailableSantri = availableSantri.filter((santri) => {
+    const q = linkSantriSearch.toLowerCase();
+    if (!q) return true;
+    return (
+      santri.nama.toLowerCase().includes(q) ||
+      (santri.nis && santri.nis.toLowerCase().includes(q))
+    );
+  });
 
   return (
     <div className="space-y-6 animate-fade-in">
