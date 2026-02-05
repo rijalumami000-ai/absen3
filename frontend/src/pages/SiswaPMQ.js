@@ -32,6 +32,15 @@ const SiswaPMQ = () => {
     tingkatan_key: '',
     kelompok_id: '',
   });
+
+  const filteredAvailableSantri = availableSantri.filter((s) => {
+    const q = linkSantriSearch.toLowerCase();
+    if (!q) return true;
+    return (
+      (s.nama && s.nama.toLowerCase().includes(q)) ||
+      (s.nis && s.nis.toLowerCase().includes(q))
+    );
+  });
   const [editingSiswa, setEditingSiswa] = useState(null);
   const [qrPreview, setQrPreview] = useState({ open: false, siswa: null });
   const [availableSantri, setAvailableSantri] = useState([]);
@@ -114,6 +123,8 @@ const SiswaPMQ = () => {
       setEditingId(null);
       fetchSiswa();
     } catch (e) {
+  const [linkSantriSearch, setLinkSantriSearch] = useState('');
+
       toast.error(e.response?.data?.detail || `Gagal ${editingId ? 'memperbarui' : 'menambah'} siswa PMQ`);
     }
   };
