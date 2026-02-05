@@ -5638,6 +5638,7 @@ async def upsert_pmq_pengabsen_absensi(
 async def scan_pmq_pengabsen_absensi(
     payload: Dict[str, Any],
     sesi: str,
+    tanggal: Optional[str] = None,
     current_pengabsen: dict = Depends(get_current_pengabsen_pmq),
 ):
     """Catat absensi via scan QR.
@@ -5646,7 +5647,7 @@ async def scan_pmq_pengabsen_absensi(
     - {{"type": "siswa_pmq", "id": <siswa_pmq_id>}}
     - QR santri biasa (berisi santri_id) → cari siswa_pmq dengan santri_id tsb.
     """
-    tanggal = datetime.now(timezone.utc).date().isoformat()
+    tanggal = tanggal or get_today_local_iso()
 
     siswa_id = None
     kelompok_id = None
