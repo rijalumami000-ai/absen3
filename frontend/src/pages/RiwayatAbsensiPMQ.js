@@ -343,7 +343,7 @@ const RiwayatAbsensiPMQ = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4" data-testid="pmq-filter-selects">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4" data-testid="pmq-filter-selects">
             <div>
               <Label>Tingkatan PMQ</Label>
               <Select
