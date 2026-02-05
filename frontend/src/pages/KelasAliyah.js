@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Edit2, Trash2, Search, Users, Layers } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -102,22 +102,30 @@ const KelasAliyah = () => {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in" data-testid="kelas-aliyah-page">
       {/* Header */}
-      <div className="flex justify-between items-center animate-slide-in-left">
+      <div className="flex justify-between items-center animate-slide-in-left" data-testid="kelas-aliyah-header">
         <div>
-          <h1 className="text-3xl font-display font-bold text-foreground">Kelas Madrasah Aliyah</h1>
-          <p className="text-muted-foreground mt-1">Kelola kelas untuk Madrasah Aliyah</p>
+          <h1 className="text-3xl font-display font-bold text-foreground" data-testid="kelas-aliyah-title">
+            Kelas Madrasah Aliyah
+          </h1>
+          <p className="text-muted-foreground mt-1" data-testid="kelas-aliyah-subtitle">
+            Kelola kelas untuk Madrasah Aliyah
+          </p>
         </div>
         <div className="flex gap-2">
           <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
             <DialogTrigger asChild>
-              <Button onClick={resetForm} className="btn-ripple active-scale shadow-card hover:shadow-card-hover transition-smooth">
+              <Button
+                onClick={resetForm}
+                className="btn-ripple active-scale shadow-card hover:shadow-card-hover transition-smooth"
+                data-testid="kelas-aliyah-add-button"
+              >
                 <Plus className="w-4 h-4 mr-2" />
                 Tambah Kelas Aliyah
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-md animate-scale-in">
+            <DialogContent className="max-w-md animate-scale-in" data-testid="kelas-aliyah-create-dialog">
               <DialogHeader>
                 <DialogTitle className="font-display">Tambah Kelas Aliyah</DialogTitle>
               </DialogHeader>
@@ -128,6 +136,7 @@ const KelasAliyah = () => {
                     placeholder="Misal: X IPA 1"
                     value={formData.nama}
                     onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
+                    data-testid="kelas-aliyah-create-name-input"
                   />
                 </div>
                 <div>
@@ -136,9 +145,10 @@ const KelasAliyah = () => {
                     placeholder="Misal: X / XI / XII"
                     value={formData.tingkat}
                     onChange={(e) => setFormData({ ...formData, tingkat: e.target.value })}
+                    data-testid="kelas-aliyah-create-tingkat-input"
                   />
                 </div>
-                <Button onClick={handleCreate} className="w-full">
+                <Button onClick={handleCreate} className="w-full" data-testid="kelas-aliyah-create-submit">
                   Simpan
                 </Button>
               </div>
@@ -148,73 +158,76 @@ const KelasAliyah = () => {
       </div>
 
       {/* Search */}
-      <div className="relative">
+      <div className="relative" data-testid="kelas-aliyah-search-wrapper">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
         <Input
           placeholder="Cari kelas..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-3"
+          className="pl-10"
+          data-testid="kelas-aliyah-search-input"
         />
       </div>
 
       {/* Kelas List */}
       {loading ? (
-        <div className="text-center py-12">
+        <div className="text-center py-12" data-testid="kelas-aliyah-loading">
           <p className="text-muted-foreground">Memuat data...</p>
         </div>
       ) : filteredKelas.length === 0 ? (
-        <div className="text-center py-12 bg-card rounded-xl border border-border">
+        <div className="text-center py-12 bg-card rounded-xl border border-border" data-testid="kelas-aliyah-empty">
           <p className="text-muted-foreground">Tidak ada kelas Aliyah ditemukan</p>
         </div>
       ) : (
-        <div className="bg-card rounded-xl border border-border overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-muted">
-                <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Nama Kelas</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Tingkat</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Jumlah Siswa</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Aksi</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {filteredKelas.map((kelas) => (
-                  <tr key={kelas.id} className="hover:bg-muted/50 transition-colors">
-                    <td className="px-6 py-4 text-sm font-medium text-foreground">{kelas.nama}</td>
-                    <td className="px-6 py-4 text-sm text-muted-foreground">{kelas.tingkat || '-'}</td>
-                    <td className="px-6 py-4 text-sm text-muted-foreground">{kelas.jumlah_siswa ?? 0}</td>
-                    <td className="px-6 py-4 text-sm text-muted-foreground">
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => openEditDialog(kelas)}
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-8 w-8 text-destructive"
-                          onClick={() => handleDelete(kelas.id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="kelas-aliyah-grid">
+          {filteredKelas.map((kelas) => (
+            <div
+              key={kelas.id}
+              className="bg-card rounded-xl border border-border p-6 hover:shadow-lg transition-shadow"
+              data-testid={`kelas-aliyah-card-${kelas.id}`}
+            >
+              <div className="flex justify-between items-start mb-4">
+                <h3 className="text-xl font-display font-bold text-foreground" data-testid={`kelas-aliyah-name-${kelas.id}`}>
+                  {kelas.nama}
+                </h3>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => openEditDialog(kelas)}
+                    className="p-2 hover:bg-muted rounded-lg transition-colors"
+                    data-testid={`kelas-aliyah-edit-${kelas.id}`}
+                  >
+                    <Edit2 className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(kelas.id)}
+                    className="p-2 hover:bg-destructive/10 text-destructive rounded-lg transition-colors"
+                    data-testid={`kelas-aliyah-delete-${kelas.id}`}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground" data-testid={`kelas-aliyah-count-${kelas.id}`}>
+                  <Users className="w-4 h-4" />
+                  <span>{kelas.jumlah_siswa ?? 0} Siswa</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground" data-testid={`kelas-aliyah-tingkat-${kelas.id}`}>
+                  <Layers className="w-4 h-4" />
+                  <span>{kelas.tingkat || '-'}</span>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
       {/* Edit Dialog */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="max-w-md animate-scale-in">
+        <DialogContent className="max-w-md animate-scale-in" data-testid="kelas-aliyah-edit-dialog">
           <DialogHeader>
             <DialogTitle className="font-display">Edit Kelas Aliyah</DialogTitle>
           </DialogHeader>
@@ -225,6 +238,7 @@ const KelasAliyah = () => {
                 placeholder="Nama kelas"
                 value={formData.nama}
                 onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
+                data-testid="kelas-aliyah-edit-name-input"
               />
             </div>
             <div>
@@ -233,9 +247,10 @@ const KelasAliyah = () => {
                 placeholder="Misal: X / XI / XII"
                 value={formData.tingkat}
                 onChange={(e) => setFormData({ ...formData, tingkat: e.target.value })}
+                data-testid="kelas-aliyah-edit-tingkat-input"
               />
             </div>
-            <Button onClick={handleUpdate} className="w-full">
+            <Button onClick={handleUpdate} className="w-full" data-testid="kelas-aliyah-edit-submit">
               Simpan Perubahan
             </Button>
           </div>
