@@ -4214,6 +4214,12 @@ async def initialize_admin():
         password="aliyah123",
         role="aliyah",
     )
+    await ensure_admin_account(
+        username="pmq",
+        nama="Admin PMQ",
+        password="pmq123",
+        role="pmq",
+    )
 
     return {"message": "Akun-akun admin berhasil diinisialisasi"}
 
