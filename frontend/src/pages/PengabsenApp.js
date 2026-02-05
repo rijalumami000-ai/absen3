@@ -67,7 +67,7 @@ const PengabsenApp = () => {
 
   useEffect(() => {
     if (!loading && !user) {
-      navigate('/pengabsen-app/login');
+      navigate('/pengabsen-portal');
     }
   }, [loading, user, navigate]);
 
