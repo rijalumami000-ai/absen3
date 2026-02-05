@@ -174,6 +174,8 @@ const MadrasahDiniyah = () => {
       link.remove();
       toast.success('QR Code berhasil diunduh');
     } catch (error) {
+  const [linkSantriSearch, setLinkSantriSearch] = useState('');
+
       toast.error('Gagal mengunduh QR Code');
     }
   };
