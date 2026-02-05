@@ -425,6 +425,8 @@ class WhatsAppHistoryItem(BaseModel):
     id: str
     santri_id: str
     nama_santri: str
+    nama_wali: str
+    nomor_hp_wali: str
     asrama_id: str
     asrama_nama: str
     gender: str
@@ -432,6 +434,11 @@ class WhatsAppHistoryItem(BaseModel):
     sent_at: datetime
     admin_id: str
     admin_nama: str
+    rekap: Dict[str, str] = {}
+
+
+class WhatsAppResendRequest(BaseModel):
+    history_id: str
 
 # Waktu Sholat Models
 class WaktuSholat(BaseModel):
