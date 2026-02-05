@@ -71,6 +71,10 @@ Bangun sistem absensi terpadu untuk pesantren yang mencakup absensi sholat, Madr
 - WhatsApp notification (parked).
 - NFC/RFID attendance (parked).
 
+## Next Action Items
+- Minta user memverifikasi hasil scan QR PMQ & layout Kelas Aliyah.
+- Validasi apakah riwayat PWA Aliyah tampil konsisten setelah pengisian absensi.
+
 ## Notes
 - Endpoint `/api/init/admin` perlu dipanggil di environment deployment untuk seed akun admin multi-role.
 - Token PWA disimpan per role (contoh: `pengabsen_pmq_token`).
