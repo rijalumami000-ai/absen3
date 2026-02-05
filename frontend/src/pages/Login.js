@@ -61,16 +61,19 @@ const Login = () => {
         {/* Content */}
         <div className="relative z-10 flex flex-col justify-center px-12 text-white">
           <div className="mb-8">
-            <div className="flex items-center gap-3 mb-6" data-testid="login-logos">
-              {[LOGO_AL_HAMID, LOGO_YAYASAN].map((src, idx) => (
+            <div className="flex items-center gap-4 mb-6" data-testid="login-logos">
+              {[
+                { src: LOGO_AL_HAMID, alt: 'Logo Pondok Al-Hamid', frameClass: 'bg-transparent border-white/40' },
+                { src: LOGO_YAYASAN, alt: 'Logo Yayasan', frameClass: 'bg-white/80 border-white/30' },
+              ].map((logo, idx) => (
                 <div
-                  key={src}
-                  className="w-14 h-14 rounded-2xl bg-white/80 backdrop-blur border border-white/30 flex items-center justify-center p-2 shadow-lg"
+                  key={logo.alt}
+                  className={`w-20 h-20 rounded-2xl backdrop-blur border flex items-center justify-center p-2 shadow-lg ${logo.frameClass}`}
                   data-testid={`login-logo-frame-${idx}`}
                 >
                   <img
-                    src={src}
-                    alt={`Logo ${idx + 1}`}
+                    src={logo.src}
+                    alt={logo.alt}
                     className="w-full h-full object-contain mix-blend-multiply"
                     data-testid={`login-logo-${idx}`}
                   />
@@ -119,16 +122,19 @@ const Login = () => {
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
-            <div className="flex items-center justify-center gap-3 mb-4" data-testid="login-logos-mobile">
-              {[LOGO_AL_HAMID, LOGO_YAYASAN].map((src, idx) => (
+            <div className="flex items-center justify-center gap-4 mb-4" data-testid="login-logos-mobile">
+              {[
+                { src: LOGO_AL_HAMID, alt: 'Logo Pondok Al-Hamid', frameClass: 'bg-transparent border-border/60' },
+                { src: LOGO_YAYASAN, alt: 'Logo Yayasan', frameClass: 'bg-white border-border/60' },
+              ].map((logo, idx) => (
                 <div
-                  key={src}
-                  className="w-14 h-14 rounded-2xl bg-white border border-border/60 flex items-center justify-center p-2 shadow-sm"
+                  key={logo.alt}
+                  className={`w-16 h-16 rounded-2xl border flex items-center justify-center p-2 shadow-sm ${logo.frameClass}`}
                   data-testid={`login-logo-mobile-frame-${idx}`}
                 >
                   <img
-                    src={src}
-                    alt={`Logo ${idx + 1}`}
+                    src={logo.src}
+                    alt={logo.alt}
                     className="w-full h-full object-contain mix-blend-multiply"
                     data-testid={`login-logo-mobile-${idx}`}
                   />
