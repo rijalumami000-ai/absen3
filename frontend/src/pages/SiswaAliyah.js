@@ -219,6 +219,15 @@ const SiswaAliyah = () => {
     return matchKelas && matchSearch;
   });
 
+  const filteredAvailableSantri = availableSantri.filter((santri) => {
+    const q = linkSantriSearch.toLowerCase();
+    if (!q) return true;
+    return (
+      santri.nama.toLowerCase().includes(q) ||
+      (santri.nis && santri.nis.toLowerCase().includes(q))
+    );
+  });
+
   const totalFiltered = filteredSiswa.length;
   const totalBelumAdaKelas = filteredSiswa.filter((siswa) => !siswa.kelas_id).length;
 
