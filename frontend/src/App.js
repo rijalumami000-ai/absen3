@@ -107,7 +107,7 @@ const PengabsenProtectedRoute = ({ children }) => {
   }
 
   if (!user) {
-    return <Navigate to="/pengabsen-app/login" replace />;
+    return <Navigate to="/pengabsen-portal" replace />;
   }
 
   return children;
@@ -161,7 +161,7 @@ const PengabsenKelasProtectedRoute = ({ children }) => {
   }
 
   if (!user) {
-    return <Navigate to="/pengabsen-kelas-app/login" replace />;
+    return <Navigate to="/pengabsen-portal" replace />;
   }
 
   return children;
@@ -197,7 +197,7 @@ const PengabsenAliyahProtectedRoute = ({ children }) => {
   }
 
   if (!user) {
-    return <Navigate to="/pengabsen-aliyah-app/login" replace />;
+    return <Navigate to="/pengabsen-portal" replace />;
   }
 
   return children;
@@ -233,7 +233,7 @@ const PengabsenPMQProtectedRoute = ({ children }) => {
   }
 
   if (!user) {
-    return <Navigate to="/pengabsen-pmq-app/login" replace />;
+    return <Navigate to="/pengabsen-portal" replace />;
   }
 
   return children;
