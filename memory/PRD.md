@@ -59,6 +59,7 @@ Bangun sistem absensi terpadu untuk pesantren yang mencakup absensi sholat, Madr
 - **2026-02-05**: Penambahan logo institusi pada portal pengabsen & branding admin (Master Absensi).
 - **2026-02-05**: Logo ditambahkan ke kartu dashboard + menu waktu sholat pengabsen menjadi bottom nav berikon.
 - **2026-02-05**: Dashboard menampilkan logo tiap institusi + navigasi waktu sholat pengabsen menggunakan icon menu bawah.
+- **2026-02-05**: Menu waktu sholat dipindah ke bawah (offset) + tombol Riwayat di sisi kanan.
 - **2026-02-05**: Layout Kelas Aliyah disamakan dengan Kelas Madrasah Diniyah (card grid).
 - **2026-02-05**: Edit Kelompok PMQ (UI + endpoint PUT /pmq/kelompok/{id}).
 - **2026-02-05**: Filter status Riwayat PMQ dipindah ke atas tabel (seperti Aliyah).
