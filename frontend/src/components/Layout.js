@@ -126,7 +126,7 @@ const Layout = ({ children }) => {
       type: 'group',
       icon: GraduationCap,
       label: 'Setting PMQ',
-      allowedRoles: ['superadmin', 'admin'],
+      allowedRoles: ['superadmin', 'admin', 'pmq'],
       items: [
         { path: '/pmq/siswa', icon: Users, label: 'Database Siswa PMQ' },
         { path: '/pmq/tingkatan', icon: Layers, label: 'Tingkatan & Kelompok PMQ' },
