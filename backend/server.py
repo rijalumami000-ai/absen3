@@ -3922,6 +3922,64 @@ async def get_absensi_riwayat(
     return {"summary": summary, "detail": detail}
 
 
+@api_router.get("/whatsapp/rekap", response_model=List[WhatsAppRekapItem])
+async def get_whatsapp_rekap(
+    tanggal: str,
+    asrama_id: Optional[str] = None,
+    gender: Optional[str] = None,
+    q: Optional[str] = None,
+    _: dict = Depends(get_current_admin),
+):
+    if not tanggal:
+        raise HTTPException(status_code=400, detail="Tanggal wajib diisi")
+
+    santri_query: Dict[str, Any] = {}
+    if asrama_id:
+        santri_query["asrama_id"] = asrama_id
+    if gender:
+        santri_query["gender"] = gender
+    if q:
+        santri_query["$or"] = [
+            {"nama": {"$regex": q, "$options": "i"}},
+            {"nis": {"$regex": q, "$options": "i"}},
+        ]
+
+    santri_list = await db.santri.find(santri_query, {"_id": 0}).to_list(10000)
+    if not santri_list:
+        return []
+
+    santri_ids = [s["id"] for s in santri_list]
+    absensi_list = await db.absensi.find(
+        {"tanggal": tanggal, "santri_id": {"$in": santri_ids}},
+        {"_id": 0, "santri_id": 1, "waktu_sholat": 1, "status": 1},
+    ).to_list(10000)
+
+    absensi_map = {(a["santri_id"], a["waktu_sholat"]): a.get("status", "belum") for a in absensi_list}
+
+    asrama_ids = list({s["asrama_id"] for s in santri_list})
+    asrama_list = await db.asrama.find({"id": {"$in": asrama_ids}}, {"_id": 0, "id": 1, "nama": 1}).to_list(10000)
+    asrama_map = {a["id"]: a.get("nama", "-") for a in asrama_list}
+
+    waktu_order = ["dzuhur", "ashar", "maghrib", "isya", "subuh"]
+    result: List[WhatsAppRekapItem] = []
+    for s in santri_list:
+        rekap = {w: absensi_map.get((s["id"], w), "belum") for w in waktu_order}
+        result.append(
+            WhatsAppRekapItem(
+                santri_id=s["id"],
+                nama_santri=s["nama"],
+                nama_wali=s.get("nama_wali", "-"),
+                nomor_hp_wali=s.get("nomor_hp_wali", ""),
+                asrama_id=s.get("asrama_id", ""),
+                asrama_nama=asrama_map.get(s.get("asrama_id", ""), "-"),
+                gender=s.get("gender", ""),
+                rekap=rekap,
+            )
+        )
+
+    return result
+
+
 @api_router.get("/pmq/settings/waktu")
 async def get_pmq_waktu_settings(_: dict = Depends(get_current_admin)):
     settings = await db.settings.find_one({"id": "pmq_waktu"}, {"_id": 0})
