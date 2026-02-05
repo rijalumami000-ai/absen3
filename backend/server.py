@@ -4035,6 +4035,22 @@ class WaliNotifikasiSettings(BaseModel):
     istihadhoh: str = "{nama} tidak mengikuti sholat {waktu} pada hari ini karena sedang istihadhoh (istihadhoh)"
 
 
+class WhatsAppTemplateSettings(BaseModel):
+    template: str
+
+
+WHATSAPP_DEFAULT_TEMPLATE = (
+    "Assalamu'alaikum {nama_wali}.\n"
+    "Rekap sholat ananda {nama_santri} pada {tanggal}:\n"
+    "Dzuhur: {dzuhur}\n"
+    "Ashar: {ashar}\n"
+    "Maghrib: {maghrib}\n"
+    "Isya: {isya}\n"
+    "Subuh: {subuh}\n"
+    "Terima kasih."
+)
+
+
 # App Settings Models
 class AppSettings(BaseModel):
     model_config = ConfigDict(extra="ignore")
