@@ -5,6 +5,7 @@ import { pengabsenPMQAppAPI } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
 import { Scanner } from '@yudiel/react-qr-scanner';
 import { BookOpen, Rocket, Sparkles, MoonStar, History } from 'lucide-react';
 
@@ -43,6 +44,8 @@ const PengabsenPMQApp = () => {
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [collapsedGroups, setCollapsedGroups] = useState({});
   const [collapsedHistoryGroups, setCollapsedHistoryGroups] = useState({});
+
+  const { toast } = useToast();
 
   const navigate = useNavigate();
 
@@ -112,16 +115,22 @@ const PengabsenPMQApp = () => {
   const handleStatusChange = async (siswaId, kelompokId, status) => {
     try {
       const newStatus = status === 'null' ? null : status;
+      const normalizedKelompokId = kelompokId === 'unknown' ? null : kelompokId;
       await pengabsenPMQAppAPI.upsertAbsensi({
         siswa_id: siswaId,
-        kelompok_id: kelompokId,
+        kelompok_id: normalizedKelompokId,
         tanggal,
         sesi: sesiKey,
         status: newStatus,
       });
       await loadData();
+      toast({ title: 'Sukses', description: 'Status absensi diperbarui' });
     } catch (e) {
-      // TODO: optional toast
+      toast({
+        title: 'Error',
+        description: e.response?.data?.detail || 'Gagal memperbarui absensi',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -141,8 +150,13 @@ const PengabsenPMQApp = () => {
 
       await pengabsenPMQAppAPI.scanAbsensi(payload, { sesi: sesiKey, tanggal });
       await loadData();
+      toast({ title: 'Sukses', description: 'Absensi via scan berhasil dicatat' });
     } catch (e) {
-      // TODO: optional toast
+      toast({
+        title: 'Error',
+        description: e.response?.data?.detail || 'Gagal mencatat absensi via scan',
+        variant: 'destructive',
+      });
     }
   };
 
