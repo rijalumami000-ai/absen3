@@ -504,6 +504,13 @@ const SiswaPMQ = () => {
           </DialogHeader>
           <div className="space-y-4">
             <div>
+              <Label>Cari Santri</Label>
+              <Input
+                placeholder="Ketik nama atau NIS santri..."
+                value={linkSantriSearch}
+                onChange={(e) => setLinkSantriSearch(e.target.value)}
+                className="mb-2"
+              />
               <Label>Pilih Santri</Label>
               <Select
                 value={linkForm.santri_id}
@@ -513,7 +520,7 @@ const SiswaPMQ = () => {
                   <SelectValue placeholder="Pilih santri" />
                 </SelectTrigger>
                 <SelectContent>
-                  {availableSantri.map((s) => (
+                  {filteredAvailableSantri.map((s) => (
                     <SelectItem key={s.id} value={s.id}>
                       {s.nama} ({getGenderLabel(s.gender)})
                     </SelectItem>
