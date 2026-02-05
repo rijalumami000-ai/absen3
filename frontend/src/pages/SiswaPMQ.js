@@ -46,9 +46,6 @@ const SiswaPMQ = () => {
       (s.nis && s.nis.toLowerCase().includes(q))
     );
   });
-  const [qrPreview, setQrPreview] = useState({ open: false, siswa: null });
-  const [availableSantri, setAvailableSantri] = useState([]);
-  const [editingId, setEditingId] = useState(null);
 
   useEffect(() => {
     fetchMaster();
