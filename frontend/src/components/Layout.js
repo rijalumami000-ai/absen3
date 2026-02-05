@@ -137,7 +137,7 @@ const Layout = ({ children }) => {
       type: 'group',
       icon: ClipboardCheck,
       label: 'Absensi PMQ',
-      allowedRoles: ['superadmin', 'admin'],
+      allowedRoles: ['superadmin', 'admin', 'pmq'],
       items: [
         { path: '/pmq/pengabsen', icon: UserCheck, label: 'Pengabsen PMQ' },
         { path: '/pmq/riwayat', icon: ClipboardList, label: 'Riwayat Absensi PMQ' },
