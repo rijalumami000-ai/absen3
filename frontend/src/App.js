@@ -291,14 +291,7 @@ function AppRoutes() {
           </PembimbingAuthProvider>
         }
       />
-      <Route
-        path="/pengabsen-kelas-app/login"
-        element={
-          <PengabsenKelasAuthProvider>
-            <PengabsenKelasAppLogin />
-          </PengabsenKelasAuthProvider>
-        }
-      />
+      <Route path="/pengabsen-kelas-app/login" element={<Navigate to="/pengabsen-portal" replace />} />
       <Route
         path="/pengabsen-kelas-app"
         element={
