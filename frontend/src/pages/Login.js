@@ -8,6 +8,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Lock, User } from 'lucide-react';
 
 const Login = () => {
+  const LOGO_AL_HAMID = 'https://customer-assets.emergentagent.com/job_pesantren-app-3/artifacts/443f4wsk_Logo%20Al%20Hamid.jpg';
+  const LOGO_YAYASAN = 'https://customer-assets.emergentagent.com/job_pesantren-app-3/artifacts/l73l3ek6_LOGO%20YAYASAN.png';
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -59,17 +61,27 @@ const Login = () => {
         {/* Content */}
         <div className="relative z-10 flex flex-col justify-center px-12 text-white">
           <div className="mb-8">
-            <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6">
-              <svg className="w-10 h-10 text-white" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2L3 7v2h18V7L12 2zM5 11v7c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-7H5zm7 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
-              </svg>
+            <div className="flex items-center gap-3 mb-6" data-testid="login-logos">
+              {[LOGO_AL_HAMID, LOGO_YAYASAN].map((src, idx) => (
+                <div
+                  key={src}
+                  className="w-14 h-14 rounded-2xl bg-white/80 backdrop-blur border border-white/30 flex items-center justify-center p-2 shadow-lg"
+                  data-testid={`login-logo-frame-${idx}`}
+                >
+                  <img
+                    src={src}
+                    alt={`Logo ${idx + 1}`}
+                    className="w-full h-full object-contain mix-blend-multiply"
+                    data-testid={`login-logo-${idx}`}
+                  />
+                </div>
+              ))}
             </div>
             <h1 className="font-display text-4xl font-bold mb-4">
-              Absensi Sholat<br/>Pesantren
+              Master Absensi Santri &amp; Siswa
             </h1>
             <p className="text-white/80 text-lg leading-relaxed">
-              Sistem manajemen absensi sholat modern untuk pesantren. 
-              Memudahkan pencatatan, monitoring, dan pelaporan kehadiran santri.
+              Sistem manajemen absensi modern untuk pesantren dan sekolah. Memudahkan pencatatan, monitoring, dan pelaporan kehadiran santri &amp; siswa. Di lingkungan Pondok Pesantren Al-Hamid Cintamulya &amp; Satuan Pendidikan di Mathlaul Anwar Cintamulya.
             </p>
           </div>
           
@@ -107,12 +119,23 @@ const Login = () => {
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
-            <div className="w-16 h-16 bg-primary-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <svg className="w-10 h-10 text-white" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2L3 7v2h18V7L12 2zM5 11v7c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-7H5zm7 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
-              </svg>
+            <div className="flex items-center justify-center gap-3 mb-4" data-testid="login-logos-mobile">
+              {[LOGO_AL_HAMID, LOGO_YAYASAN].map((src, idx) => (
+                <div
+                  key={src}
+                  className="w-14 h-14 rounded-2xl bg-white border border-border/60 flex items-center justify-center p-2 shadow-sm"
+                  data-testid={`login-logo-mobile-frame-${idx}`}
+                >
+                  <img
+                    src={src}
+                    alt={`Logo ${idx + 1}`}
+                    className="w-full h-full object-contain mix-blend-multiply"
+                    data-testid={`login-logo-mobile-${idx}`}
+                  />
+                </div>
+              ))}
             </div>
-            <h1 className="font-display text-2xl font-bold text-foreground">Absensi Sholat</h1>
+            <h1 className="font-display text-2xl font-bold text-foreground">Master Absensi Santri &amp; Siswa</h1>
           </div>
 
           <div className="bg-card rounded-2xl shadow-card p-8 border border-border/50">
@@ -182,7 +205,7 @@ const Login = () => {
           </div>
 
           <p className="text-center text-xs text-muted-foreground mt-6">
-            Sistem Absensi Sholat Pesantren &copy; {new Date().getFullYear()}
+            Master Absensi Santri &amp; Siswa &copy; {new Date().getFullYear()}
           </p>
         </div>
       </div>
