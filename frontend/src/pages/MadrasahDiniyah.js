@@ -160,6 +160,8 @@ const MadrasahDiniyah = () => {
     setSelectedSiswa(null);
   };
 
+  const [linkSantriSearch, setLinkSantriSearch] = useState('');
+
   const downloadQRCode = async (siswaId, namaSiswa) => {
     try {
       const response = await api.get(`/siswa-madrasah/${siswaId}/qr-code`, {
@@ -174,8 +176,6 @@ const MadrasahDiniyah = () => {
       link.remove();
       toast.success('QR Code berhasil diunduh');
     } catch (error) {
-  const [linkSantriSearch, setLinkSantriSearch] = useState('');
-
       toast.error('Gagal mengunduh QR Code');
     }
   };
