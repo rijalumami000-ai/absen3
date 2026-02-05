@@ -4004,6 +4004,73 @@ async def get_whatsapp_rekap(
     return result
 
 
+@api_router.post("/whatsapp/rekap/send", response_model=WhatsAppHistoryItem)
+async def record_whatsapp_send(
+    payload: WhatsAppSendRequest,
+    current_admin: dict = Depends(get_current_admin),
+):
+    today = get_today_local_iso()
+    if payload.tanggal >= today:
+        raise HTTPException(status_code=400, detail="Rekap hanya dapat dikirim untuk hari sebelumnya")
+
+    existing = await db.whatsapp_history.find_one(
+        {"santri_id": payload.santri_id, "tanggal": payload.tanggal},
+        {"_id": 0},
+    )
+    if existing:
+        if isinstance(existing.get("sent_at"), str):
+            existing["sent_at"] = datetime.fromisoformat(existing["sent_at"])
+        return WhatsAppHistoryItem(**existing)
+
+    santri = await db.santri.find_one({"id": payload.santri_id}, {"_id": 0})
+    if not santri:
+        raise HTTPException(status_code=404, detail="Santri tidak ditemukan")
+
+    asrama = await db.asrama.find_one({"id": santri.get("asrama_id")}, {"_id": 0})
+    asrama_nama = asrama.get("nama", "-") if asrama else "-"
+
+    record = {
+        "id": str(uuid.uuid4()),
+        "santri_id": santri["id"],
+        "nama_santri": santri.get("nama", "-"),
+        "asrama_id": santri.get("asrama_id", ""),
+        "asrama_nama": asrama_nama,
+        "gender": santri.get("gender", ""),
+        "tanggal": payload.tanggal,
+        "sent_at": datetime.now(timezone.utc),
+        "admin_id": current_admin.get("id", ""),
+        "admin_nama": current_admin.get("nama") or current_admin.get("username", "admin"),
+    }
+
+    await db.whatsapp_history.insert_one({**record, "sent_at": record["sent_at"].isoformat()})
+    return WhatsAppHistoryItem(**record)
+
+
+@api_router.get("/whatsapp/history", response_model=List[WhatsAppHistoryItem])
+async def get_whatsapp_history(
+    tanggal: Optional[str] = None,
+    asrama_id: Optional[str] = None,
+    gender: Optional[str] = None,
+    q: Optional[str] = None,
+    _: dict = Depends(get_current_admin),
+):
+    query: Dict[str, Any] = {}
+    if tanggal:
+        query["tanggal"] = tanggal
+    if asrama_id:
+        query["asrama_id"] = asrama_id
+    if gender:
+        query["gender"] = gender
+    if q:
+        query["nama_santri"] = {"$regex": q, "$options": "i"}
+
+    records = await db.whatsapp_history.find(query, {"_id": 0}).sort("sent_at", -1).to_list(10000)
+    for rec in records:
+        if isinstance(rec.get("sent_at"), str):
+            rec["sent_at"] = datetime.fromisoformat(rec["sent_at"])
+    return records
+
+
 @api_router.get("/pmq/settings/waktu")
 async def get_pmq_waktu_settings(_: dict = Depends(get_current_admin)):
     settings = await db.settings.find_one({"id": "pmq_waktu"}, {"_id": 0})
