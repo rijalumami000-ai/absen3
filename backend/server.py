@@ -4110,6 +4110,25 @@ async def update_wali_notifikasi_settings(data: WaliNotifikasiSettings, _: dict 
     return {"message": "Pengaturan notifikasi berhasil disimpan"}
 
 
+@api_router.get("/settings/whatsapp-template")
+async def get_whatsapp_template_settings(_: dict = Depends(get_current_admin)):
+    settings = await db.settings.find_one({"id": "whatsapp_template"}, {"_id": 0})
+    if not settings:
+        return {"template": WHATSAPP_DEFAULT_TEMPLATE}
+    return {"template": settings.get("template", WHATSAPP_DEFAULT_TEMPLATE)}
+
+
+@api_router.put("/settings/whatsapp-template")
+async def update_whatsapp_template_settings(data: WhatsAppTemplateSettings, _: dict = Depends(get_current_admin)):
+    payload = {
+        "id": "whatsapp_template",
+        "template": data.template,
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.settings.update_one({"id": "whatsapp_template"}, {"$set": payload}, upsert=True)
+    return {"message": "Template WhatsApp berhasil disimpan"}
+
+
 # ==================== APP SETTINGS ENDPOINTS ====================
 
 @api_router.get("/settings/app")
