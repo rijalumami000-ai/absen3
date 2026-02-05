@@ -4089,6 +4089,45 @@ async def get_whatsapp_history(
     return records
 
 
+@api_router.post("/whatsapp/history/resend", response_model=WhatsAppHistoryItem)
+async def resend_whatsapp_history(
+    payload: WhatsAppResendRequest,
+    current_admin: dict = Depends(get_current_admin),
+):
+    record = await db.whatsapp_history.find_one({"id": payload.history_id}, {"_id": 0})
+    if not record:
+        raise HTTPException(status_code=404, detail="History tidak ditemukan")
+
+    if not record.get("nomor_hp_wali") or not record.get("rekap"):
+        santri = await db.santri.find_one({"id": record.get("santri_id")}, {"_id": 0})
+        if santri:
+            record["nama_wali"] = santri.get("nama_wali", record.get("nama_wali", "-"))
+            record["nomor_hp_wali"] = santri.get("nomor_hp_wali", record.get("nomor_hp_wali", ""))
+            absensi_list = await db.absensi.find(
+                {"tanggal": record.get("tanggal"), "santri_id": record.get("santri_id")},
+                {"_id": 0, "waktu_sholat": 1, "status": 1},
+            ).to_list(100)
+            absensi_map = {a.get("waktu_sholat"): a.get("status", "belum") for a in absensi_list}
+            waktu_order = ["dzuhur", "ashar", "maghrib", "isya", "subuh"]
+            record["rekap"] = {w: absensi_map.get(w, "belum") for w in waktu_order}
+
+    updated = {
+        "sent_at": datetime.now(timezone.utc),
+        "admin_id": current_admin.get("id", ""),
+        "admin_nama": current_admin.get("nama") or current_admin.get("username", "admin"),
+        "nama_wali": record.get("nama_wali", "-"),
+        "nomor_hp_wali": record.get("nomor_hp_wali", ""),
+        "rekap": record.get("rekap", {}),
+    }
+
+    await db.whatsapp_history.update_one(
+        {"id": payload.history_id},
+        {"$set": {**updated, "sent_at": updated["sent_at"].isoformat()}},
+    )
+    record.update(updated)
+    return WhatsAppHistoryItem(**record)
+
+
 @api_router.get("/pmq/settings/waktu")
 async def get_pmq_waktu_settings(_: dict = Depends(get_current_admin)):
     settings = await db.settings.find_one({"id": "pmq_waktu"}, {"_id": 0})
