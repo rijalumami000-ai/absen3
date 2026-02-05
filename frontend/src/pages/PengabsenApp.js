@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Scanner } from '@yudiel/react-qr-scanner';
-import { Sunrise, Sun, CloudSun, Sunset, MoonStar } from 'lucide-react';
+import { Sunrise, Sun, CloudSun, Sunset, MoonStar, History } from 'lucide-react';
 
 const WAKTU_OPTIONS = [
   { value: 'subuh', label: 'Subuh' },
@@ -194,6 +194,11 @@ const PengabsenApp = () => {
 
   const groupedList = Object.values(groupedByAsrama);
 
+  const handleOpenHistory = async () => {
+    setActiveTab('history');
+    await loadHistory();
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col" data-testid="pengabsen-app-page">
       <header className="bg-white shadow-sm px-4 py-3 flex items-center justify-between">
@@ -206,11 +211,12 @@ const PengabsenApp = () => {
         </Button>
       </header>
 
-      <main className="flex-1 p-4 space-y-4 max-w-4xl mx-auto w-full pb-24">
+      <main className="flex-1 p-4 space-y-4 max-w-4xl mx-auto w-full pb-36">
         <div className="flex gap-2 mb-4">
           <button
             type="button"
             onClick={() => setActiveTab('today')}
+            data-testid="pengabsen-tab-today"
             className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
               activeTab === 'today'
                 ? 'bg-emerald-500 text-white border-emerald-500'
@@ -221,10 +227,8 @@ const PengabsenApp = () => {
           </button>
           <button
             type="button"
-            onClick={() => {
-              setActiveTab('history');
-              loadHistory();
-            }}
+            onClick={handleOpenHistory}
+            data-testid="pengabsen-tab-history"
             className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
               activeTab === 'history'
                 ? 'bg-emerald-500 text-white border-emerald-500'
@@ -727,10 +731,10 @@ const PengabsenApp = () => {
       </main>
 
       <div
-        className="border-t bg-white px-4 py-2 flex items-center justify-between gap-2 fixed bottom-0 left-0 right-0 max-w-4xl mx-auto z-40"
+        className="border-t bg-white px-4 py-2 flex items-center justify-between gap-2 fixed bottom-12 left-0 right-0 max-w-4xl mx-auto z-40"
         data-testid="pengabsen-waktu-bottom-nav"
       >
-        <div className="flex gap-2 overflow-x-auto flex-1">
+        <div className="flex gap-2 overflow-x-auto flex-1 pr-2">
           {WAKTU_MENU.map((menu) => {
             const Icon = menu.icon;
             const isActive = waktu === menu.value;
@@ -738,7 +742,10 @@ const PengabsenApp = () => {
               <button
                 key={menu.value}
                 type="button"
-                onClick={() => setWaktu(menu.value)}
+                onClick={() => {
+                  setWaktu(menu.value);
+                  setActiveTab('today');
+                }}
                 data-testid={`pengabsen-waktu-tab-${menu.value}`}
                 className={`flex flex-col items-center justify-center min-w-[70px] px-2 py-1 rounded-xl border text-[11px] transition-colors ${
                   isActive
@@ -751,6 +758,21 @@ const PengabsenApp = () => {
               </button>
             );
           })}
+        </div>
+        <div className="flex flex-col items-center pl-2 border-l border-slate-200 ml-2">
+          <button
+            type="button"
+            onClick={handleOpenHistory}
+            data-testid="pengabsen-history-tab-button"
+            className={`flex flex-col items-center justify-center w-[60px] px-2 py-1 rounded-xl border text-[11px] transition-colors ${
+              activeTab === 'history'
+                ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            <History className="w-4 h-4 mb-0.5" />
+            <span>Riwayat</span>
+          </button>
         </div>
       </div>
     </div>
