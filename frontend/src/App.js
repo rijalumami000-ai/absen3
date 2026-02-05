@@ -320,14 +320,7 @@ function AppRoutes() {
           </PembimbingKelasAuthProvider>
         }
       />
-      <Route
-        path="/pengabsen-aliyah-app/login"
-        element={
-          <PengabsenAliyahAuthProvider>
-            <PengabsenAliyahAppLogin />
-          </PengabsenAliyahAuthProvider>
-        }
-      />
+      <Route path="/pengabsen-aliyah-app/login" element={<Navigate to="/pengabsen-portal" replace />} />
       <Route
         path="/pengabsen-aliyah-app"
         element={
@@ -356,14 +349,7 @@ function AppRoutes() {
           </MonitoringAliyahAuthProvider>
         }
       />
-      <Route
-        path="/pengabsen-pmq-app/login"
-        element={
-          <PengabsenPMQAuthProvider>
-            <PengabsenPMQAppLogin />
-          </PengabsenPMQAuthProvider>
-        }
-      />
+      <Route path="/pengabsen-pmq-app/login" element={<Navigate to="/pengabsen-portal" replace />} />
       <Route
         path="/pengabsen-pmq-app"
         element={
