@@ -55,6 +55,7 @@ Bangun sistem absensi terpadu untuk pesantren yang mencakup absensi sholat, Madr
 ## What's Implemented (Latest)
 - **2026-02-05**: Perbaikan QR scan PMQ (tanggal mengikuti pilihan user) + uji endpoint scan berhasil.
 - **2026-02-05**: Perbaikan input manual PMQ (normalisasi kelompok tanpa ID + notifikasi error/sukses).
+- **2026-02-05**: Portal login pengabsen terpusat (/pengabsen-portal) + redirect dari semua login PWA pengabsen.
 - **2026-02-05**: Layout Kelas Aliyah disamakan dengan Kelas Madrasah Diniyah (card grid).
 - **2026-02-05**: Edit Kelompok PMQ (UI + endpoint PUT /pmq/kelompok/{id}).
 - **2026-02-05**: Filter status Riwayat PMQ dipindah ke atas tabel (seperti Aliyah).
@@ -73,7 +74,7 @@ Bangun sistem absensi terpadu untuk pesantren yang mencakup absensi sholat, Madr
 - NFC/RFID attendance (parked).
 
 ## Next Action Items
-- Minta user memverifikasi hasil scan QR PMQ & layout Kelas Aliyah.
+- Minta user memverifikasi portal login pengabsen baru.
 - Validasi apakah riwayat PWA Aliyah tampil konsisten setelah pengisian absensi.
 
 ## Notes
