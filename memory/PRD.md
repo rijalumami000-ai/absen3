@@ -1,153 +1,76 @@
-# Absensi Sholat - Prayer Attendance Application
+# Absensi Pesantren - Multi-Module Attendance System
 
 ## Original Problem Statement
-Build a comprehensive prayer attendance application for a school (Pesantren). The system includes:
-- **Admin Web App**: Manage all entities (students, dormitories, staff), generate QR codes, and view attendance history
-- **Attendant App (Pengabsen PWA)**: Scan student QR codes to record attendance
-- **Guardian App (Wali Santri PWA)**: View their child's attendance and receive real-time notifications
-- **Supervisor App (Pembimbing PWA)**: Monitor attendance for managed asrama
+Bangun sistem absensi terpadu untuk pesantren yang mencakup absensi sholat, Madrasah Diniyah (Madin), Madrasah Aliyah, dan Pendidikan Murottilil Qur'an (PMQ). Sistem harus menyediakan admin panel untuk manajemen data serta beberapa PWA untuk pengabsen, wali santri, dan pembimbing.
 
 ## User Personas
-1. **Admin**: School administrator who manages the system
-2. **Pengabsen (Attendant)**: Staff responsible for recording prayer attendance
-3. **Wali Santri (Guardian)**: Parents/guardians who want to monitor their child's attendance
-4. **Pembimbing (Supervisor)**: Teachers/mentors who oversee students in specific dormitories
+1. **Super Admin/Admin**: Mengelola semua data dan konfigurasi.
+2. **Pengabsen Sholat**: Petugas absensi sholat berbasis QR.
+3. **Wali Santri**: Orang tua/wali memantau kehadiran.
+4. **Pembimbing**: Monitoring statistik absensi sholat (read-only).
+5. **Pengabsen Kelas Madin**: Petugas absensi Madrasah Diniyah.
+6. **Pengabsen Aliyah**: Petugas absensi Madrasah Aliyah.
+7. **Monitoring Aliyah**: Pengawas kehadiran Aliyah.
+8. **Pengabsen PMQ**: Petugas absensi PMQ (QR + manual).
 
 ## Core Requirements
+### Admin Web App
+- Auth berbasis JWT dengan role: `superadmin`, `pesantren`, `madin`, `aliyah`, `pmq`.
+- CRUD Santri + QR Code.
+- Manajemen Asrama, Pengabsen, Pembimbing.
+- Madrasah Diniyah: Kelas, Siswa, Riwayat Absensi.
+- Madrasah Aliyah: Kelas, Siswa, Pengabsen, Monitoring, Riwayat.
+- PMQ: Tingkatan, Kelompok, Siswa, Pengabsen, Riwayat, Setting Waktu.
+- Export PDF untuk laporan/daftar tertentu.
 
-### Phase 1 - Admin Web App ✅ COMPLETED
-- [x] Authentication system (JWT-based)
-- [x] CRUD for Asrama (Dormitories)
-- [x] CRUD for Santri (Students) with QR code generation
-- [x] CRUD for Wali Santri (Guardians) - auto-generated from Santri data
-- [x] CRUD for Pengabsen (Attendants) with kode_akses management
-- [x] CRUD for Pembimbing (Supervisors) with kode_akses management
-- [x] Attendance history view with filters
-- [x] Prayer times integration (Al-Adhan API)
-- [x] Excel import/export for Santri data
-- [x] WhatsApp message generation for Wali credentials
+### PWA
+- **Pengabsen Sholat**: Scan QR, update status manual, riwayat.
+- **Wali Santri**: Dashboard kehadiran, riwayat kalender, notifikasi.
+- **Pembimbing**: Statistik kehadiran, filter waktu sholat.
+- **Pengabsen Kelas Madin**: Absensi kelas Madin.
+- **Pengabsen Aliyah**: Absensi pagi/dzuhur + riwayat.
+- **Monitoring Aliyah**: Monitoring read-only.
+- **Pengabsen PMQ**: Bottom navigation, scan QR, manual status, riwayat.
 
-### Phase 2 - Pengabsen PWA ✅ COMPLETED
-- [x] Login with username + kode_akses (9-digit)
-- [x] QR code scanning with @yudiel/react-qr-scanner
-- [x] Manual status update (hadir, alfa, sakit, izin, haid, istihadhoh)
-- [x] History view for recorded attendance
-- [x] Students grouped by dormitory
-
-### Phase 3 - Wali Santri PWA ✅ COMPLETED
-- [x] Login with default password (12345)
-- [x] Dashboard showing current day's attendance status
-- [x] Historical view with calendar grid UI
-- [x] "Dicatat oleh" (recorded by) information displayed
-
-### Phase 4 - Push Notifications ✅ COMPLETED (Jan 21, 2026)
-- [x] Firebase Cloud Messaging (FCM) integration
-- [x] Backend: firebase-admin SDK v7.1 with send_each()
-- [x] Frontend: Firebase Web SDK for token generation
-- [x] Service worker for background notifications
-- [x] FCM token registration endpoint
-- [x] Notification triggered on attendance update
-- [x] Admin settings page for notification templates
-- [x] Customizable message templates with {nama} and {waktu} placeholders
-- **Status**: Ready to use on real devices
-
-### Phase 5 - Pembimbing PWA ✅ COMPLETED (Jan 21, 2026)
-- [x] Login with username and kode_akses (9-digit access code)
-- [x] Dashboard with today's attendance statistics (all 7 status columns)
-- [x] Santri list grouped by asrama
-- [x] Filter by waktu sholat (subuh, dzuhur, ashar, maghrib, isya)
-- [x] History tab with period filters (day/week/biweek/month/year)
-- [x] Admin can view and regenerate kode_akses
-- [x] Read-only access (cannot modify attendance)
-
-### Phase 6 - UI/UX Redesign ✅ COMPLETED (Jan 21, 2026)
-- [x] Modern design system with Emerald (primary) + Amber (secondary) colors
-- [x] Google Fonts: Playfair Display (headings), Plus Jakarta Sans (body)
-- [x] Admin: Split-screen login, sidebar navigation with active states
-- [x] PWA Login pages: Unique colors per role (green/amber/violet)
-- [x] Card-based layouts with subtle shadows
-- [x] Responsive mobile-first design
-- [x] Smooth animations and transitions
-- [x] Consistent notification banners with icons
+### Notifikasi
+- FCM untuk wali santri (template dapat diatur admin).
 
 ## Tech Stack
-- **Backend**: FastAPI, Python 3.11, Motor (async MongoDB), firebase-admin
+- **Backend**: FastAPI, Python 3.11, Motor (MongoDB)
 - **Frontend**: React 19, React Router, Axios, Tailwind CSS, Shadcn/UI
 - **Database**: MongoDB
-- **External APIs**: Al-Adhan (prayer times), Firebase Cloud Messaging
+- **External APIs**: Al-Adhan (waktu sholat), Firebase Cloud Messaging
 
-## Design System
-- **Primary Color**: Emerald (#047857) - for main actions and Pengabsen
-- **Secondary Color**: Amber (#D97706) - for Wali Santri  
-- **Accent Color**: Violet (#7C3AED) - for Pembimbing
-- **Background**: Warm stone (#FAFAF9)
-- **Fonts**: Playfair Display (serif headings), Plus Jakarta Sans (body)
+## Key Endpoints (High-Level)
+- Auth: `/api/auth/login`, `/api/init/admin`
+- PMQ: `/api/pmq/tingkatan`, `/api/pmq/kelompok`, `/api/pmq/siswa`, `/api/pmq/pengabsen`, `/api/pmq/absensi/riwayat`
+- PWA PMQ: `/api/pmq/pengabsen/absensi-hari-ini`, `/api/pmq/pengabsen/absensi`, `/api/pmq/pengabsen/absensi/scan`, `/api/pmq/pengabsen/riwayat`
 
-## API Endpoints Summary
+## Database Collections (High-Level)
+- `admins`, `asrama`, `santri`, `wali_santri`, `pengabsen`, `pembimbing`
+- `kelas`, `siswa_madrasah`, `siswa_aliyah`, `siswa_pmq`
+- `pmq_kelompok`, `pengabsen_pmq`, `absensi_pmq`, `absensi_aliyah`, `absensi_madrasah`
+- `settings`
 
-### Authentication
-- `POST /api/auth/login` - Admin login
-- `POST /api/pengabsen/login` - Pengabsen login (username + kode_akses)
-- `POST /api/wali/login` - Wali login (username + password)
-- `POST /api/pembimbing/login` - Pembimbing login (username + kode_akses)
+## What's Implemented (Latest)
+- **2026-02-05**: Perbaikan QR scan PMQ (tanggal mengikuti pilihan user) + uji endpoint scan berhasil.
+- **2026-02-05**: Layout Kelas Aliyah disamakan dengan Kelas Madrasah Diniyah (card grid).
+- **2026-02-05**: Edit Kelompok PMQ (UI + endpoint PUT /pmq/kelompok/{id}).
+- **2026-02-05**: Filter status Riwayat PMQ dipindah ke atas tabel (seperti Aliyah).
+- **2026-02-05**: Verifikasi halaman Siswa Aliyah tidak error (screenshot).
 
-### Admin Resources
-- `/api/asrama` - CRUD for dormitories
-- `/api/santri` - CRUD for students
-- `/api/wali` - Read/Update for guardians
-- `/api/pengabsen` - CRUD for attendants (includes kode_akses)
-- `/api/pengabsen/{id}/regenerate-kode-akses` - Regenerate access code
-- `/api/pembimbing` - CRUD for supervisors (includes kode_akses)
-- `/api/pembimbing/{id}/regenerate-kode-akses` - Regenerate access code
-- `/api/absensi` - Attendance records
-- `/api/waktu-sholat` - Prayer times
-- `/api/settings/wali-notifikasi` - Notification templates
+## Prioritized Backlog
+### P0
+- Verifikasi ulang riwayat absensi PWA Aliyah (isu lama, data kadang tidak tampil).
 
-### PWA Endpoints
-- `/api/pengabsen/absensi` - Record attendance (triggers FCM)
-- `/api/pengabsen/santri-absensi-hari-ini` - Get today's attendance
-- `/api/pengabsen/riwayat` - Attendance history
-- `/api/wali/anak-absensi-hari-ini` - Get child's today attendance
-- `/api/wali/anak-absensi-riwayat` - Get child's attendance history
-- `/api/wali/fcm-token` - Register FCM token
-- `/api/pembimbing/me` - Get pembimbing info
-- `/api/pembimbing/santri-absensi-hari-ini` - Get santri attendance
-- `/api/pembimbing/absensi-riwayat` - Get historical attendance
-- `/api/pembimbing/statistik` - Get attendance statistics
+### P1
+- Konversi PWA menjadi aplikasi Android native.
+- Dark mode global.
 
-## Database Collections
-- `admins` - Admin users
-- `asrama` - Dormitories
-- `santri` - Students (with QR codes, wali info)
-- `wali_santri` - Guardians (auto-synced, includes fcm_tokens)
-- `pengabsen` - Attendants
-- `pembimbing` - Supervisors (with kode_akses instead of password)
-- `absensi` - Attendance records
-- `waktu_sholat` - Prayer times cache
-- `settings` - App settings (notification templates)
-
-## PWA URLs
-- `/pengabsen-app` - Pengabsen PWA
-- `/wali-app` - Wali Santri PWA
-- `/pembimbing-app` - Pembimbing PWA
-
-## Test Credentials
-- **Admin**: admin / admin123
-- **Wali Santri**: vvvvvvvv / 12345 (or any wali username)
-- **Pengabsen**: anwar / password123
-- **Pembimbing**: Wafa / 258064095 (kode_akses may change if regenerated)
-
-## Backlog / Future Tasks
-1. [ ] Offline support for PWAs
-2. [ ] Push notification delivery confirmation/tracking
-3. [ ] Monthly/weekly attendance reports
-4. [ ] Attendance statistics and analytics dashboard
-5. [ ] Multi-language support (Arabic, English)
-6. [ ] Bulk attendance recording feature
-7. [ ] Export attendance report to PDF
+### P2
+- WhatsApp notification (parked).
+- NFC/RFID attendance (parked).
 
 ## Notes
-- FCM notifications work when Wali PWA is installed on real devices
-- Pembimbing uses kode_akses (9-digit) instead of password for easier sharing
-- Default wali password is "12345" for all guardians
-- kode_akses can be regenerated by admin at any time
+- Endpoint `/api/init/admin` perlu dipanggil di environment deployment untuk seed akun admin multi-role.
+- Token PWA disimpan per role (contoh: `pengabsen_pmq_token`).
