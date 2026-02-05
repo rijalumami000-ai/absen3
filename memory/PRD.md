@@ -63,6 +63,7 @@ Bangun sistem absensi terpadu untuk pesantren yang mencakup absensi sholat, Madr
 - **2026-02-05**: Batas tinggi daftar santri diperketat agar tidak menabrak menu bawah.
 - **2026-02-05**: Halaman rekap WhatsApp wali + template pesan WhatsApp.
 - **2026-02-05**: History WhatsApp + pencatatan kirim otomatis; daftar rekap mengecualikan yang sudah dikirim.
+- **2026-02-05**: History WhatsApp kini bisa kirim ulang + tombol kembali ke rekap.
 - **2026-02-05**: Layout Kelas Aliyah disamakan dengan Kelas Madrasah Diniyah (card grid).
 - **2026-02-05**: Edit Kelompok PMQ (UI + endpoint PUT /pmq/kelompok/{id}).
 - **2026-02-05**: Filter status Riwayat PMQ dipindah ke atas tabel (seperti Aliyah).
