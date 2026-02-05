@@ -120,17 +120,25 @@ const WhatsAppHistory = () => {
   };
 
   const handleResend = async (item) => {
-    const phone = normalizePhone(item.nomor_hp_wali || '');
-    if (!phone) {
-      toast({ title: 'Nomor WA kosong', description: 'Nomor wali santri belum tersedia.', variant: 'destructive' });
-      return;
-    }
-    const message = buildMessage(item);
-    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
+    const waWindow = window.open('', '_blank', 'noopener,noreferrer');
     try {
       setSendingId(item.id);
-      await api.post('/whatsapp/history/resend', { history_id: item.id });
-      toast({ title: 'Terkirim ulang', description: `Notifikasi untuk ${item.nama_santri} tercatat ulang.` });
+      const resp = await api.post('/whatsapp/history/resend', { history_id: item.id });
+      const updated = resp.data || item;
+      const phone = normalizePhone(updated.nomor_hp_wali || item.nomor_hp_wali || '');
+      if (!phone) {
+        toast({ title: 'Nomor WA kosong', description: 'Nomor wali santri belum tersedia.', variant: 'destructive' });
+        if (waWindow) waWindow.close();
+        return;
+      }
+      const message = buildMessage(updated);
+      const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+      if (waWindow) {
+        waWindow.location.href = url;
+      } else {
+        window.open(url, '_blank', 'noopener,noreferrer');
+      }
+      toast({ title: 'Terkirim ulang', description: `Notifikasi untuk ${updated.nama_santri} tercatat ulang.` });
       await fetchHistory();
     } catch (err) {
       toast({
@@ -138,6 +146,7 @@ const WhatsAppHistory = () => {
         description: err.response?.data?.detail || 'Gagal mencatat kirim ulang',
         variant: 'destructive',
       });
+      if (waWindow) waWindow.close();
     } finally {
       setSendingId(null);
     }
