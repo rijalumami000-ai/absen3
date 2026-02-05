@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Scanner } from '@yudiel/react-qr-scanner';
+import { Sunrise, Sun, CloudSun, Sunset, MoonStar } from 'lucide-react';
 
 const WAKTU_OPTIONS = [
   { value: 'subuh', label: 'Subuh' },
@@ -14,6 +15,14 @@ const WAKTU_OPTIONS = [
   { value: 'ashar', label: 'Ashar' },
   { value: 'maghrib', label: 'Maghrib' },
   { value: 'isya', label: 'Isya' },
+];
+
+const WAKTU_MENU = [
+  { value: 'subuh', label: 'Subuh', icon: Sunrise },
+  { value: 'dzuhur', label: 'Dzuhur', icon: Sun },
+  { value: 'ashar', label: 'Ashar', icon: CloudSun },
+  { value: 'maghrib', label: 'Maghrib', icon: Sunset },
+  { value: 'isya', label: 'Isya', icon: MoonStar },
 ];
 
 const STATUS_OPTIONS = [
@@ -197,7 +206,7 @@ const PengabsenApp = () => {
         </Button>
       </header>
 
-      <main className="flex-1 p-4 space-y-4 max-w-4xl mx-auto w-full">
+      <main className="flex-1 p-4 space-y-4 max-w-4xl mx-auto w-full pb-24">
         <div className="flex gap-2 mb-4">
           <button
             type="button"
@@ -326,26 +335,6 @@ const PengabsenApp = () => {
                   )}
                 </div>
               )}
-            </section>
-
-            <section className="bg-white rounded-lg shadow p-4">
-              <h2 className="text-sm font-semibold text-gray-700 mb-2">Pilih Waktu Sholat</h2>
-              <div className="flex flex-wrap gap-2">
-                {WAKTU_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    onClick={() => setWaktu(opt.value)}
-                    className={`px-3 py-1 rounded-full text-sm border transition-colors ${
-                      waktu === opt.value
-                        ? 'bg-emerald-500 text-white border-emerald-500'
-                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                    }`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
             </section>
 
             <section className="bg-white rounded-lg shadow p-4">
@@ -736,6 +725,34 @@ const PengabsenApp = () => {
           )}
         </section>
       </main>
+
+      <div
+        className="border-t bg-white px-4 py-2 flex items-center justify-between gap-2 fixed bottom-0 left-0 right-0 max-w-4xl mx-auto z-40"
+        data-testid="pengabsen-waktu-bottom-nav"
+      >
+        <div className="flex gap-2 overflow-x-auto flex-1">
+          {WAKTU_MENU.map((menu) => {
+            const Icon = menu.icon;
+            const isActive = waktu === menu.value;
+            return (
+              <button
+                key={menu.value}
+                type="button"
+                onClick={() => setWaktu(menu.value)}
+                data-testid={`pengabsen-waktu-tab-${menu.value}`}
+                className={`flex flex-col items-center justify-center min-w-[70px] px-2 py-1 rounded-xl border text-[11px] transition-colors ${
+                  isActive
+                    ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                    : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
+                }`}
+              >
+                <Icon className="w-4 h-4 mb-0.5" />
+                <span>{menu.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 };
