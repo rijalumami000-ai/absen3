@@ -4086,6 +4086,9 @@ async def get_whatsapp_history(
     for rec in records:
         if isinstance(rec.get("sent_at"), str):
             rec["sent_at"] = datetime.fromisoformat(rec["sent_at"])
+        rec.setdefault("nama_wali", "-")
+        rec.setdefault("nomor_hp_wali", "")
+        rec.setdefault("rekap", {})
     return records
 
 
