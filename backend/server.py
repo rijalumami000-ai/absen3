@@ -3966,6 +3966,12 @@ async def get_whatsapp_rekap(
     if not santri_list:
         return []
 
+    sent_records = await db.whatsapp_history.find({"tanggal": tanggal}, {"_id": 0, "santri_id": 1}).to_list(10000)
+    sent_ids = {s["santri_id"] for s in sent_records}
+    santri_list = [s for s in santri_list if s["id"] not in sent_ids]
+    if not santri_list:
+        return []
+
     santri_ids = [s["id"] for s in santri_list]
     absensi_list = await db.absensi.find(
         {"tanggal": tanggal, "santri_id": {"$in": santri_ids}},
