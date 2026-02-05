@@ -127,9 +127,10 @@ const PengabsenPMQApp = () => {
 
   const handleScanResult = async (detected) => {
     try {
+      if (!sesiKey) return;
       if (!detected || detected.length === 0) return;
       const code = detected[0];
-      const text = code.rawValue || '';
+      const text = code?.rawValue || '';
 
       let payload;
       try {
@@ -138,7 +139,7 @@ const PengabsenPMQApp = () => {
         payload = { id: text, type: 'santri' };
       }
 
-      await pengabsenPMQAppAPI.scanAbsensi(payload, { sesi: sesiKey });
+      await pengabsenPMQAppAPI.scanAbsensi(payload, { sesi: sesiKey, tanggal });
       await loadData();
     } catch (e) {
       // TODO: optional toast
@@ -234,25 +235,32 @@ const PengabsenPMQApp = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col" data-testid="pengabsen-pmq-app-page">
-      <header className="bg-white shadow-sm px-4 py-3 flex items-center justify-between">
+      <header
+        className="bg-white shadow-sm px-4 py-3 flex items-center justify-between"
+        data-testid="pengabsen-pmq-header"
+      >
         <div>
-          <h1 className="text-lg font-semibold text-gray-800">Pengabsen PMQ</h1>
-          <p className="text-xs text-gray-500">{user.nama} (@{user.username})</p>
+          <h1 className="text-lg font-semibold text-gray-800" data-testid="pengabsen-pmq-title">
+            Pengabsen PMQ
+          </h1>
+          <p className="text-xs text-gray-500" data-testid="pengabsen-pmq-user-info">
+            {user.nama} (@{user.username})
+          </p>
         </div>
-        <Button variant="outline" size="sm" onClick={logout}>
+        <Button variant="outline" size="sm" onClick={logout} data-testid="pengabsen-pmq-logout-button">
           Logout
         </Button>
       </header>
 
       <main className="flex-1 p-4 space-y-4 max-w-4xl mx-auto w-full pb-24">
         {activeTab === 'today' && (
-          <section className="bg-white rounded-lg shadow p-4 space-y-4">
+          <section className="bg-white rounded-lg shadow p-4 space-y-4" data-testid="pmq-today-section">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
               <div>
                 <p className="text-xs text-gray-500">Sesi & Tanggal</p>
                 <div className="flex flex-wrap gap-2 mt-1">
                   <Select value={sesiKey} onValueChange={setSesiKey}>
-                    <SelectTrigger className="w-40 h-8 text-xs">
+                    <SelectTrigger className="w-40 h-8 text-xs" data-testid="pmq-sesi-select-trigger">
                       <SelectValue placeholder="Pilih sesi" />
                     </SelectTrigger>
                     <SelectContent>
@@ -268,6 +276,7 @@ const PengabsenPMQApp = () => {
                     value={tanggal}
                     onChange={(e) => setTanggal(e.target.value)}
                     className="h-8 text-xs w-40"
+                    data-testid="pmq-tanggal-input"
                   />
                 </div>
               </div>
@@ -279,23 +288,36 @@ const PengabsenPMQApp = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="h-8 text-xs"
+                    data-testid="pmq-search-input"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-3 text-center text-xs">
-              <div className="bg-emerald-50 border border-emerald-200 rounded-lg py-2">
-                <p className="text-emerald-700 font-semibold">Total Siswa</p>
-                <p className="text-lg font-bold text-emerald-800">{totalSiswa}</p>
+            <div className="grid grid-cols-3 gap-3 text-center text-xs" data-testid="pmq-summary-cards">
+              <div className="bg-emerald-50 border border-emerald-200 rounded-lg py-2" data-testid="pmq-total-card">
+                <p className="text-emerald-700 font-semibold" data-testid="pmq-total-label">
+                  Total Siswa
+                </p>
+                <p className="text-lg font-bold text-emerald-800" data-testid="pmq-total-count">
+                  {totalSiswa}
+                </p>
               </div>
-              <div className="bg-blue-50 border border-blue-200 rounded-lg py-2">
-                <p className="text-blue-700 font-semibold">Hadir</p>
-                <p className="text-lg font-bold text-blue-800">{hadirCount}</p>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg py-2" data-testid="pmq-hadir-card">
+                <p className="text-blue-700 font-semibold" data-testid="pmq-hadir-label">
+                  Hadir
+                </p>
+                <p className="text-lg font-bold text-blue-800" data-testid="pmq-hadir-count">
+                  {hadirCount}
+                </p>
               </div>
-              <div className="bg-amber-50 border border-amber-200 rounded-lg py-2">
-                <p className="text-amber-700 font-semibold">Belum Absen</p>
-                <p className="text-lg font-bold text-amber-800">{belumCount}</p>
+              <div className="bg-amber-50 border border-amber-200 rounded-lg py-2" data-testid="pmq-belum-card">
+                <p className="text-amber-700 font-semibold" data-testid="pmq-belum-label">
+                  Belum Absen
+                </p>
+                <p className="text-lg font-bold text-amber-800" data-testid="pmq-belum-count">
+                  {belumCount}
+                </p>
               </div>
             </div>
 
@@ -305,13 +327,17 @@ const PengabsenPMQApp = () => {
                 variant={scanning ? 'outline' : 'default'}
                 size="sm"
                 onClick={() => setScanning((prev) => !prev)}
+                data-testid="pmq-scan-toggle-button"
               >
                 {scanning ? 'Stop Kamera' : 'Mulai Scan'}
               </Button>
             </div>
 
             {scanning ? (
-              <div className="aspect-video max-w-md mx-auto overflow-hidden rounded-xl border bg-black">
+              <div
+                className="aspect-video max-w-md mx-auto overflow-hidden rounded-xl border bg-black"
+                data-testid="pmq-qr-scanner-container"
+              >
                 <Scanner onScan={handleScanResult} allowMultiple={false} styles={{ container: { width: '100%' } }} />
               </div>
             ) : (
@@ -321,26 +347,32 @@ const PengabsenPMQApp = () => {
               </p>
             )}
 
-            <div className="mt-4">
+            <div className="mt-4" data-testid="pmq-student-list-section">
               {loadingData ? (
-                <div className="text-center text-xs text-gray-500 py-4">Memuat data...</div>
+                <div className="text-center text-xs text-gray-500 py-4" data-testid="pmq-loading-state">
+                  Memuat data...
+                </div>
               ) : !selectedTingkatan ? (
-                <div className="text-center text-xs text-gray-500 py-4">
+                <div className="text-center text-xs text-gray-500 py-4" data-testid="pmq-empty-tingkatan">
                   Pilih tingkatan di menu bawah untuk melihat daftar siswa.
                 </div>
               ) : !groupedData[selectedTingkatan.key] ? (
-                <div className="text-center text-xs text-gray-500 py-4">Tidak ada data siswa untuk tingkatan ini</div>
+                <div className="text-center text-xs text-gray-500 py-4" data-testid="pmq-empty-siswa">
+                  Tidak ada data siswa untuk tingkatan ini
+                </div>
               ) : (
-                <div className="space-y-4 max-h-[420px] overflow-y-auto">
+                <div className="space-y-4 max-h-[420px] overflow-y-auto" data-testid="pmq-group-list">
                   {Object.values(groupedData[selectedTingkatan.key].kelompok).map((group) => {
                     const count = group.items.length;
                     const key = group.kelompok_id || group.kelompok_nama;
+                    const safeKey = String(key || 'unknown').replace(/\s+/g, '-').toLowerCase();
                     const isCollapsed = collapsedGroups[key];
                     return (
-                      <div key={key}>
+                      <div key={key} data-testid={`pmq-group-${safeKey}`}>
                         <button
                           type="button"
                           className="w-full flex items-center justify-between text-xs font-semibold text-slate-700 mb-2 bg-slate-100 hover:bg-slate-200 rounded px-3 py-2"
+                          data-testid={`pmq-group-toggle-${safeKey}`}
                           onClick={() =>
                             setCollapsedGroups((prev) => ({
                               ...prev,
@@ -362,9 +394,12 @@ const PengabsenPMQApp = () => {
                               <div
                                 key={row.siswa_id}
                                 className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-lg px-3 py-2"
+                                data-testid={`pmq-siswa-row-${row.siswa_id}`}
                               >
                                 <div>
-                                  <p className="text-sm font-medium text-gray-800">{row.nama}</p>
+                                  <p className="text-sm font-medium text-gray-800" data-testid={`pmq-siswa-nama-${row.siswa_id}`}>
+                                    {row.nama}
+                                  </p>
                                   {/* Tanpa keterangan tingkatan/kelompok di bawah nama */}
                                 </div>
                                 <div className="w-32">
@@ -372,7 +407,10 @@ const PengabsenPMQApp = () => {
                                     value={row.status || 'null'}
                                     onValueChange={(val) => handleStatusChange(row.siswa_id, group.kelompok_id, val)}
                                   >
-                                    <SelectTrigger className="h-8 text-xs">
+                                    <SelectTrigger
+                                      className="h-8 text-xs"
+                                      data-testid={`pmq-status-select-${row.siswa_id}`}
+                                    >
                                       <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -398,7 +436,7 @@ const PengabsenPMQApp = () => {
         )}
 
         {activeTab === 'history' && (
-          <section className="bg-white rounded-lg shadow p-4 space-y-4">
+          <section className="bg-white rounded-lg shadow p-4 space-y-4" data-testid="pmq-history-section">
             <div className="flex flex-col gap-3">
               <div className="flex flex-col md:flex-row gap-3">
                 <div className="w-full md:w-64">
@@ -408,6 +446,7 @@ const PengabsenPMQApp = () => {
                     value={historySearchQuery}
                     onChange={(e) => setHistorySearchQuery(e.target.value)}
                     className="h-8 text-xs"
+                    data-testid="pmq-history-search-input"
                   />
                 </div>
                 <div className="flex gap-2 items-end">
@@ -418,6 +457,7 @@ const PengabsenPMQApp = () => {
                       value={historyStart}
                       onChange={(e) => setHistoryStart(e.target.value)}
                       className="h-8 text-xs"
+                      data-testid="pmq-history-start-input"
                     />
                   </div>
                   <div>
@@ -427,6 +467,7 @@ const PengabsenPMQApp = () => {
                       value={historyEnd}
                       onChange={(e) => setHistoryEnd(e.target.value)}
                       className="h-8 text-xs"
+                      data-testid="pmq-history-end-input"
                     />
                   </div>
                   <div className="pt-5">
@@ -434,6 +475,7 @@ const PengabsenPMQApp = () => {
                       type="button"
                       size="sm"
                       className="w-full md:w-auto"
+                      data-testid="pmq-history-show-button"
                       onClick={async () => {
                         try {
                           setLoadingHistory(true);
@@ -459,20 +501,26 @@ const PengabsenPMQApp = () => {
             </div>
 
             {loadingHistory ? (
-              <div className="text-center text-xs text-gray-500 py-4">Memuat riwayat...</div>
+              <div className="text-center text-xs text-gray-500 py-4" data-testid="pmq-history-loading">
+                Memuat riwayat...
+              </div>
             ) : groupedHistory.length === 0 ? (
-              <div className="text-center text-xs text-gray-500 py-4">Tidak ada riwayat</div>
+              <div className="text-center text-xs text-gray-500 py-4" data-testid="pmq-history-empty">
+                Tidak ada riwayat
+              </div>
             ) : (
-              <div className="space-y-4 max-h-[420px] overflow-y-auto">
+              <div className="space-y-4 max-h-[420px] overflow-y-auto" data-testid="pmq-history-list">
                 {groupedHistory.map((group) => {
                   const count = group.items.length;
                   const key = group.kelompok_id || group.kelompok_nama;
+                  const safeKey = String(key || 'unknown').replace(/\s+/g, '-').toLowerCase();
                   const isCollapsed = collapsedHistoryGroups[key];
                   return (
-                    <div key={key}>
+                    <div key={key} data-testid={`pmq-history-group-${safeKey}`}>
                       <button
                         type="button"
                         className="w-full flex items-center justify-between text-xs font-semibold text-slate-700 mb-2 bg-slate-100 hover:bg-slate-200 rounded px-3 py-2"
+                        data-testid={`pmq-history-group-toggle-${safeKey}`}
                         onClick={() =>
                           setCollapsedHistoryGroups((prev) => ({
                             ...prev,
@@ -494,14 +542,25 @@ const PengabsenPMQApp = () => {
                             <div
                               key={row.id || `${row.siswa_id}-${row.tanggal}-${row.status}`}
                               className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-lg px-3 py-2"
+                                data-testid={`pmq-history-row-${row.id || `${row.siswa_id}-${row.tanggal}`}`}
                             >
                               <div>
-                                <p className="text-sm font-medium text-gray-800">{row.siswa_nama}</p>
-                                <p className="text-xs text-gray-500">
+                                  <p
+                                    className="text-sm font-medium text-gray-800"
+                                    data-testid={`pmq-history-siswa-nama-${row.siswa_id}`}
+                                  >
+                                    {row.siswa_nama}
+                                  </p>
+                                  <p className="text-xs text-gray-500" data-testid={`pmq-history-meta-${row.siswa_id}`}>
                                   {row.tingkatan_label} • {group.kelompok_nama || '-'} • {row.tanggal}
                                 </p>
                               </div>
-                              <div className="text-xs capitalize text-gray-700">{row.status}</div>
+                                <div
+                                  className="text-xs capitalize text-gray-700"
+                                  data-testid={`pmq-history-status-${row.siswa_id}`}
+                                >
+                                  {row.status}
+                                </div>
                             </div>
                           ))}
                         </div>
@@ -516,7 +575,10 @@ const PengabsenPMQApp = () => {
       </main>
 
       {/* Bottom Tingkatan & Tab Bar */}
-      <div className="border-t bg-white px-4 py-2 flex items-center justify-between gap-2 fixed bottom-12 left-0 right-0 max-w-4xl mx-auto">
+      <div
+        className="border-t bg-white px-4 py-2 flex items-center justify-between gap-2 fixed bottom-12 left-0 right-0 max-w-4xl mx-auto"
+        data-testid="pmq-bottom-nav"
+      >
         <div className="flex gap-2 overflow-x-auto flex-1 pr-2">
           {allowedTingkatanKeys.map((t) => {
             const Icon = t.icon;
@@ -529,6 +591,7 @@ const PengabsenPMQApp = () => {
                   setSelectedTingkatanKey(t.key);
                   setActiveTab('today');
                 }}
+                data-testid={`pmq-tingkatan-tab-${t.key}`}
                 className={`flex flex-col items-center justify-center min-w-[70px] px-2 py-1 rounded-xl border text-[11px] transition-colors ${
                   isActive
                     ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
@@ -549,6 +612,7 @@ const PengabsenPMQApp = () => {
           <button
             type="button"
             onClick={() => setActiveTab('history')}
+            data-testid="pmq-history-tab-button"
             className={`flex flex-col items-center justify-center w-[60px] px-2 py-1 rounded-xl border text-[11px] transition-colors ${
               activeTab === 'history'
                 ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
