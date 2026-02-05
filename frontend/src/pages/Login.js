@@ -63,8 +63,18 @@ const Login = () => {
           <div className="mb-8">
             <div className="flex items-center gap-4 mb-6" data-testid="login-logos">
               {[
-                { src: LOGO_AL_HAMID, alt: 'Logo Pondok Al-Hamid', frameClass: 'bg-transparent border-white/40' },
-                { src: LOGO_YAYASAN, alt: 'Logo Yayasan', frameClass: 'bg-white/80 border-white/30' },
+                {
+                  src: LOGO_AL_HAMID,
+                  alt: 'Logo Pondok Al-Hamid',
+                  frameClass: 'bg-transparent border-white/40 overflow-hidden',
+                  imgClass: 'scale-110',
+                },
+                {
+                  src: LOGO_YAYASAN,
+                  alt: 'Logo Yayasan',
+                  frameClass: 'bg-white/80 border-white/30',
+                  imgClass: '',
+                },
               ].map((logo, idx) => (
                 <div
                   key={logo.alt}
@@ -74,7 +84,7 @@ const Login = () => {
                   <img
                     src={logo.src}
                     alt={logo.alt}
-                    className="w-full h-full object-contain mix-blend-multiply"
+                    className={`w-full h-full object-contain mix-blend-multiply ${logo.imgClass}`}
                     data-testid={`login-logo-${idx}`}
                   />
                 </div>
@@ -124,8 +134,18 @@ const Login = () => {
           <div className="lg:hidden text-center mb-8">
             <div className="flex items-center justify-center gap-4 mb-4" data-testid="login-logos-mobile">
               {[
-                { src: LOGO_AL_HAMID, alt: 'Logo Pondok Al-Hamid', frameClass: 'bg-transparent border-border/60' },
-                { src: LOGO_YAYASAN, alt: 'Logo Yayasan', frameClass: 'bg-white border-border/60' },
+                {
+                  src: LOGO_AL_HAMID,
+                  alt: 'Logo Pondok Al-Hamid',
+                  frameClass: 'bg-transparent border-border/60 overflow-hidden',
+                  imgClass: 'scale-110',
+                },
+                {
+                  src: LOGO_YAYASAN,
+                  alt: 'Logo Yayasan',
+                  frameClass: 'bg-white border-border/60',
+                  imgClass: '',
+                },
               ].map((logo, idx) => (
                 <div
                   key={logo.alt}
@@ -135,7 +155,7 @@ const Login = () => {
                   <img
                     src={logo.src}
                     alt={logo.alt}
-                    className="w-full h-full object-contain mix-blend-multiply"
+                    className={`w-full h-full object-contain mix-blend-multiply ${logo.imgClass}`}
                     data-testid={`login-logo-mobile-${idx}`}
                   />
                 </div>
