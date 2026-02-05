@@ -108,7 +108,7 @@ const SiswaPMQ = () => {
         toast.error('Nama dan Tingkatan wajib diisi');
         return;
       }
-      
+
       if (editingId) {
         // Update existing siswa
         await api.put(`/pmq/siswa/${editingId}`, formData);
@@ -118,14 +118,14 @@ const SiswaPMQ = () => {
         await api.post('/pmq/siswa', formData);
         toast.success('Siswa PMQ berhasil ditambahkan');
       }
-      
+
       setIsCreateOpen(false);
       setEditingId(null);
       fetchSiswa();
     } catch (e) {
-  const [linkSantriSearch, setLinkSantriSearch] = useState('');
-
-      toast.error(e.response?.data?.detail || `Gagal ${editingId ? 'memperbarui' : 'menambah'} siswa PMQ`);
+      toast.error(
+        e.response?.data?.detail || `Gagal ${editingId ? 'memperbarui' : 'menambah'} siswa PMQ`
+      );
     }
   };
 
