@@ -845,6 +845,10 @@ class PMQKelompokCreate(BaseModel):
     nama: str
 
 
+class PMQKelompokUpdate(BaseModel):
+    nama: Optional[str] = None
+
+
 class PMQKelompokResponse(BaseModel):
     id: str
     tingkatan_key: str
@@ -1012,6 +1016,31 @@ async def create_pmq_kelompok(payload: PMQKelompokCreate, _: dict = Depends(get_
     doc["created_at"] = doc["created_at"].isoformat()
     await db.pmq_kelompok.insert_one(doc)
     return PMQKelompokResponse(**kelompok.model_dump())
+
+
+@api_router.put("/pmq/kelompok/{kelompok_id}", response_model=PMQKelompokResponse)
+async def update_pmq_kelompok(kelompok_id: str, payload: PMQKelompokUpdate, _: dict = Depends(get_current_admin)):
+    kelompok = await db.pmq_kelompok.find_one({"id": kelompok_id}, {"_id": 0})
+    if not kelompok:
+        raise HTTPException(status_code=404, detail="Kelompok PMQ tidak ditemukan")
+
+    update_data = {k: v for k, v in payload.model_dump().items() if v is not None}
+    if "nama" in update_data:
+        nama = update_data["nama"].strip()
+        if not nama:
+            raise HTTPException(status_code=400, detail="Nama kelompok wajib diisi")
+        update_data["nama"] = nama
+
+    if not update_data:
+        raise HTTPException(status_code=400, detail="Tidak ada data untuk diperbarui")
+
+    await db.pmq_kelompok.update_one({"id": kelompok_id}, {"$set": update_data})
+    kelompok.update(update_data)
+    created_at_val = kelompok.get("created_at")
+    if isinstance(created_at_val, str):
+        created_at_val = datetime.fromisoformat(created_at_val)
+    kelompok["created_at"] = created_at_val or datetime.now(timezone.utc)
+    return PMQKelompokResponse(**kelompok)
 
 
 @api_router.delete("/pmq/kelompok/{kelompok_id}")
