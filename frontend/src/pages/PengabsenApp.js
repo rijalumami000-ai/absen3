@@ -369,7 +369,7 @@ const PengabsenApp = () => {
               Belum ada santri untuk asrama yang Anda kelola.
             </div>
           ) : (
-            <div className="max-h-[60vh] overflow-y-auto space-y-4">
+            <div className="max-h-[50vh] overflow-y-auto space-y-4 pb-16" data-testid="pengabsen-santri-list">
               {groupedList.map((group) => (
                 <div key={group.asramaId || 'tanpa-asrama'} className="border rounded-lg overflow-hidden bg-white">
                   <div className="px-3 py-2 bg-gray-50 border-b flex items-center justify-between">
