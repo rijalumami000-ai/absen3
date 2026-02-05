@@ -6,7 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { MessageCircle, CalendarClock, Users } from 'lucide-react';
+import { MessageCircle, CalendarClock, Users, History } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const DEFAULT_TEMPLATE =
   "Assalamu'alaikum {nama_wali}.\n" +
@@ -68,7 +69,9 @@ const WhatsAppRekap = () => {
   const [template, setTemplate] = useState(DEFAULT_TEMPLATE);
   const [loading, setLoading] = useState(true);
   const [loadingTemplate, setLoadingTemplate] = useState(true);
+  const [sendingId, setSendingId] = useState(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const today = useMemo(() => {
     const date = new Date();
@@ -140,6 +143,31 @@ const WhatsAppRekap = () => {
     fetchRekap();
   };
 
+  const handleSendWhatsApp = async (item) => {
+    const phone = normalizePhone(item.nomor_hp_wali || '');
+    if (!phone) {
+      toast({ title: 'Nomor WA kosong', description: 'Nomor wali santri belum tersedia.', variant: 'destructive' });
+      return;
+    }
+    const message = buildMessage(item);
+    const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+    try {
+      setSendingId(item.santri_id);
+      await api.post('/whatsapp/rekap/send', { santri_id: item.santri_id, tanggal });
+      toast({ title: 'Tercatat', description: `Notifikasi untuk ${item.nama_santri} dicatat di history.` });
+      await fetchRekap();
+    } catch (err) {
+      toast({
+        title: 'Gagal mencatat',
+        description: err.response?.data?.detail || 'Gagal mencatat history WhatsApp',
+        variant: 'destructive',
+      });
+    } finally {
+      setSendingId(null);
+    }
+  };
+
   const buildMessage = (item) => {
     const payload = {
       '{nama_wali}': item.nama_wali || '-',
@@ -160,7 +188,8 @@ const WhatsAppRekap = () => {
 
   return (
     <div className="space-y-6 animate-fade-in" data-testid="whatsapp-rekap-page">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
         <div className="w-12 h-12 bg-gradient-to-br from-emerald-600 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg">
           <MessageCircle className="text-white" size={24} />
         </div>
@@ -172,6 +201,17 @@ const WhatsAppRekap = () => {
             Rekap sholat harian (Dzuhur–Subuh) dikirimkan ke nomor WhatsApp wali santri.
           </p>
         </div>
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => navigate('/whatsapp/history')}
+          className="gap-2"
+          data-testid="whatsapp-rekap-history-button"
+        >
+          <History className="w-4 h-4" />
+          History Notifikasi
+        </Button>
       </div>
 
       {!canSend && (
@@ -265,8 +305,6 @@ const WhatsAppRekap = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4" data-testid="whatsapp-rekap-list">
           {rekapList.map((item) => {
             const phone = normalizePhone(item.nomor_hp_wali || '');
-            const message = buildMessage(item);
-            const whatsappUrl = phone ? `https://wa.me/${phone}?text=${encodeURIComponent(message)}` : '#';
             const sendDisabled = !canSend || !phone;
             return (
               <Card key={item.santri_id} className="shadow-card" data-testid={`whatsapp-rekap-card-${item.santri_id}`}>
@@ -290,17 +328,21 @@ const WhatsAppRekap = () => {
                     ))}
                   </div>
                   <div className="text-xs text-muted-foreground">Nomor WA: {phone || '-'}</div>
-                  {sendDisabled ? (
-                    <Button type="button" className="w-full" disabled data-testid={`whatsapp-rekap-send-${item.santri_id}`}>
-                      {phone ? 'Tersedia besok' : 'Nomor wali belum ada'}
-                    </Button>
-                  ) : (
-                    <Button type="button" className="w-full" asChild data-testid={`whatsapp-rekap-send-${item.santri_id}`}>
-                      <a href={whatsappUrl} target="_blank" rel="noreferrer">
-                        Kirim WhatsApp
-                      </a>
-                    </Button>
-                  )}
+                  <Button
+                    type="button"
+                    className="w-full"
+                    disabled={sendDisabled || sendingId === item.santri_id}
+                    onClick={() => handleSendWhatsApp(item)}
+                    data-testid={`whatsapp-rekap-send-${item.santri_id}`}
+                  >
+                    {sendDisabled
+                      ? phone
+                        ? 'Tersedia besok'
+                        : 'Nomor wali belum ada'
+                      : sendingId === item.santri_id
+                        ? 'Mencatat...'
+                        : 'Kirim WhatsApp'}
+                  </Button>
                 </CardContent>
               </Card>
             );
