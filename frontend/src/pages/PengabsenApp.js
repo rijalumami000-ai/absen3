@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePengabsenAuth } from '@/contexts/PengabsenAuthContext';
 import { useAppSettings } from '@/contexts/AppSettingsContext';
@@ -45,6 +45,11 @@ const PengabsenApp = () => {
   const [data, setData] = useState([]);
   const [loadingData, setLoadingData] = useState(false);
   const [scanning, setScanning] = useState(false);
+  const [inputMode, setInputMode] = useState('qr');
+  const [nfcValue, setNfcValue] = useState('');
+  const [nfcSupported, setNfcSupported] = useState(false);
+  const [nfcScanning, setNfcScanning] = useState(false);
+  const nfcInputRef = useRef(null);
   const [lastScan, setLastScan] = useState(null);
   const [lastScanAt, setLastScanAt] = useState(0);
   const [showScanSuccess, setShowScanSuccess] = useState(false);
@@ -70,6 +75,10 @@ const PengabsenApp = () => {
       navigate('/pengabsen-portal');
     }
   }, [loading, user, navigate]);
+
+  useEffect(() => {
+    setNfcSupported(typeof window !== 'undefined' && 'NDEFReader' in window);
+  }, []);
 
   const loadData = async (waktuSholat) => {
     try {
@@ -113,6 +122,62 @@ const PengabsenApp = () => {
         description: error.response?.data?.detail || 'Gagal memperbarui status',
         variant: 'destructive',
       });
+    }
+  };
+
+  const handleNfcSubmit = async (rawValue) => {
+    const nfcUid = (rawValue || '').trim();
+    if (!nfcUid) {
+      toast({ title: 'NFC kosong', description: 'Tempelkan kartu NFC terlebih dahulu.', variant: 'destructive' });
+      return;
+    }
+    try {
+      await pengabsenAppAPI.nfcAbsensi({
+        nfc_uid: nfcUid,
+        waktu_sholat: waktu,
+        status: 'hadir',
+      });
+      setNfcValue('');
+      await loadData(waktu);
+      toast({ title: 'NFC berhasil', description: 'Absensi tercatat dari kartu NFC.' });
+    } catch (error) {
+      toast({
+        title: 'NFC gagal',
+        description: error.response?.data?.detail || 'Gagal mencatat absensi NFC',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const startNfcScan = async () => {
+    if (!nfcSupported) {
+      toast({ title: 'NFC tidak tersedia', description: 'Perangkat ini belum mendukung Web NFC.', variant: 'destructive' });
+      return;
+    }
+    try {
+      setNfcScanning(true);
+      const reader = new window.NDEFReader();
+      await reader.scan();
+      toast({ title: 'NFC aktif', description: 'Tempelkan kartu NFC ke perangkat.' });
+      reader.onreading = (event) => {
+        const serial = event.serialNumber || '';
+        if (serial) {
+          handleNfcSubmit(serial);
+        } else if (event.message?.records?.length) {
+          const record = event.message.records[0];
+          if (record.recordType === 'text') {
+            const textDecoder = new TextDecoder(record.encoding || 'utf-8');
+            handleNfcSubmit(textDecoder.decode(record.data));
+          }
+        }
+      };
+      reader.onreadingerror = () => {
+        toast({ title: 'NFC gagal', description: 'Tidak bisa membaca kartu NFC.', variant: 'destructive' });
+      };
+    } catch (error) {
+      toast({ title: 'NFC gagal', description: 'Tidak bisa mengaktifkan NFC.', variant: 'destructive' });
+    } finally {
+      setNfcScanning(false);
     }
   };
 
