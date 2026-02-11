@@ -409,6 +409,13 @@ class AbsensiResponse(BaseModel):
     created_at: datetime
 
 
+class NFCAbsensiRequest(BaseModel):
+    nfc_uid: str
+    waktu_sholat: str
+    status: Optional[str] = None
+    tanggal: Optional[str] = None
+
+
 class WhatsAppRekapItem(BaseModel):
     santri_id: str
     nama_santri: str
