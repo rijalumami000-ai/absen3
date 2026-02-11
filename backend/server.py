@@ -1260,6 +1260,16 @@ async def update_siswa_pmq(siswa_id: str, payload: SiswaPMQUpdate, _: dict = Dep
 
     data = payload.model_dump(exclude_unset=True)
 
+    if "nfc_uid" in data:
+        nfc_uid = (data.get("nfc_uid") or "").strip()
+        if nfc_uid:
+            existing_nfc = await db.siswa_pmq.find_one({"nfc_uid": nfc_uid, "id": {"$ne": siswa_id}})
+            if existing_nfc:
+                raise HTTPException(status_code=400, detail="NFC UID sudah digunakan")
+            data["nfc_uid"] = nfc_uid
+        else:
+            data["nfc_uid"] = None
+
     # Jika link ke santri, nama tidak boleh diedit
     if siswa.get("santri_id") and "nama" in data:
         data.pop("nama")
