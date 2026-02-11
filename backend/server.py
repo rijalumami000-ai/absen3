@@ -521,6 +521,7 @@ class SiswaMadrasah(BaseModel):
     kelas_id: Optional[str] = None
     santri_id: Optional[str] = None  # Link ke menu Santri (optional)
     qr_code: Optional[str] = None  # Only if santri_id is None
+    nfc_uid: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -530,6 +531,7 @@ class SiswaMadrasahCreate(BaseModel):
     gender: Literal["putra", "putri"]
     kelas_id: Optional[str] = None
     santri_id: Optional[str] = None
+    nfc_uid: Optional[str] = None
 
 class SiswaMadrasahUpdate(BaseModel):
     nama: Optional[str] = None
@@ -537,6 +539,7 @@ class SiswaMadrasahUpdate(BaseModel):
     gender: Optional[Literal["putra", "putri"]] = None
     kelas_id: Optional[str] = None
     santri_id: Optional[str] = None
+    nfc_uid: Optional[str] = None
 
 
 # REMOVED DUPLICATE CLASS
@@ -576,6 +579,7 @@ class SiswaMadrasahResponse(BaseModel):
     kelas_nama: Optional[str] = None
     santri_id: Optional[str]
     has_qr: bool = False
+    nfc_uid: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 
