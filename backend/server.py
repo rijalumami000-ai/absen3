@@ -1302,6 +1302,7 @@ async def update_siswa_pmq(siswa_id: str, payload: SiswaPMQUpdate, _: dict = Dep
         santri_id=siswa.get("santri_id"),
         has_qr=bool(siswa.get("qr_code")),
         qr_code=siswa.get("qr_code"),
+        nfc_uid=siswa.get("nfc_uid"),
         created_at=created_at_val or datetime.now(timezone.utc),
     )
 
