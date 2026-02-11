@@ -1187,6 +1187,16 @@ async def create_siswa_pmq(payload: SiswaPMQCreate, _: dict = Depends(get_curren
 
     data = payload.model_dump()
 
+    if data.get("nfc_uid"):
+        nfc_uid = data["nfc_uid"].strip()
+        if nfc_uid:
+            existing_nfc = await db.siswa_pmq.find_one({"nfc_uid": nfc_uid})
+            if existing_nfc:
+                raise HTTPException(status_code=400, detail="NFC UID sudah digunakan")
+            data["nfc_uid"] = nfc_uid
+        else:
+            data["nfc_uid"] = None
+
     # Jika link dari santri, ambil nama dari santri dan pastikan belum terdaftar
     if data.get("santri_id"):
         existing = await db.siswa_pmq.find_one({"santri_id": data["santri_id"]}, {"_id": 0})
@@ -1208,6 +1218,9 @@ async def create_siswa_pmq(payload: SiswaPMQCreate, _: dict = Depends(get_curren
             raise HTTPException(status_code=400, detail="Nama wajib diisi untuk siswa PMQ baru")
 
     siswa = SiswaPMQ(**data)
+
+    if siswa.nfc_uid:
+        siswa.nfc_uid = siswa.nfc_uid.strip()
 
     # Generate QR baru untuk siswa manual (tanpa santri_id) bila belum ada
     if not siswa.santri_id and not siswa.qr_code:
