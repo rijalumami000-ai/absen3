@@ -306,6 +306,197 @@ const PengabsenApp = () => {
 
         {activeTab === 'today' && (
           <>
+            <section className="bg-white rounded-lg shadow p-4" data-testid="pengabsen-mode-section">
+              <h2 className="text-sm font-semibold text-gray-700 mb-2">Mode Input Absen</h2>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setInputMode('qr');
+                    setScanning(false);
+                  }}
+                  data-testid="pengabsen-mode-qr"
+                  className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
+                    inputMode === 'qr'
+                      ? 'bg-emerald-500 text-white border-emerald-500'
+                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                  }`}
+                >
+                  QR Scan
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setInputMode('nfc');
+                    setScanning(false);
+                    setTimeout(() => nfcInputRef.current?.focus(), 150);
+                  }}
+                  data-testid="pengabsen-mode-nfc"
+                  className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
+                    inputMode === 'nfc'
+                      ? 'bg-emerald-500 text-white border-emerald-500'
+                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                  }`}
+                >
+                  NFC
+                </button>
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                Pilih QR untuk scan kamera, atau NFC untuk tempel kartu (USB reader / Android NFC).
+              </p>
+            </section>
+
+            {inputMode === 'qr' && (
+              <section className="bg-white rounded-lg shadow p-4" data-testid="pengabsen-qr-section">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-sm font-semibold text-gray-700">Scan QR Santri</h2>
+                  <Button
+                    variant={scanning ? 'outline' : 'default'}
+                    size="sm"
+                    onClick={() => setScanning((prev) => !prev)}
+                    data-testid="pengabsen-qr-toggle"
+                  >
+                    {scanning ? 'Stop Kamera' : 'Mulai Scan'}
+                  </Button>
+                </div>
+
+                {!scanning ? (
+                  <p className="text-xs text-gray-500">
+                    Tekan tombol <span className="font-semibold">Mulai Scan</span> untuk mengaktifkan kamera dan scan QR
+                    santri. Pastikan Anda mengizinkan akses kamera di browser.
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    <div
+                      className={`aspect-video max-w-md mx-auto overflow-hidden rounded-xl border bg-black transition-colors duration-300 ${
+                        showScanSuccess ? 'border-emerald-500' : 'border-gray-300'
+                      }`}
+                    >
+                      <Scanner
+                        onScan={async (detected) => {
+                          try {
+                            if (!detected || detected.length === 0) return;
+                            const code = detected[0];
+                            const text = code.rawValue || '';
+                            if (!text) return;
+
+                            const parsed = JSON.parse(text);
+                            if (!parsed.santri_id) {
+                              throw new Error('QR tidak berisi santri_id');
+                            }
+
+                            const now = Date.now();
+                            if (now - lastScanAt < 1500) {
+                              return;
+                            }
+
+                            setLastScanAt(now);
+                            setShowScanSuccess(true);
+                            setTimeout(() => setShowScanSuccess(false), 1000);
+
+                            setLastScan({ raw: text, parsed, waktu });
+                            await pengabsenAppAPI.upsertAbsensi({
+                              santri_id: parsed.santri_id,
+                              waktu_sholat: waktu,
+                              status_absen: 'hadir',
+                            });
+                            await loadData(waktu);
+                            toast({
+                              title: 'Scan Berhasil',
+                              description: `Hadir: ${parsed.nama || 'Santri'} (${parsed.nis || '-'})`,
+                            });
+                          } catch (e) {
+                            console.error(e);
+                            toast({
+                              title: 'QR tidak valid',
+                              description: 'Pastikan QR berasal dari sistem ini.',
+                              variant: 'destructive',
+                            });
+                          }
+                        }}
+                        onError={(error) => {
+                          console.warn(error);
+                        }}
+                        components={{
+                          audio: false,
+                        }}
+                        styles={{
+                          container: { width: '100%', height: '100%' },
+                          video: { width: '100%', height: '100%', objectFit: 'cover' },
+                        }}
+                      />
+                    </div>
+
+                    {showScanSuccess && (
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div className="bg-emerald-500/80 text-white px-6 py-3 rounded-full text-lg font-bold shadow-lg">
+                          HADIR
+                        </div>
+                      </div>
+                    )}
+
+                    {lastScan && (
+                      <div className="text-xs text-gray-600 bg-emerald-50 border border-emerald-100 rounded-lg p-3">
+                        <div className="font-semibold mb-1">Scan terakhir:</div>
+                        <div>Nama: {lastScan.parsed.nama}</div>
+                        <div>NIS: {lastScan.parsed.nis}</div>
+                        <div>Waktu Sholat: {WAKTU_OPTIONS.find((w) => w.value === lastScan.waktu)?.label}</div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </section>
+            )}
+
+            {inputMode === 'nfc' && (
+              <section className="bg-white rounded-lg shadow p-4" data-testid="pengabsen-nfc-section">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-sm font-semibold text-gray-700">Input NFC Santri</h2>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => nfcInputRef.current?.focus()}
+                    data-testid="pengabsen-nfc-focus"
+                  >
+                    Fokus Input
+                  </Button>
+                </div>
+                <p className="text-xs text-gray-500 mb-3">
+                  Gunakan NFC Reader USB (seperti keyboard) atau NFC Android. Tempel kartu lalu tekan Enter.
+                </p>
+                <div className="flex flex-col md:flex-row gap-2">
+                  <input
+                    ref={nfcInputRef}
+                    value={nfcValue}
+                    onChange={(e) => setNfcValue(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleNfcSubmit(nfcValue);
+                      }
+                    }}
+                    placeholder="Tempel kartu NFC di reader..."
+                    className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm"
+                    data-testid="pengabsen-nfc-input"
+                  />
+                  <Button type="button" onClick={() => handleNfcSubmit(nfcValue)} data-testid="pengabsen-nfc-submit">
+                    Simpan NFC
+                  </Button>
+                </div>
+                <div className="flex flex-wrap gap-2 mt-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={startNfcScan}
+                    disabled={!nfcSupported || nfcScanning}
+                    data-testid="pengabsen-nfc-start"
+                  >
+                    {nfcSupported ? 'Aktifkan NFC (Android)' : 'NFC tidak tersedia'}
+                  </Button>
+                </div>
+              </section>
+            )}
+
             <section className="bg-white rounded-lg shadow p-4">
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-sm font-semibold text-gray-700">Scan QR Santri</h2>
