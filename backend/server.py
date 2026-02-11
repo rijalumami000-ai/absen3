@@ -4976,7 +4976,16 @@ async def create_siswa_aliyah(data: SiswaAliyahCreate, _: dict = Depends(get_cur
         if not santri:
             raise HTTPException(status_code=404, detail="Santri tidak ditemukan")
 
+    if data.nfc_uid:
+        nfc_uid = data.nfc_uid.strip()
+        if nfc_uid:
+            existing_nfc = await db.siswa_aliyah.find_one({"nfc_uid": nfc_uid})
+            if existing_nfc:
+                raise HTTPException(status_code=400, detail="NFC UID sudah digunakan")
+
     siswa = SiswaAliyah(**data.model_dump())
+    if siswa.nfc_uid:
+        siswa.nfc_uid = siswa.nfc_uid.strip()
 
     # Generate QR code only if no santri_id
     if not siswa.santri_id:
