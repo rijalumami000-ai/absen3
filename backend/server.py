@@ -150,6 +150,7 @@ class Santri(BaseModel):
     nis: str
     gender: Literal["putra", "putri"]
     asrama_id: str
+    nfc_uid: Optional[str] = None
     # Data wali inline
     nama_wali: str
     nomor_hp_wali: str
@@ -166,6 +167,7 @@ class SantriCreate(BaseModel):
     nama_wali: str
     nomor_hp_wali: str
     email_wali: Optional[str] = None
+    nfc_uid: Optional[str] = None
 
 class SantriUpdate(BaseModel):
     nama: Optional[str] = None
@@ -175,6 +177,7 @@ class SantriUpdate(BaseModel):
     nama_wali: Optional[str] = None
     nomor_hp_wali: Optional[str] = None
     email_wali: Optional[str] = None
+    nfc_uid: Optional[str] = None
 
 class SantriResponse(BaseModel):
     id: str
@@ -185,6 +188,7 @@ class SantriResponse(BaseModel):
     nama_wali: str
     nomor_hp_wali: str
     email_wali: Optional[str]
+    nfc_uid: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 
