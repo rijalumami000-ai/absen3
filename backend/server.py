@@ -1741,6 +1741,53 @@ async def scan_aliyah_absensi(
     return {"message": "Absensi berhasil dicatat"}
 
 
+@api_router.post("/aliyah/pengabsen/absensi/nfc")
+async def pengabsen_aliyah_absensi_nfc(
+    payload: PengabsenAliyahNFCRequest,
+    current_pengabsen: dict = Depends(get_current_pengabsen_aliyah)
+):
+    nfc_uid = payload.nfc_uid.strip() if payload.nfc_uid else ""
+    if not nfc_uid:
+        raise HTTPException(status_code=400, detail="NFC UID wajib diisi")
+
+    jenis = payload.jenis if payload.jenis in ["pagi", "dzuhur"] else "pagi"
+    tanggal = payload.tanggal or get_today_local_iso()
+
+    siswa = await db.siswa_aliyah.find_one({"nfc_uid": nfc_uid}, {"_id": 0})
+    if not siswa:
+        raise HTTPException(status_code=404, detail="Kartu NFC belum terdaftar")
+
+    kelas_ids = current_pengabsen.get("kelas_ids", []) or []
+    if siswa.get("kelas_id") not in kelas_ids:
+        raise HTTPException(status_code=403, detail="Siswa ini bukan dari kelas yang Anda pegang")
+
+    existing = await db.absensi_aliyah.find_one(
+        {"siswa_id": siswa["id"], "tanggal": tanggal, "jenis": jenis},
+        {"_id": 0},
+    )
+
+    now = datetime.now(timezone.utc)
+    if existing:
+        await db.absensi_aliyah.update_one(
+            {"id": existing["id"]},
+            {"$set": {"status": "hadir", "kelas_id": siswa.get("kelas_id"), "waktu_absen": now}},
+        )
+    else:
+        absensi = AbsensiAliyah(
+            siswa_id=siswa["id"],
+            kelas_id=siswa.get("kelas_id"),
+            tanggal=tanggal,
+            jenis=jenis,
+            status="hadir",
+        )
+        doc = absensi.model_dump()
+        doc["created_at"] = doc["created_at"].isoformat()
+        doc["waktu_absen"] = now.isoformat()
+        await db.absensi_aliyah.insert_one(doc)
+
+    return {"message": "Absensi NFC berhasil dicatat"}
+
+
 class MonitoringAliyahUpdate(BaseModel):
     nama: Optional[str] = None
     email_atau_hp: Optional[str] = None
