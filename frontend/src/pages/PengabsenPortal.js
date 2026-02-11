@@ -120,22 +120,23 @@ const PengabsenPortal = () => {
         <div className="w-full max-w-5xl">
           <div className="text-center mb-10" data-testid="pengabsen-portal-header">
             <div className="flex items-center justify-center gap-3 flex-wrap mb-6" data-testid="pengabsen-portal-logos">
-              {[{ src: LOGO_AL_HAMID, alt: 'Logo Al Hamid' }, { src: LOGO_YAYASAN, alt: 'Logo Yayasan' }].map(
-                (logo, idx) => (
-                  <div
-                    key={logo.alt}
-                    className="w-16 h-16 md:w-20 md:h-20 rounded-2xl border border-emerald-100 bg-white/70 backdrop-blur shadow-lg flex items-center justify-center p-2"
-                    data-testid={`pengabsen-portal-logo-frame-${idx}`}
-                  >
-                    <img
-                      src={logo.src}
-                      alt={logo.alt}
-                      className="w-full h-full object-contain mix-blend-multiply"
-                      data-testid={`pengabsen-portal-logo-${idx}`}
-                    />
-                  </div>
-                )
-              )}
+              {[
+                { src: LOGO_AL_HAMID, alt: 'Logo Al Hamid', imgClass: 'mix-blend-darken' },
+                { src: LOGO_YAYASAN, alt: 'Logo Yayasan', imgClass: 'mix-blend-multiply' },
+              ].map((logo, idx) => (
+                <div
+                  key={logo.alt}
+                  className="w-16 h-16 md:w-20 md:h-20 rounded-2xl border border-emerald-100 bg-white/70 backdrop-blur shadow-lg flex items-center justify-center p-2"
+                  data-testid={`pengabsen-portal-logo-frame-${idx}`}
+                >
+                  <img
+                    src={logo.src}
+                    alt={logo.alt}
+                    className={`w-full h-full object-contain ${logo.imgClass}`}
+                    data-testid={`pengabsen-portal-logo-${idx}`}
+                  />
+                </div>
+              ))}
             </div>
             <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/80 border border-emerald-100 shadow-sm mb-5">
               <ShieldCheck className="w-4 h-4 text-emerald-700" />

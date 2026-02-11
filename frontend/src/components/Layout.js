@@ -173,16 +173,19 @@ const Layout = ({ children }) => {
         <div className="p-6 border-b border-border">
           <div className="flex items-center gap-3" data-testid="admin-branding">
             <div className="flex items-center gap-2">
-              {[LOGO_AL_HAMID, LOGO_YAYASAN].map((src, idx) => (
+              {[
+                { src: LOGO_AL_HAMID, alt: 'Logo Al-Hamid', imgClass: 'mix-blend-darken' },
+                { src: LOGO_YAYASAN, alt: 'Logo Yayasan', imgClass: 'mix-blend-multiply' },
+              ].map((logo, idx) => (
                 <div
-                  key={src}
+                  key={logo.alt}
                   className="w-10 h-10 rounded-xl border border-emerald-100 bg-white/80 flex items-center justify-center p-1 shadow-sm"
                   data-testid={`admin-logo-frame-${idx}`}
                 >
                   <img
-                    src={src}
-                    alt={`Logo ${idx + 1}`}
-                    className="w-full h-full object-contain mix-blend-multiply"
+                    src={logo.src}
+                    alt={logo.alt}
+                    className={`w-full h-full object-contain ${logo.imgClass}`}
                     data-testid={`admin-logo-${idx}`}
                   />
                 </div>
@@ -345,16 +348,19 @@ const Layout = ({ children }) => {
       <header className="md:hidden fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-b border-border h-16 flex items-center justify-between px-4">
         <div className="flex items-center gap-3" data-testid="admin-mobile-branding">
           <div className="flex items-center gap-2">
-            {[LOGO_AL_HAMID, LOGO_YAYASAN].map((src, idx) => (
+            {[
+              { src: LOGO_AL_HAMID, alt: 'Logo Al-Hamid', imgClass: 'mix-blend-darken' },
+              { src: LOGO_YAYASAN, alt: 'Logo Yayasan', imgClass: 'mix-blend-multiply' },
+            ].map((logo, idx) => (
               <div
-                key={src}
+                key={logo.alt}
                 className="w-8 h-8 rounded-lg border border-emerald-100 bg-white/80 flex items-center justify-center p-1 shadow-sm"
                 data-testid={`admin-mobile-logo-frame-${idx}`}
               >
                 <img
-                  src={src}
-                  alt={`Logo ${idx + 1}`}
-                  className="w-full h-full object-contain mix-blend-multiply"
+                  src={logo.src}
+                  alt={logo.alt}
+                  className={`w-full h-full object-contain ${logo.imgClass}`}
                   data-testid={`admin-mobile-logo-${idx}`}
                 />
               </div>
@@ -389,16 +395,19 @@ const Layout = ({ children }) => {
         <div className="p-6 border-b border-border flex items-center justify-between">
           <div className="flex items-center gap-3" data-testid="admin-mobile-sidebar-branding">
             <div className="flex items-center gap-2">
-              {[LOGO_AL_HAMID, LOGO_YAYASAN].map((src, idx) => (
+              {[
+                { src: LOGO_AL_HAMID, alt: 'Logo Al-Hamid', imgClass: 'mix-blend-darken' },
+                { src: LOGO_YAYASAN, alt: 'Logo Yayasan', imgClass: 'mix-blend-multiply' },
+              ].map((logo, idx) => (
                 <div
-                  key={src}
+                  key={logo.alt}
                   className="w-9 h-9 rounded-xl border border-emerald-100 bg-white/80 flex items-center justify-center p-1 shadow-sm"
                   data-testid={`admin-mobile-sidebar-logo-frame-${idx}`}
                 >
                   <img
-                    src={src}
-                    alt={`Logo ${idx + 1}`}
-                    className="w-full h-full object-contain mix-blend-multiply"
+                    src={logo.src}
+                    alt={logo.alt}
+                    className={`w-full h-full object-contain ${logo.imgClass}`}
                     data-testid={`admin-mobile-sidebar-logo-${idx}`}
                   />
                 </div>
