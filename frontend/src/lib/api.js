@@ -118,6 +118,10 @@ export const pengabsenAppAPI = {
       params,
       headers: getPengabsenAuthHeader(),
     }),
+  nfcAbsensi: (payload) =>
+    axios.post(`${API}/pengabsen/absensi/nfc`, payload, {
+      headers: getPengabsenAuthHeader(),
+    }),
   deleteAbsensi: (params) =>
     axios.delete(`${API}/pengabsen/absensi`, {
       params,
