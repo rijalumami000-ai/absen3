@@ -3203,6 +3203,109 @@ async def upsert_absensi_pengabsen(
     return {"message": "Absensi tersimpan", "tanggal": today}
 
 
+@api_router.post("/pengabsen/absensi/nfc")
+async def absensi_pengabsen_nfc(
+    payload: NFCAbsensiRequest,
+    current_pengabsen: dict = Depends(get_current_pengabsen),
+):
+    nfc_uid = payload.nfc_uid.strip() if payload.nfc_uid else ""
+    if not nfc_uid:
+        raise HTTPException(status_code=400, detail="NFC UID wajib diisi")
+
+    waktu_sholat = payload.waktu_sholat
+    valid_waktu = ["subuh", "dzuhur", "ashar", "maghrib", "isya"]
+    if waktu_sholat not in valid_waktu:
+        raise HTTPException(status_code=400, detail="Waktu sholat tidak valid")
+
+    status_absen = payload.status or "hadir"
+    valid_status = ["hadir", "alfa", "sakit", "izin", "haid", "istihadhoh", "masbuq"]
+    if status_absen not in valid_status:
+        raise HTTPException(status_code=400, detail="Status absensi tidak valid")
+
+    santri = await db.santri.find_one({"nfc_uid": nfc_uid}, {"_id": 0})
+    if not santri:
+        raise HTTPException(status_code=404, detail="Kartu NFC belum terdaftar")
+
+    if santri['asrama_id'] not in current_pengabsen.get('asrama_ids', []):
+        raise HTTPException(status_code=403, detail="Santri bukan asrama yang Anda kelola")
+
+    tanggal = payload.tanggal or get_today_local_iso()
+
+    existing = await db.absensi.find_one({
+        "santri_id": santri["id"],
+        "waktu_sholat": waktu_sholat,
+        "tanggal": tanggal,
+    })
+
+    doc = {
+        "santri_id": santri["id"],
+        "waktu_sholat": waktu_sholat,
+        "status": status_absen,
+        "tanggal": tanggal,
+        "pengabsen_id": current_pengabsen['id'],
+        "waktu_absen": datetime.now(timezone.utc).isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+
+    if existing:
+        await db.absensi.update_one({"id": existing.get("id")}, {"$set": doc})
+    else:
+        doc["id"] = str(uuid.uuid4())
+        await db.absensi.insert_one(doc)
+
+    try:
+        wali_list = await db.wali_santri.find({"anak_ids": santri["id"]}, {"_id": 0}).to_list(100)
+        if wali_list:
+            settings_doc = await db.settings.find_one({"id": "wali_notifikasi"}, {"_id": 0}) or {}
+            templates = {
+                "hadir": settings_doc.get(
+                    "hadir",
+                    "{nama} hadir pada waktu sholat {waktu} hari ini, alhamdulillah (hadir)",
+                ),
+                "alfa": settings_doc.get(
+                    "alfa",
+                    "{nama} tidak mengikuti/membolos sholat {waktu} pada hari ini (alfa)",
+                ),
+                "sakit": settings_doc.get(
+                    "sakit",
+                    "{nama} tidak mengikuti sholat {waktu} pada hari ini karena sedang sakit (sakit)",
+                ),
+                "izin": settings_doc.get(
+                    "izin",
+                    "{nama} tidak mengikuti sholat {waktu} pada hari ini karena izin (izin)",
+                ),
+                "haid": settings_doc.get(
+                    "haid",
+                    "{nama} tidak mengikuti sholat {waktu} pada hari ini karena sedang haid (haid)",
+                ),
+                "istihadhoh": settings_doc.get(
+                    "istihadhoh",
+                    "{nama} tidak mengikuti sholat {waktu} pada hari ini karena sedang istihadhoh (istihadhoh)",
+                ),
+                "masbuq": settings_doc.get(
+                    "masbuq",
+                    "{nama} mengikuti sholat {waktu} hari ini namun datang masbuq (masbuq)",
+                ),
+            }
+            waktu_label_map = {
+                "subuh": "subuh",
+                "dzuhur": "dzuhur",
+                "ashar": "ashar",
+                "maghrib": "maghrib",
+                "isya": "isya",
+            }
+            template = templates.get(status_absen)
+            if template:
+                body = template.format(nama=santri["nama"], waktu=waktu_label_map.get(waktu_sholat, waktu_sholat))
+                title = f"Absensi Sholat {waktu_label_map.get(waktu_sholat, waktu_sholat).capitalize()}"
+                for wali in wali_list:
+                    await send_wali_push_notification(wali, title=title, body=body)
+    except Exception as e:
+        logging.error(f"Failed to send wali notification (NFC): {e}")
+
+    return {"message": "Absensi NFC tersimpan", "tanggal": tanggal}
+
+
 @api_router.delete("/pengabsen/absensi")
 async def delete_absensi_pengabsen(
     santri_id: str,
