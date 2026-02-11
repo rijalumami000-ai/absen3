@@ -4855,28 +4855,55 @@ async def get_siswa_madrasah_list(_: dict = Depends(get_current_admin)):
 
 @api_router.post("/siswa-madrasah", response_model=SiswaMadrasahResponse)
 async def create_siswa_madrasah(data: SiswaMadrasahCreate, _: dict = Depends(get_current_admin)):
-    # Validate kelas_id if provided
     if data.kelas_id:
         kelas = await db.kelas.find_one({"id": data.kelas_id}, {"_id": 0})
         if not kelas:
             raise HTTPException(status_code=404, detail="Kelas tidak ditemukan")
-    
-    # Validate santri_id if provided
+
     if data.santri_id:
         santri = await db.santri.find_one({"id": data.santri_id}, {"_id": 0})
         if not santri:
             raise HTTPException(status_code=404, detail="Santri tidak ditemukan")
-    
-    siswa = SiswaMadrasah(**data.model_dump())
-    
-    # Generate QR code only if no santri_id
-    if not siswa.santri_id:
-        qr_data = {
-            "id": siswa.id,
-            "nama": siswa.nama,
-            "type": "siswa_madrasah"
-        }
-        siswa.qr_code = generate_qr_code(qr_data)
+        existing = await db.siswa_madrasah.find_one({"santri_id": data.santri_id})
+        if existing:
+            raise HTTPException(status_code=400, detail="Santri sudah terdaftar sebagai siswa Madrasah")
+
+    if data.nfc_uid:
+        nfc_uid = data.nfc_uid.strip()
+        if nfc_uid:
+            existing_nfc = await db.siswa_madrasah.find_one({"nfc_uid": nfc_uid})
+            if existing_nfc:
+                raise HTTPException(status_code=400, detail="NFC UID sudah digunakan")
+
+    qr_payload = {
+        "id": str(uuid.uuid4()),
+        "nama": data.nama,
+        "type": "siswa_madrasah",
+    }
+    qr_code = generate_qr_code(qr_payload) if not data.santri_id else None
+
+    siswa_dict = data.model_dump()
+    siswa_dict["id"] = qr_payload["id"]
+    siswa_dict["qr_code"] = qr_code
+    if siswa_dict.get("nfc_uid"):
+        siswa_dict["nfc_uid"] = siswa_dict["nfc_uid"].strip()
+    else:
+        siswa_dict["nfc_uid"] = None
+    siswa_dict["created_at"] = datetime.now(timezone.utc)
+    siswa_dict["updated_at"] = datetime.now(timezone.utc)
+
+    await db.siswa_madrasah.insert_one(siswa_dict)
+
+    kelas_nama = None
+    if data.kelas_id:
+        kelas = await db.kelas.find_one({"id": data.kelas_id}, {"_id": 0})
+        kelas_nama = kelas.get("nama") if kelas else None
+
+    return SiswaMadrasahResponse(
+        **siswa_dict,
+        kelas_nama=kelas_nama,
+        has_qr=bool(qr_code) or bool(data.santri_id),
+    )
     
 
 
