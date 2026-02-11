@@ -78,7 +78,7 @@ const Login = () => {
               ].map((logo, idx) => (
                 <div
                   key={logo.alt}
-                  className={`w-20 h-20 rounded-2xl backdrop-blur border flex items-center justify-center p-2 shadow-lg ${logo.frameClass}`}
+                  className={`w-24 h-24 rounded-2xl backdrop-blur border flex items-center justify-center p-2 shadow-lg ${logo.frameClass}`}
                   data-testid={`login-logo-frame-${idx}`}
                 >
                   <img
@@ -149,7 +149,7 @@ const Login = () => {
               ].map((logo, idx) => (
                 <div
                   key={logo.alt}
-                  className={`w-16 h-16 rounded-2xl border flex items-center justify-center p-2 shadow-sm ${logo.frameClass}`}
+                  className={`w-20 h-20 rounded-2xl border flex items-center justify-center p-2 shadow-sm ${logo.frameClass}`}
                   data-testid={`login-logo-mobile-frame-${idx}`}
                 >
                   <img
