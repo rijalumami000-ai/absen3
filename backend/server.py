@@ -2336,6 +2336,16 @@ async def update_asrama(asrama_id: str, data: AsramaUpdate, _: dict = Depends(ge
         raise HTTPException(status_code=404, detail="Asrama tidak ditemukan")
     
     update_data = {k: v for k, v in data.model_dump().items() if v is not None}
+
+    if "nfc_uid" in update_data:
+        nfc_uid = (update_data.get("nfc_uid") or "").strip()
+        if nfc_uid:
+            existing_nfc = await db.siswa_aliyah.find_one({"nfc_uid": nfc_uid, "id": {"$ne": siswa_id}})
+            if existing_nfc:
+                raise HTTPException(status_code=400, detail="NFC UID sudah digunakan")
+            update_data["nfc_uid"] = nfc_uid
+        else:
+            update_data["nfc_uid"] = None
     if update_data:
         await db.asrama.update_one({"id": asrama_id}, {"$set": update_data})
         asrama.update(update_data)
