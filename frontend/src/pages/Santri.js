@@ -216,6 +216,61 @@ const Santri = () => {
     }
   };
 
+  const openNfcDialog = (santri) => {
+    setSelectedSantri(santri);
+    setNfcValue(santri.nfc_uid || '');
+    setNfcDialogOpen(true);
+    setTimeout(() => nfcInputRef.current?.focus(), 200);
+  };
+
+  const handleSaveNfc = async () => {
+    if (!selectedSantri) return;
+    try {
+      await santriAPI.update(selectedSantri.id, { nfc_uid: nfcValue.trim() || '' });
+      toast({ title: 'Sukses', description: 'NFC berhasil disimpan' });
+      setNfcDialogOpen(false);
+      setSelectedSantri(null);
+      setNfcValue('');
+      loadSantri();
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error.response?.data?.detail || 'Gagal menyimpan NFC',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const startNfcScan = async () => {
+    if (!nfcSupported) {
+      toast({ title: 'NFC tidak tersedia', description: 'Perangkat belum mendukung Web NFC.', variant: 'destructive' });
+      return;
+    }
+    try {
+      setNfcScanning(true);
+      const reader = new window.NDEFReader();
+      await reader.scan();
+      toast({ title: 'NFC aktif', description: 'Tempelkan kartu NFC ke perangkat.' });
+      reader.onreading = (event) => {
+        const serial = event.serialNumber || '';
+        if (serial) {
+          setNfcValue(serial);
+        } else if (event.message?.records?.length) {
+          const record = event.message.records[0];
+          if (record.recordType === 'text') {
+            const textDecoder = new TextDecoder(record.encoding || 'utf-8');
+            setNfcValue(textDecoder.decode(record.data));
+          }
+        }
+      };
+      reader.onreadingerror = () => toast({ title: 'NFC gagal', description: 'Tidak bisa membaca kartu NFC.', variant: 'destructive' });
+    } catch (error) {
+      toast({ title: 'NFC gagal', description: 'Tidak bisa mengaktifkan NFC.', variant: 'destructive' });
+    } finally {
+      setNfcScanning(false);
+    }
+  };
+
   const downloadQRCode = async (santri) => {
     try {
       const token = localStorage.getItem('token');
