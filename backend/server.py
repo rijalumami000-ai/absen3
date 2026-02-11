@@ -2351,6 +2351,13 @@ async def create_santri(data: SantriCreate, _: dict = Depends(get_current_admin)
     existing = await db.santri.find_one({"nis": data.nis})
     if existing:
         raise HTTPException(status_code=400, detail="NIS sudah digunakan")
+
+    if data.nfc_uid:
+        nfc_uid = data.nfc_uid.strip()
+        if nfc_uid:
+            existing_nfc = await db.santri.find_one({"nfc_uid": nfc_uid})
+            if existing_nfc:
+                raise HTTPException(status_code=400, detail="NFC UID sudah digunakan")
     
     # Verify asrama exists
     asrama = await db.asrama.find_one({"id": data.asrama_id})
@@ -2368,6 +2375,10 @@ async def create_santri(data: SantriCreate, _: dict = Depends(get_current_admin)
     qr_code = generate_qr_code(qr_data)
     
     santri_dict = data.model_dump()
+    if santri_dict.get("nfc_uid"):
+        santri_dict["nfc_uid"] = santri_dict["nfc_uid"].strip()
+    else:
+        santri_dict["nfc_uid"] = None
     santri_dict['id'] = santri_id
     santri_dict['qr_code'] = qr_code
     santri_dict['created_at'] = datetime.now(timezone.utc)
@@ -2401,6 +2412,16 @@ async def update_santri(santri_id: str, data: SantriUpdate, _: dict = Depends(ge
         raise HTTPException(status_code=404, detail="Santri tidak ditemukan")
     
     update_data = {k: v for k, v in data.model_dump().items() if v is not None}
+
+    if "nfc_uid" in update_data:
+        nfc_uid = (update_data.get("nfc_uid") or "").strip()
+        if nfc_uid:
+            existing_nfc = await db.santri.find_one({"nfc_uid": nfc_uid, "id": {"$ne": santri_id}})
+            if existing_nfc:
+                raise HTTPException(status_code=400, detail="NFC UID sudah digunakan")
+            update_data["nfc_uid"] = nfc_uid
+        else:
+            update_data["nfc_uid"] = None
     
     if 'asrama_id' in update_data:
         asrama = await db.asrama.find_one({"id": update_data['asrama_id']})
