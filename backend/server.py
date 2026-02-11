@@ -1134,6 +1134,12 @@ async def get_siswa_pmq(
     if gender in ["putra", "putri"]:
         query["gender"] = gender
 
+    if search:
+        query["$or"] = [
+            {"nama": {"$regex": search, "$options": "i"}},
+            {"nfc_uid": {"$regex": search, "$options": "i"}},
+        ]
+
     docs = await db.siswa_pmq.find(query, {"_id": 0}).to_list(5000)
 
     # Join kelompok & tingkatan label
