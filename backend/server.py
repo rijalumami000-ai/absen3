@@ -5307,19 +5307,18 @@ async def absensi_kelas_nfc(
     if existing:
         return {"message": "Siswa sudah diabsen hari ini", "status": existing["status"]}
 
-    absensi = AbsensiKelas(
-        siswa_id=siswa["id"],
-        kelas_id=siswa.get("kelas_id"),
-        tanggal=tanggal,
-        status=status,
-        waktu_absen=datetime.now(timezone.utc),
-        pengabsen_kelas_id=current_pengabsen["id"]
-    )
-
-    doc = absensi.model_dump()
-    doc['created_at'] = doc['created_at'].isoformat()
-    if doc.get('waktu_absen'):
-        doc['waktu_absen'] = doc['waktu_absen'].isoformat()
+    now = datetime.now(timezone.utc)
+    doc = {
+        "id": str(uuid.uuid4()),
+        "siswa_id": siswa["id"],
+        "kelas_id": siswa.get("kelas_id"),
+        "tanggal": tanggal,
+        "status": status,
+        "waktu_absen": now.isoformat(),
+        "pengabsen_kelas_id": current_pengabsen["id"],
+        "created_at": now.isoformat(),
+        "updated_at": now.isoformat(),
+    }
 
     await db.absensi_kelas.insert_one(doc)
 
