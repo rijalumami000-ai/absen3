@@ -5080,6 +5080,16 @@ async def update_siswa_madrasah(siswa_id: str, data: SiswaMadrasahUpdate, _: dic
         if not santri:
             raise HTTPException(status_code=404, detail="Santri tidak ditemukan")
         update_data["qr_code"] = None
+
+    if "nfc_uid" in update_data:
+        nfc_uid = (update_data.get("nfc_uid") or "").strip()
+        if nfc_uid:
+            existing_nfc = await db.siswa_madrasah.find_one({"nfc_uid": nfc_uid, "id": {"$ne": siswa_id}})
+            if existing_nfc:
+                raise HTTPException(status_code=400, detail="NFC UID sudah digunakan")
+            update_data["nfc_uid"] = nfc_uid
+        else:
+            update_data["nfc_uid"] = None
     
     if update_data:
         update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
