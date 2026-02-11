@@ -68,6 +68,7 @@ Bangun sistem absensi terpadu untuk pesantren yang mencakup absensi sholat, Madr
 - **2026-02-05**: Logo login diperbesar + transparansi logo Al-Hamid diperkuat; history WA bisa kirim ulang.
 - **2026-02-05**: Resend WhatsApp history diperbaiki + logo login diperbesar & di-crop agar lebih transparan.
 - **2026-02-05**: Mode NFC untuk absensi sholat (backend + PWA) + registrasi NFC di Database Santri.
+- **2026-02-05**: Perbaikan resend WhatsApp popup + UX NFC Android (status & NDEF info) + perbaikan blend logo.
 - **2026-02-05**: Layout Kelas Aliyah disamakan dengan Kelas Madrasah Diniyah (card grid).
 - **2026-02-05**: Edit Kelompok PMQ (UI + endpoint PUT /pmq/kelompok/{id}).
 - **2026-02-05**: Filter status Riwayat PMQ dipindah ke atas tabel (seperti Aliyah).
