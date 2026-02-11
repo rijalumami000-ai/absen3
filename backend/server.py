@@ -1153,6 +1153,7 @@ async def get_siswa_pmq(
                 santri_id=doc.get("santri_id"),
                 has_qr=bool(doc.get("qr_code")),
                 qr_code=doc.get("qr_code"),
+                nfc_uid=doc.get("nfc_uid"),
                 gender=doc.get("gender"),
                 created_at=doc.get("created_at", datetime.now(timezone.utc)),
             )
