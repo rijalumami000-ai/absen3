@@ -602,6 +602,7 @@ const Santri = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Asrama</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Wali</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">HP Wali</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">NFC</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
             </tr>
           </thead>
@@ -627,6 +628,15 @@ const Santri = () => {
                 <td className="px-6 py-4 text-sm text-gray-600">{getAsramaName(santri.asrama_id)}</td>
                 <td className="px-6 py-4 text-sm text-gray-600">{santri.nama_wali}</td>
                 <td className="px-6 py-4 text-sm text-gray-600">{santri.nomor_hp_wali}</td>
+                <td className="px-6 py-4 text-sm text-gray-600" data-testid={`santri-nfc-${santri.id}`}>
+                  {santri.nfc_uid ? (
+                    <span className="px-2 py-1 rounded-full text-xs bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      Terdaftar
+                    </span>
+                  ) : (
+                    <span className="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-500">Belum</span>
+                  )}
+                </td>
                 <td className="px-6 py-4 text-sm">
                   <div className="flex space-x-2">
                     <Button size="sm" variant="outline" onClick={() => showQRCode(santri)} data-testid={`qr-santri-${santri.id}`} title="Lihat QR Code">
@@ -634,6 +644,9 @@ const Santri = () => {
                     </Button>
                     <Button size="sm" variant="outline" onClick={() => downloadQRCode(santri)} data-testid={`download-qr-${santri.id}`} title="Download QR">
                       <Download size={16} />
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => openNfcDialog(santri)} data-testid={`nfc-santri-${santri.id}`} title="Atur NFC">
+                      <CreditCard size={16} />
                     </Button>
                     <Button size="sm" variant="outline" onClick={() => handleEdit(santri)} data-testid={`edit-santri-${santri.id}`} title="Edit">
                       <Edit size={16} />
