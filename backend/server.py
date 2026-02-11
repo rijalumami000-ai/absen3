@@ -1741,6 +1741,60 @@ async def scan_aliyah_absensi(
     return {"message": "Absensi berhasil dicatat"}
 
 
+@api_router.post("/pmq/pengabsen/absensi/nfc")
+async def pengabsen_pmq_absensi_nfc(
+    payload: PengabsenPMQNFCRequest,
+    sesi: str,
+    tanggal: Optional[str] = None,
+    current_pengabsen: dict = Depends(get_current_pengabsen_pmq),
+):
+    nfc_uid = payload.nfc_uid.strip() if payload.nfc_uid else ""
+    if not nfc_uid:
+        raise HTTPException(status_code=400, detail="NFC UID wajib diisi")
+
+    if sesi not in ["pagi", "sore"]:
+        raise HTTPException(status_code=400, detail="Sesi tidak valid")
+
+    siswa = await db.siswa_pmq.find_one({"nfc_uid": nfc_uid}, {"_id": 0})
+    if not siswa:
+        raise HTTPException(status_code=404, detail="Kartu NFC belum terdaftar")
+
+    if siswa.get("tingkatan_key") not in current_pengabsen.get("tingkatan_keys", []):
+        raise HTTPException(status_code=403, detail="Siswa bukan tingkatan yang Anda kelola")
+    if siswa.get("kelompok_id") not in current_pengabsen.get("kelompok_ids", []):
+        raise HTTPException(status_code=403, detail="Siswa bukan kelompok yang Anda kelola")
+
+    tanggal_final = tanggal or get_today_local_iso()
+    existing = await db.absensi_pmq.find_one({
+        "siswa_id": siswa["id"],
+        "tanggal": tanggal_final,
+        "sesi": sesi,
+    }, {"_id": 0})
+
+    now = datetime.now(timezone.utc)
+    if existing:
+        await db.absensi_pmq.update_one(
+            {"id": existing["id"]},
+            {"$set": {"status": "hadir", "waktu_absen": now.isoformat(), "pengabsen_id": current_pengabsen["id"]}},
+        )
+    else:
+        absensi = PMQAbsensi(
+            siswa_id=siswa["id"],
+            tanggal=tanggal_final,
+            sesi=sesi,
+            status="hadir",
+            kelompok_id=siswa.get("kelompok_id"),
+            pengabsen_id=current_pengabsen["id"],
+            waktu_absen=now,
+        )
+        doc = absensi.model_dump()
+        doc["created_at"] = doc["created_at"].isoformat()
+        doc["waktu_absen"] = doc["waktu_absen"].isoformat()
+        await db.absensi_pmq.insert_one(doc)
+
+    return {"message": "Absensi NFC berhasil dicatat"}
+
+
 @api_router.post("/aliyah/pengabsen/absensi/nfc")
 async def pengabsen_aliyah_absensi_nfc(
     payload: PengabsenAliyahNFCRequest,
