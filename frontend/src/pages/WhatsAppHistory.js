@@ -120,7 +120,7 @@ const WhatsAppHistory = () => {
   };
 
   const handleResend = async (item) => {
-    const waWindow = window.open('', '_blank', 'noopener,noreferrer');
+    const waWindow = window.open('', '_blank');
     try {
       setSendingId(item.id);
       const resp = await api.post('/whatsapp/history/resend', { history_id: item.id });

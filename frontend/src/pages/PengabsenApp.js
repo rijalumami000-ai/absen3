@@ -49,7 +49,9 @@ const PengabsenApp = () => {
   const [nfcValue, setNfcValue] = useState('');
   const [nfcSupported, setNfcSupported] = useState(false);
   const [nfcScanning, setNfcScanning] = useState(false);
+  const [nfcStatus, setNfcStatus] = useState('');
   const nfcInputRef = useRef(null);
+  const nfcReaderRef = useRef(null);
   const [lastScan, setLastScan] = useState(null);
   const [lastScanAt, setLastScanAt] = useState(0);
   const [showScanSuccess, setShowScanSuccess] = useState(false);
@@ -139,8 +141,10 @@ const PengabsenApp = () => {
       });
       setNfcValue('');
       await loadData(waktu);
+      setNfcStatus(`Kartu terbaca: ${nfcUid}`);
       toast({ title: 'NFC berhasil', description: 'Absensi tercatat dari kartu NFC.' });
     } catch (error) {
+      setNfcStatus('Gagal membaca NFC.');
       toast({
         title: 'NFC gagal',
         description: error.response?.data?.detail || 'Gagal mencatat absensi NFC',
@@ -157,27 +161,41 @@ const PengabsenApp = () => {
     try {
       setNfcScanning(true);
       const reader = new window.NDEFReader();
+      nfcReaderRef.current = reader;
       await reader.scan();
+      setNfcStatus('Menunggu kartu NFC...');
       toast({ title: 'NFC aktif', description: 'Tempelkan kartu NFC ke perangkat.' });
       reader.onreading = (event) => {
         const serial = event.serialNumber || '';
         if (serial) {
           handleNfcSubmit(serial);
-        } else if (event.message?.records?.length) {
+          setNfcScanning(false);
+          return;
+        }
+        if (event.message?.records?.length) {
           const record = event.message.records[0];
           if (record.recordType === 'text') {
             const textDecoder = new TextDecoder(record.encoding || 'utf-8');
             handleNfcSubmit(textDecoder.decode(record.data));
+            setNfcScanning(false);
+            return;
           }
         }
+        setNfcStatus('Kartu NFC tidak berisi data (NDEF).');
+        toast({
+          title: 'NFC tidak terbaca',
+          description: 'Pastikan kartu NFC berisi data teks (NDEF).',
+          variant: 'destructive',
+        });
       };
       reader.onreadingerror = () => {
+        setNfcStatus('Gagal membaca kartu NFC.');
         toast({ title: 'NFC gagal', description: 'Tidak bisa membaca kartu NFC.', variant: 'destructive' });
+        setNfcScanning(false);
       };
     } catch (error) {
+      setNfcStatus('Tidak bisa mengaktifkan NFC.');
       toast({ title: 'NFC gagal', description: 'Tidak bisa mengaktifkan NFC.', variant: 'destructive' });
-    } finally {
-      setNfcScanning(false);
     }
   };
 
@@ -462,7 +480,8 @@ const PengabsenApp = () => {
                   </Button>
                 </div>
                 <p className="text-xs text-gray-500 mb-3">
-                  Gunakan NFC Reader USB (seperti keyboard) atau NFC Android. Tempel kartu lalu tekan Enter.
+                  Gunakan NFC Reader USB (seperti keyboard) atau NFC Android. Untuk Android, kartu harus bertipe NDEF
+                  (berisi teks UID). Tempel kartu lalu tekan Enter.
                 </p>
                 <div className="flex flex-col md:flex-row gap-2">
                   <input
@@ -491,8 +510,13 @@ const PengabsenApp = () => {
                     disabled={!nfcSupported || nfcScanning}
                     data-testid="pengabsen-nfc-start"
                   >
-                    {nfcSupported ? 'Aktifkan NFC (Android)' : 'NFC tidak tersedia'}
+                    {nfcSupported ? (nfcScanning ? 'NFC aktif...' : 'Aktifkan NFC (Android)') : 'NFC tidak tersedia'}
                   </Button>
+                  {nfcStatus && (
+                    <span className="text-xs text-emerald-700" data-testid="pengabsen-nfc-status">
+                      {nfcStatus}
+                    </span>
+                  )}
                 </div>
               </section>
             )}

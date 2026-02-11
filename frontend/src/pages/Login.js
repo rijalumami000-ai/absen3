@@ -67,13 +67,13 @@ const Login = () => {
                   src: LOGO_AL_HAMID,
                   alt: 'Logo Pondok Al-Hamid',
                   frameClass: 'bg-transparent border-white/40 overflow-hidden',
-                  imgClass: 'scale-110',
+                  imgClass: 'scale-110 mix-blend-darken',
                 },
                 {
                   src: LOGO_YAYASAN,
                   alt: 'Logo Yayasan',
                   frameClass: 'bg-white/80 border-white/30',
-                  imgClass: '',
+                  imgClass: 'mix-blend-multiply',
                 },
               ].map((logo, idx) => (
                 <div
@@ -84,7 +84,7 @@ const Login = () => {
                   <img
                     src={logo.src}
                     alt={logo.alt}
-                    className={`w-full h-full object-contain mix-blend-multiply ${logo.imgClass}`}
+                    className={`w-full h-full object-contain ${logo.imgClass}`}
                     data-testid={`login-logo-${idx}`}
                   />
                 </div>
@@ -138,13 +138,13 @@ const Login = () => {
                   src: LOGO_AL_HAMID,
                   alt: 'Logo Pondok Al-Hamid',
                   frameClass: 'bg-transparent border-border/60 overflow-hidden',
-                  imgClass: 'scale-110',
+                  imgClass: 'scale-110 mix-blend-darken',
                 },
                 {
                   src: LOGO_YAYASAN,
                   alt: 'Logo Yayasan',
                   frameClass: 'bg-white border-border/60',
-                  imgClass: '',
+                  imgClass: 'mix-blend-multiply',
                 },
               ].map((logo, idx) => (
                 <div
@@ -155,7 +155,7 @@ const Login = () => {
                   <img
                     src={logo.src}
                     alt={logo.alt}
-                    className={`w-full h-full object-contain mix-blend-multiply ${logo.imgClass}`}
+                    className={`w-full h-full object-contain ${logo.imgClass}`}
                     data-testid={`login-logo-mobile-${idx}`}
                   />
                 </div>
