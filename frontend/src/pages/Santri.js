@@ -400,7 +400,8 @@ const Santri = () => {
     const matchesSearch = !searchQuery || 
       santri.nama.toLowerCase().includes(searchQuery.toLowerCase()) ||
       santri.nis.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      santri.nama_wali?.toLowerCase().includes(searchQuery.toLowerCase());
+      santri.nama_wali?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (santri.nfc_uid || '').toLowerCase().includes(searchQuery.toLowerCase());
     
     return matchesGender && matchesAsrama && matchesSearch;
   });
