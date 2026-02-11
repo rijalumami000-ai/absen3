@@ -336,6 +336,12 @@ class PengabsenAliyahMeResponse(BaseModel):
     created_at: datetime
 
 
+class PengabsenAliyahNFCRequest(BaseModel):
+    nfc_uid: str
+    jenis: Optional[str] = "pagi"
+    tanggal: Optional[str] = None
+
+
 class PengabsenPMQLoginRequest(BaseModel):
     username: str
     kode_akses: str
@@ -349,6 +355,12 @@ class PengabsenPMQMeResponse(BaseModel):
     tingkatan_keys: List[str] = []
     kelompok_ids: List[str] = []
     created_at: datetime
+
+
+class PengabsenPMQNFCRequest(BaseModel):
+    nfc_uid: str
+    sesi: Optional[str] = None
+    tanggal: Optional[str] = None
 
 
 class PengabsenPMQTokenResponse(BaseModel):
