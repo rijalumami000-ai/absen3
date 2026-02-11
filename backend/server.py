@@ -920,6 +920,7 @@ class SiswaPMQ(BaseModel):
     kelompok_id: Optional[str] = None
     santri_id: Optional[str] = None
     qr_code: Optional[str] = None
+    nfc_uid: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
@@ -929,6 +930,7 @@ class SiswaPMQCreate(BaseModel):
     tingkatan_key: str
     kelompok_id: Optional[str] = None
     santri_id: Optional[str] = None
+    nfc_uid: Optional[str] = None
 
 
 class SiswaPMQUpdate(BaseModel):
@@ -936,6 +938,7 @@ class SiswaPMQUpdate(BaseModel):
     gender: Optional[Literal["putra", "putri"]] = None
     tingkatan_key: Optional[str] = None
     kelompok_id: Optional[str] = None
+    nfc_uid: Optional[str] = None
 
 
 class SiswaPMQResponse(BaseModel):
@@ -949,6 +952,7 @@ class SiswaPMQResponse(BaseModel):
     santri_id: Optional[str]
     has_qr: bool = False
     qr_code: Optional[str] = None
+    nfc_uid: Optional[str] = None
     created_at: datetime
 
 
