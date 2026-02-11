@@ -223,10 +223,10 @@ const Santri = () => {
     setTimeout(() => nfcInputRef.current?.focus(), 200);
   };
 
-  const handleSaveNfc = async () => {
+  const handleSaveNfc = async (value = nfcValue) => {
     if (!selectedSantri) return;
     try {
-      await santriAPI.update(selectedSantri.id, { nfc_uid: nfcValue.trim() || '' });
+      await santriAPI.update(selectedSantri.id, { nfc_uid: value.trim() || '' });
       toast({ title: 'Sukses', description: 'NFC berhasil disimpan' });
       setNfcDialogOpen(false);
       setSelectedSantri(null);
@@ -741,10 +741,7 @@ const Santri = () => {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => {
-                  setNfcValue('');
-                  handleSaveNfc();
-                }}
+                onClick={() => handleSaveNfc('')}
                 data-testid="santri-nfc-clear"
               >
                 Hapus NFC
