@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit, Trash2, QrCode, Download, Upload, FileDown, FileSpreadsheet, GraduationCap, Search } from 'lucide-react';
+import { Plus, Edit, Trash2, QrCode, Download, Upload, FileDown, FileSpreadsheet, GraduationCap, Search, CreditCard } from 'lucide-react';
 
 const Santri = () => {
   const [santriList, setSantriList] = useState([]);
@@ -17,6 +17,7 @@ const Santri = () => {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [qrDialogOpen, setQrDialogOpen] = useState(false);
+  const [nfcDialogOpen, setNfcDialogOpen] = useState(false);
   const [linkMadrasahDialogOpen, setLinkMadrasahDialogOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [selectedSantri, setSelectedSantri] = useState(null);
@@ -24,6 +25,9 @@ const Santri = () => {
   const [filterAsrama, setFilterAsrama] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [importing, setImporting] = useState(false);
+  const [nfcValue, setNfcValue] = useState('');
+  const [nfcSupported, setNfcSupported] = useState(false);
+  const [nfcScanning, setNfcScanning] = useState(false);
   const [formData, setFormData] = useState({
     nama: '',
     nis: '',
@@ -34,10 +38,15 @@ const Santri = () => {
     email_wali: ''
   });
   const fileInputRef = useRef(null);
+  const nfcInputRef = useRef(null);
   const { toast } = useToast();
 
   useEffect(() => {
     loadData();
+  }, []);
+
+  useEffect(() => {
+    setNfcSupported(typeof window !== 'undefined' && 'NDEFReader' in window);
   }, []);
 
   useEffect(() => {
