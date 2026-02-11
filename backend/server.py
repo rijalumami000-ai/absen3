@@ -674,6 +674,12 @@ class AbsensiKelasCreate(BaseModel):
     tanggal: str
     status: Literal["hadir", "alfa", "izin", "sakit", "telat"]
 
+
+class AbsensiKelasNFCRequest(BaseModel):
+    nfc_uid: str
+    status: Optional[Literal["hadir", "alfa", "izin", "sakit", "telat"]] = "hadir"
+    tanggal: Optional[str] = None
+
 class AbsensiKelasUpdate(BaseModel):
     status: Literal["hadir", "alfa", "izin", "sakit", "telat"]
 
