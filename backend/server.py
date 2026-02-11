@@ -5279,6 +5279,52 @@ async def scan_qr_absensi_kelas(
     
     return {"message": "Absensi berhasil dicatat", "siswa_nama": siswa["nama"], "status": "hadir"}
 
+
+@api_router.post("/absensi-kelas/nfc")
+async def absensi_kelas_nfc(
+    payload: AbsensiKelasNFCRequest,
+    current_pengabsen: dict = Depends(get_current_pengabsen_kelas)
+):
+    nfc_uid = payload.nfc_uid.strip() if payload.nfc_uid else ""
+    if not nfc_uid:
+        raise HTTPException(status_code=400, detail="NFC UID wajib diisi")
+
+    siswa = await db.siswa_madrasah.find_one({"nfc_uid": nfc_uid}, {"_id": 0})
+    if not siswa:
+        raise HTTPException(status_code=404, detail="Kartu NFC belum terdaftar")
+
+    if siswa.get("kelas_id") not in current_pengabsen.get("kelas_ids", []):
+        raise HTTPException(status_code=403, detail="Siswa tidak termasuk kelas Anda")
+
+    tanggal = payload.tanggal or get_today_local_iso()
+    status = payload.status or "hadir"
+
+    existing = await db.absensi_kelas.find_one({
+        "siswa_id": siswa["id"],
+        "tanggal": tanggal,
+    }, {"_id": 0})
+
+    if existing:
+        return {"message": "Siswa sudah diabsen hari ini", "status": existing["status"]}
+
+    absensi = AbsensiKelas(
+        siswa_id=siswa["id"],
+        kelas_id=siswa.get("kelas_id"),
+        tanggal=tanggal,
+        status=status,
+        waktu_absen=datetime.now(timezone.utc),
+        pengabsen_kelas_id=current_pengabsen["id"]
+    )
+
+    doc = absensi.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    if doc.get('waktu_absen'):
+        doc['waktu_absen'] = doc['waktu_absen'].isoformat()
+
+    await db.absensi_kelas.insert_one(doc)
+
+    return {"message": "Absensi NFC berhasil dicatat", "siswa_nama": siswa["nama"], "status": status}
+
 @api_router.get("/absensi-kelas/riwayat")
 async def get_absensi_kelas_riwayat(
     tanggal_start: str,
