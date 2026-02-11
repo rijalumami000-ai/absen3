@@ -709,6 +709,59 @@ const Santri = () => {
         </DialogContent>
       </Dialog>
 
+      {/* NFC Dialog */}
+      <Dialog open={nfcDialogOpen} onOpenChange={setNfcDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Daftarkan NFC - {selectedSantri?.nama}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>NFC UID</Label>
+              <Input
+                ref={nfcInputRef}
+                placeholder="Tempelkan kartu NFC atau ketik UID"
+                value={nfcValue}
+                onChange={(e) => setNfcValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleSaveNfc();
+                  }
+                }}
+                data-testid="santri-nfc-input"
+              />
+              <p className="text-xs text-muted-foreground mt-2">
+                USB NFC Reader akan mengetik UID otomatis ke kolom ini.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button onClick={handleSaveNfc} data-testid="santri-nfc-save">
+                Simpan NFC
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setNfcValue('');
+                  handleSaveNfc();
+                }}
+                data-testid="santri-nfc-clear"
+              >
+                Hapus NFC
+              </Button>
+              <Button
+                variant="outline"
+                onClick={startNfcScan}
+                disabled={!nfcSupported || nfcScanning}
+                data-testid="santri-nfc-start"
+              >
+                {nfcSupported ? 'Scan NFC (Android)' : 'NFC tidak tersedia'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Link to Madrasah Dialog */}
       <Dialog open={linkMadrasahDialogOpen} onOpenChange={setLinkMadrasahDialogOpen}>
         <DialogContent className="max-w-md">
