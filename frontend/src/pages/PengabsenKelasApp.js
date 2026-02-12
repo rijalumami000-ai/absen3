@@ -252,44 +252,6 @@ const PengabsenKelasApp = () => {
   const getStatusIcon = (status) => {
     switch (status) {
       case 'hadir':
-      <main className="max-w-5xl mx-auto px-4 py-4 space-y-4">
-        {/* Mode Input */}
-        <section className="bg-white rounded-lg shadow p-4 mb-2">
-          <h2 className="text-sm font-semibold text-gray-700 mb-2">Mode Input Absen</h2>
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => setInputMode('qr')}
-              className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
-                inputMode === 'qr'
-                  ? 'bg-emerald-500 text-white border-emerald-500'
-                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-              }`}
-            >
-              QR Scan
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setInputMode('nfc');
-                setTimeout(() => nfcInputRef.current?.focus(), 150);
-              }}
-              className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
-                inputMode === 'nfc'
-                  ? 'bg-emerald-500 text-white border-emerald-500'
-                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-              }`}
-            >
-              NFC
-            </button>
-          </div>
-          <p className="text-xs text-gray-500 mt-2">
-            Pilih QR untuk scan kamera, atau NFC untuk tempel kartu (USB reader) pada kolom input di bawah.
-          </p>
-        </section>
-
-        {/* Konten utama */}
-
         return <CheckCircle className="w-4 h-4 text-green-600" />;
       case 'alfa':
         return <XCircle className="w-4 h-4 text-red-600" />;
