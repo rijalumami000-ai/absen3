@@ -643,14 +643,16 @@ const SiswaAliyah = () => {
                             </Button>
                           </>
                         )}
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => openEditDialog(siswa)}
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </Button>
+                        {!siswa.santri_id && (
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => openEditDialog(siswa)}
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </Button>
+                        )}
                         <Button
                           variant="outline"
                           size="icon"
