@@ -45,6 +45,8 @@ const PengabsenPMQApp = () => {
   const [collapsedGroups, setCollapsedGroups] = useState({});
   const [collapsedHistoryGroups, setCollapsedHistoryGroups] = useState({});
 
+  const [nfcValue, setNfcValue] = useState('');
+
   const { toast } = useToast();
 
   const navigate = useNavigate();

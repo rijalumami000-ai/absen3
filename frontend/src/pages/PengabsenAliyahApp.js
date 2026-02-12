@@ -50,6 +50,7 @@ const PengabsenAliyahApp = () => {
 
   const [collapsedHistoryGroups, setCollapsedHistoryGroups] = useState({});
 
+  const [nfcValue, setNfcValue] = useState('');
 
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -149,6 +150,27 @@ const PengabsenAliyahApp = () => {
         variant: 'destructive',
       });
     }
+  const handleNfcSubmit = async (rawValue) => {
+    const nfcUid = (rawValue || '').trim();
+    if (!nfcUid) {
+      toast({ title: 'Error', description: 'NFC kosong, tempelkan kartu terlebih dahulu', variant: 'destructive' });
+      return;
+    }
+    try {
+      await pengabsenAliyahAppAPI.nfcAbsensi({ nfc_uid: nfcUid }, { jenis, tanggal });
+      setNfcValue('');
+      await loadData(jenis, tanggal);
+      toast({ title: 'Sukses', description: 'Absensi NFC berhasil dicatat' });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error.response?.data?.detail || 'Gagal mencatat absensi NFC',
+        variant: 'destructive',
+      });
+    }
+  };
+
+
   };
 
   const filteredData = data.filter((row) => {
