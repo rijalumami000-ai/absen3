@@ -186,6 +186,31 @@ const PengabsenKelasApp = () => {
       });
       toast.success('Absensi dihapus');
       loadGridData();
+  const handleNfcSubmit = async (rawValue) => {
+    const nfcUid = (rawValue || '').trim();
+    if (!nfcUid) {
+      toast.error('NFC kosong, tempelkan kartu terlebih dahulu');
+      return;
+    }
+    try {
+      const token = localStorage.getItem('pengabsen_kelas_token');
+      await axios.post(
+        `${API_URL}/api/absensi-kelas/nfc`,
+        { nfc_uid: nfcUid },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setNfcValue('');
+      toast.success('Absensi NFC berhasil dicatat');
+      // refresh manual list & grid agar sinkron
+      loadManualStudents();
+      if (view === 'grid' && selectedKelas) {
+        loadGridData();
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Gagal mencatat absensi NFC');
+    }
+  };
+
     } catch (error) {
       toast.error('Gagal menghapus absensi');
     }
