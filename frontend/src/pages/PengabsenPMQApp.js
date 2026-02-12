@@ -166,6 +166,35 @@ const PengabsenPMQApp = () => {
         title: 'Error',
         description: e.response?.data?.detail || 'Gagal mencatat absensi via scan',
         variant: 'destructive',
+  const handleNfcSubmit = async (rawValue) => {
+    const nfcUid = (rawValue || '').trim();
+    if (!nfcUid) {
+      toast({ title: 'Error', description: 'NFC kosong, tempelkan kartu terlebih dahulu', variant: 'destructive' });
+      return;
+    }
+    if (!sesiKey) {
+      toast({
+        title: 'Sesi belum dipilih',
+        description: 'Silakan pilih sesi terlebih dahulu.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    try {
+      await pengabsenPMQAppAPI.nfcAbsensi({ nfc_uid: nfcUid }, { tanggal, sesi: sesiKey });
+      setNfcValue('');
+      await loadData();
+      toast({ title: 'Sukses', description: 'Absensi NFC berhasil dicatat' });
+    } catch (e) {
+      toast({
+        title: 'Error',
+        description: e.response?.data?.detail || 'Gagal mencatat absensi NFC',
+        variant: 'destructive',
+      });
+    }
+  };
+
+
       });
     }
   };
