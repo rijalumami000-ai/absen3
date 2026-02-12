@@ -839,6 +839,24 @@ const MadrasahDiniyah = () => {
               <Button onClick={handleUpdateNfc} className="flex-1">
                 Simpan
               </Button>
+              <Button
+                variant="outline"
+                onClick={async () => {
+                  if (!selectedNfcSiswa) return;
+                  try {
+                    await api.put(`/siswa-madrasah/${selectedNfcSiswa.id}`, { nfc_uid: '' });
+                    toast.success('NFC dihapus');
+                    setNfcDialogOpen(false);
+                    setSelectedNfcSiswa(null);
+                    setNfcValue('');
+                    fetchData();
+                  } catch (error) {
+                    toast.error(error.response?.data?.detail || 'Gagal menghapus NFC');
+                  }
+                }}
+              >
+                Hapus NFC
+              </Button>
               <Button 
                 variant="outline" 
                 onClick={() => {
