@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, QrCode, Search, Link, UserPlus, Users, FileDown } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Plus, Edit2, Trash2, QrCode, Search, Link, UserPlus, Users, FileDown, CreditCard } from 'lucide-react';
 import { downloadSiswaMadinPDF } from '@/lib/pdfUtils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -40,6 +40,10 @@ const MadrasahDiniyah = () => {
     kelas_id: '',
     santri_id: ''
   });
+  const [nfcDialogOpen, setNfcDialogOpen] = useState(false);
+  const [selectedNfcSiswa, setSelectedNfcSiswa] = useState(null);
+  const [nfcValue, setNfcValue] = useState('');
+  const nfcInputRef = useRef(null);
 
   useEffect(() => {
     fetchData();
