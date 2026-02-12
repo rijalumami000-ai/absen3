@@ -633,11 +633,15 @@ const MadrasahDiniyah = () => {
                 ref={nfcInputRef}
                 placeholder="Tempelkan kartu NFC atau ketik UID"
                 value={nfcValue}
-                onChange={(e) => setNfcValue(e.target.value)}
+                readOnly={!!selectedNfcSiswa?.santri_id}
+                onChange={(e) => {
+                  if (selectedNfcSiswa?.santri_id) return;
+                  setNfcValue(e.target.value);
+                }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
-                    if (selectedNfcSiswa) {
+                    if (selectedNfcSiswa && !selectedNfcSiswa.santri_id) {
                       api
                         .put(`/siswa-madrasah/${selectedNfcSiswa.id}`, { nfc_uid: nfcValue.trim() || '' })
                         .then(() => {
