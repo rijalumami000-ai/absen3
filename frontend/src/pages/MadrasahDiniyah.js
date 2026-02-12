@@ -650,9 +650,9 @@ const MadrasahDiniyah = () => {
                         .catch((error) => {
                           toast.error(error.response?.data?.detail || 'Gagal menyimpan NFC');
                         });
+                    }
                   }
-                }
-                }
+                }}
               />
               <p className="text-xs text-muted-foreground mt-2">
                 USB NFC Reader akan mengetik UID otomatis ke kolom ini.
