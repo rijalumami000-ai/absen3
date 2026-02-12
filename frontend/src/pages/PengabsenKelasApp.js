@@ -55,6 +55,10 @@ const PengabsenKelasApp = () => {
   const firstHalfDays = Array.from({ length: 15 }, (_, i) => i + 1);
   const secondHalfDays = Array.from({ length: 16 }, (_, i) => i + 16);
 
+  const [inputMode, setInputMode] = useState('qr');
+  const [nfcValue, setNfcValue] = useState('');
+  const nfcInputRef = useRef(null);
+
 
 
   useEffect(() => {
