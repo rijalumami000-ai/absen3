@@ -389,6 +389,9 @@ const SiswaPMQ = () => {
                       ) : (
                         <span className="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-500">Belum</span>
                       )}
+                      {s.santri_id && s.nfc_uid && (
+                        <p className="text-[10px] text-muted-foreground mt-1">Mengikuti NFC dari Santri</p>
+                      )}
                     </td>
                     <td className="px-4 py-2 text-muted-foreground">
                       <div className="flex items-center gap-2">
