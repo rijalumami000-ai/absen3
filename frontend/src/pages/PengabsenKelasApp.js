@@ -308,6 +308,34 @@ const PengabsenKelasApp = () => {
 
       {/* Tab Navigation */}
       <div className="border-b border-border bg-card shadow-sm">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex gap-4">
+            <button
+              onClick={() => setView('scan')}
+              className={`px-4 py-3 font-medium transition-smooth border-b-2 ${
+                view === 'scan'
+                  ? 'border-primary-700 text-primary-700'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <QrCode className="w-4 h-4 inline mr-2" />
+              Scan QR
+            </button>
+            <button
+              onClick={() => setView('grid')}
+              className={`px-4 py-3 font-medium transition-smooth border-b-2 ${
+                view === 'grid'
+                  ? 'border-primary-700 text-primary-700'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <Calendar className="w-4 h-4 inline mr-2" />
+              Riwayat
+            </button>
+          </div>
+        </div>
+      </div>
+
       <main className="max-w-7xl mx-auto px-4 py-4 space-y-4">
         {/* Mode Input Absen */}
         <section className="bg-white rounded-lg shadow p-4 mb-2">
