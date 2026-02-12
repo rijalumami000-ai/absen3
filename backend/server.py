@@ -2318,26 +2318,6 @@ async def login(request: LoginRequest):
     }
 
 
-# ==================== AUTH PENGABSEN PMQ (PWA) ====================
-
-
-async def get_current_pengabsen_pmq(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
-    try:
-        token = credentials.credentials
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        pengabsen_id: str = payload.get("sub")
-        if pengabsen_id is None:
-            raise HTTPException(status_code=401, detail="Invalid authentication credentials")
-
-        pengabsen = await db.pengabsen_pmq.find_one({"id": pengabsen_id}, {"_id": 0})
-        if pengabsen is None:
-            raise HTTPException(status_code=401, detail="Pengabsen PMQ not found")
-
-        return pengabsen
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
-
-
 @api_router.post("/pmq/pengabsen/login", response_model=PengabsenPMQTokenResponse)
 async def login_pengabsen_pmq(request: PengabsenPMQLoginRequest):
     pengabsen = await db.pengabsen_pmq.find_one({"username": request.username}, {"_id": 0})
