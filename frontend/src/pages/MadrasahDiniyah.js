@@ -491,7 +491,25 @@ const MadrasahDiniyah = () => {
               <tbody className="divide-y divide-border">
                 {filteredSiswa.map((siswa) => (
                   <tr key={siswa.id} className="hover:bg-muted/50 transition-colors">
-                    <td className="px-6 py-4 text-sm text-foreground">{siswa.nama}</td>
+                    <td className="px-6 py-4 text-sm text-foreground">
+                      <div className="flex items-center gap-2">
+                        <span>{siswa.nama}</span>
+                        <span
+                          className={`inline-flex h-5 w-5 items-center justify-center rounded-full border bg-white ${
+                            siswa.santri_id
+                              ? 'border-blue-300 text-blue-600'
+                              : 'border-emerald-300 text-emerald-600'
+                          }`}
+                          title={siswa.santri_id ? 'Siswa link dari santri' : 'Siswa manual Madrasah'}
+                        >
+                          {siswa.santri_id ? (
+                            <Link2 className="w-3 h-3" />
+                          ) : (
+                            <User className="w-3 h-3" />
+                          )}
+                        </span>
+                      </div>
+                    </td>
                     <td className="px-6 py-4 text-sm text-muted-foreground">{siswa.nis || '-'}</td>
                     <td className="px-6 py-4 text-sm">
                       <span className={`px-2 py-1 rounded text-xs ${
