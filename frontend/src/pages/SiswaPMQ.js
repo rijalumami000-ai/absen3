@@ -659,11 +659,15 @@ const SiswaPMQ = () => {
                 ref={nfcInputRef}
                 placeholder="Tempelkan kartu NFC atau ketik UID"
                 value={nfcDialog.value}
-                onChange={(e) => setNfcDialog((prev) => ({ ...prev, value: e.target.value }))}
+                readOnly={!!nfcDialog.siswa?.santri_id}
+                onChange={(e) => {
+                  if (nfcDialog.siswa?.santri_id) return;
+                  setNfcDialog((prev) => ({ ...prev, value: e.target.value }));
+                }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
-                    if (nfcDialog.siswa) {
+                    if (nfcDialog.siswa && !nfcDialog.siswa.santri_id) {
                       api
                         .put(`/pmq/siswa/${nfcDialog.siswa.id}`, { nfc_uid: nfcDialog.value.trim() || '' })
                         .then(() => {
