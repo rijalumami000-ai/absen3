@@ -5117,6 +5117,12 @@ async def get_siswa_aliyah_list(_: dict = Depends(get_current_admin)):
 
     result: List[SiswaAliyahResponse] = []
     for siswa in siswa_list:
+        # Jika link santri dan siswa belum punya nfc_uid sendiri, ikutkan dari santri
+        if siswa.get("santri_id") and not siswa.get("nfc_uid"):
+            nfc_from_santri = santri_nfc_map.get(siswa["santri_id"])
+            if nfc_from_santri:
+                siswa["nfc_uid"] = nfc_from_santri
+
         kelas_nama = kelas_map.get(siswa.get("kelas_id")) if siswa.get("kelas_id") else None
         has_qr = False
         if siswa.get("santri_id"):
