@@ -379,6 +379,15 @@ const SiswaPMQ = () => {
                     <td className="px-4 py-2 text-muted-foreground">{s.tingkatan_label}</td>
                     <td className="px-4 py-2 text-muted-foreground">{s.kelompok_nama || '-'}</td>
                     <td className="px-4 py-2 text-muted-foreground">
+                      {s.nfc_uid ? (
+                        <span className="px-2 py-1 rounded-full text-xs bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          NFC Terdaftar
+                        </span>
+                      ) : (
+                        <span className="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-500">Belum</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-2 text-muted-foreground">
                       <div className="flex items-center gap-2">
                         {s.qr_code ? (
                           <>
