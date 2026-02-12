@@ -699,49 +699,51 @@ const SiswaAliyah = () => {
                 USB NFC Reader akan mengetik UID otomatis ke kolom ini.
               </p>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <Button
-                onClick={() => {
-                  if (selectedNfcSiswa) {
-                    api
-                      .put(`/aliyah/siswa/${selectedNfcSiswa.id}`, { nfc_uid: nfcValue.trim() || '' })
-                      .then(() => {
-                        toast.success('NFC berhasil disimpan');
-                        setNfcDialogOpen(false);
-                        setSelectedNfcSiswa(null);
-                        setNfcValue('');
-                        fetchData();
-                      })
-                      .catch((error) => {
-                        toast.error(error.response?.data?.detail || 'Gagal menyimpan NFC');
-                      });
-                  }
-                }}
-              >
-                Simpan NFC
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  if (selectedNfcSiswa) {
-                    api
-                      .put(`/aliyah/siswa/${selectedNfcSiswa.id}`, { nfc_uid: '' })
-                      .then(() => {
-                        toast.success('NFC dihapus');
-                        setNfcDialogOpen(false);
-                        setSelectedNfcSiswa(null);
-                        setNfcValue('');
-                        fetchData();
-                      })
-                      .catch((error) => {
-                        toast.error(error.response?.data?.detail || 'Gagal menghapus NFC');
-                      });
-                  }
-                }}
-              >
-                Hapus NFC
-              </Button>
-            </div>
+            {!selectedNfcSiswa?.santri_id && (
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  onClick={() => {
+                    if (selectedNfcSiswa) {
+                      api
+                        .put(`/aliyah/siswa/${selectedNfcSiswa.id}`, { nfc_uid: nfcValue.trim() || '' })
+                        .then(() => {
+                          toast.success('NFC berhasil disimpan');
+                          setNfcDialogOpen(false);
+                          setSelectedNfcSiswa(null);
+                          setNfcValue('');
+                          fetchData();
+                        })
+                        .catch((error) => {
+                          toast.error(error.response?.data?.detail || 'Gagal menyimpan NFC');
+                        });
+                    }
+                  }}
+                >
+                  Simpan NFC
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    if (selectedNfcSiswa) {
+                      api
+                        .put(`/aliyah/siswa/${selectedNfcSiswa.id}`, { nfc_uid: '' })
+                        .then(() => {
+                          toast.success('NFC dihapus');
+                          setNfcDialogOpen(false);
+                          setSelectedNfcSiswa(null);
+                          setNfcValue('');
+                          fetchData();
+                        })
+                        .catch((error) => {
+                          toast.error(error.response?.data?.detail || 'Gagal menghapus NFC');
+                        });
+                    }
+                  }}
+                >
+                  Hapus NFC
+                </Button>
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>
