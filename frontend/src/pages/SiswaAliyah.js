@@ -584,8 +584,31 @@ const SiswaAliyah = () => {
                     <td className="px-6 py-4 text-sm text-muted-foreground">
                       {siswa.wali_wa || '-'}
                     </td>
+                    <td className="px-6 py-4 text-sm">
+                      {siswa.nfc_uid ? (
+                        <span className="px-2 py-1 rounded-full text-xs bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          NFC Terdaftar
+                        </span>
+                      ) : (
+                        <span className="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-500">Belum</span>
+                      )}
+                    </td>
                     <td className="px-6 py-4 text-sm text-muted-foreground">
                       <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => {
+                            setSelectedNfcSiswa(siswa);
+                            setNfcValue(siswa.nfc_uid || '');
+                            setNfcDialogOpen(true);
+                            setTimeout(() => nfcInputRef.current?.focus(), 200);
+                          }}
+                          title="Atur NFC"
+                        >
+                          <CreditCard className="w-4 h-4" />
+                        </Button>
                         {siswa.has_qr && (
                           <>
                             <Button
