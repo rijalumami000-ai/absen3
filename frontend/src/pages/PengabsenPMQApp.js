@@ -198,11 +198,6 @@ const PengabsenPMQApp = () => {
     }
   };
 
-
-      });
-    }
-  };
-
   const filteredData = useMemo(() => {
     if (!searchQuery) return data;
     const q = searchQuery.toLowerCase();
