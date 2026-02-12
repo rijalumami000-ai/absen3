@@ -44,6 +44,8 @@ const MadrasahDiniyah = () => {
   const [selectedNfcSiswa, setSelectedNfcSiswa] = useState(null);
   const [nfcValue, setNfcValue] = useState('');
   const nfcInputRef = useRef(null);
+  const nfcAutoSaveTimer = useRef(null);
+  const lastNfcSavedRef = useRef('');
 
   useEffect(() => {
     fetchData();
