@@ -693,7 +693,7 @@ const MadrasahDiniyah = () => {
                 ref={nfcInputRef}
                 placeholder="Tempelkan kartu NFC atau ketik UID"
                 value={nfcValue}
-                readOnly={!!selectedNfcSiswa?.santri_id}
+                disabled={!!selectedNfcSiswa?.santri_id}
                 onChange={(e) => {
                   if (selectedNfcSiswa?.santri_id) return;
                   setNfcValue(e.target.value);
