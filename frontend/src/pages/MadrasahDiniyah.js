@@ -642,8 +642,13 @@ const MadrasahDiniyah = () => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
                     if (selectedNfcSiswa && !selectedNfcSiswa.santri_id) {
+                      const nfc_uid = nfcValue.trim();
+                      if (!nfc_uid) {
+                        toast.error('NFC UID kosong');
+                        return;
+                      }
                       api
-                        .put(`/siswa-madrasah/${selectedNfcSiswa.id}`, { nfc_uid: nfcValue.trim() || '' })
+                        .put(`/siswa-madrasah/${selectedNfcSiswa.id}`, { nfc_uid })
                         .then(() => {
                           toast.success('NFC berhasil disimpan');
                           setNfcDialogOpen(false);
