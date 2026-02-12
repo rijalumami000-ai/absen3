@@ -86,6 +86,46 @@ const MadrasahDiniyah = () => {
       toast.error(error.response?.data?.detail || 'Gagal menambahkan siswa');
     }
   };
+  // Auto-save NFC untuk siswa manual ketika nilai berubah (debounce)
+  useEffect(() => {
+    if (!nfcDialogOpen || !selectedNfcSiswa || selectedNfcSiswa.santri_id) {
+      return;
+    }
+
+    const currentValue = (nfcValue || '').trim();
+
+    // Jika kosong atau sama dengan yang terakhir disimpan, tidak perlu kirim
+    if (!currentValue || currentValue === lastNfcSavedRef.current) {
+      return;
+    }
+
+    if (nfcAutoSaveTimer.current) {
+      clearTimeout(nfcAutoSaveTimer.current);
+    }
+
+    nfcAutoSaveTimer.current = setTimeout(() => {
+      api
+        .put(`/siswa-madrasah/${selectedNfcSiswa.id}`, { nfc_uid: currentValue })
+        .then(() => {
+          lastNfcSavedRef.current = currentValue;
+          toast.success('NFC berhasil disimpan');
+          setNfcDialogOpen(false);
+          setSelectedNfcSiswa(null);
+          setNfcValue('');
+          fetchData();
+        })
+        .catch((error) => {
+          toast.error(error.response?.data?.detail || 'Gagal menyimpan NFC');
+        });
+    }, 500);
+
+    return () => {
+      if (nfcAutoSaveTimer.current) {
+        clearTimeout(nfcAutoSaveTimer.current);
+      }
+    };
+  }, [nfcValue, nfcDialogOpen, selectedNfcSiswa]);
+
 
   const handleUpdate = async () => {
     try {
