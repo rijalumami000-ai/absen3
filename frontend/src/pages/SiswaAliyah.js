@@ -578,14 +578,18 @@ const SiswaAliyah = () => {
                       <div className="flex items-center gap-2">
                         <span>{siswa.nama}</span>
                         <span
-                          className={`inline-flex h-5 w-5 items-center justify-center rounded-full border text-[10px] ${
+                          className={`inline-flex h-5 w-5 items-center justify-center rounded-full border bg-white ${
                             siswa.santri_id
-                              ? 'border-blue-300 bg-blue-50 text-blue-600'
-                              : 'border-emerald-300 bg-emerald-50 text-emerald-600'
+                              ? 'border-blue-300 text-blue-600'
+                              : 'border-emerald-300 text-emerald-600'
                           }`}
                           title={siswa.santri_id ? 'Siswa link dari santri' : 'Siswa manual Aliyah'}
                         >
-                          {siswa.santri_id ? 'L' : 'M'}
+                          {siswa.santri_id ? (
+                            <Link2 className="w-3 h-3" />
+                          ) : (
+                            <User className="w-3 h-3" />
+                          )}
                         </span>
                       </div>
                     </td>
