@@ -574,7 +574,21 @@ const SiswaAliyah = () => {
               <tbody className="divide-y divide-border">
                 {filteredSiswa.map((siswa) => (
                   <tr key={siswa.id} className="hover:bg-muted/50 transition-colors">
-                    <td className="px-6 py-4 text-sm font-medium text-foreground">{siswa.nama}</td>
+                    <td className="px-6 py-4 text-sm font-medium text-foreground">
+                      <div className="flex items-center gap-2">
+                        <span>{siswa.nama}</span>
+                        <span
+                          className={`inline-flex h-5 w-5 items-center justify-center rounded-full border text-[10px] ${
+                            siswa.santri_id
+                              ? 'border-blue-300 bg-blue-50 text-blue-600'
+                              : 'border-emerald-300 bg-emerald-50 text-emerald-600'
+                          }`}
+                          title={siswa.santri_id ? 'Siswa link dari santri' : 'Siswa manual Aliyah'}
+                        >
+                          {siswa.santri_id ? 'L' : 'M'}
+                        </span>
+                      </div>
+                    </td>
                     <td className="px-6 py-4 text-sm text-muted-foreground">{siswa.nis || '-'}</td>
                     <td className="px-6 py-4 text-sm text-muted-foreground capitalize">{siswa.gender}</td>
                     <td className="px-6 py-4 text-sm text-muted-foreground">{siswa.kelas_nama || '-'}</td>
