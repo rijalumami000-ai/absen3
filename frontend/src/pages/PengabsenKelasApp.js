@@ -60,7 +60,6 @@ const PengabsenKelasApp = () => {
   const nfcInputRef = useRef(null);
 
 
-
   useEffect(() => {
     loadKelas();
     loadManualStudents();

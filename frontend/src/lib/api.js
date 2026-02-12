@@ -288,6 +288,11 @@ export const pengabsenAliyahAppAPI = {
       params,
       headers: getPengabsenAliyahAuthHeader(),
     }),
+  nfcAbsensi: (data, params) =>
+    axios.post(`${API}/aliyah/pengabsen/absensi/nfc`, data, {
+      params,
+      headers: getPengabsenAliyahAuthHeader(),
+    }),
   riwayat: (params) =>
     axios.get(`${API}/aliyah/pengabsen/riwayat`, {
       params,
