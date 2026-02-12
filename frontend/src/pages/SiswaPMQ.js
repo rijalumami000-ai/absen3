@@ -419,24 +419,25 @@ const SiswaPMQ = () => {
                     <td className="px-4 py-2 text-muted-foreground">
                       <div className="flex gap-2">
                         {!s.santri_id && (
-                          <Button
-                            variant="outline"
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setNfcDialog({ open: true, siswa: s, value: s.nfc_uid || '' });
-                            setTimeout(() => nfcInputRef.current?.focus(), 200);
-                          }}
-                        >
-                          Atur NFC
-                        </Button>
-
-                            size="sm"
-                            onClick={() => handleEdit(s)}
-                          >
-                            Edit
-                          </Button>
+                          <>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setNfcDialog({ open: true, siswa: s, value: s.nfc_uid || '' });
+                                setTimeout(() => nfcInputRef.current?.focus(), 200);
+                              }}
+                            >
+                              Atur NFC
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleEdit(s)}
+                            >
+                              Edit
+                            </Button>
+                          </>
                         )}
                         <Button
                           variant="outline"
