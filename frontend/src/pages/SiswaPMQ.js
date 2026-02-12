@@ -209,6 +209,8 @@ const SiswaPMQ = () => {
         </div>
         <div className="flex gap-3 animate-slide-in-right items-center flex-wrap justify-end">
           <Card className="shadow-card min-w-[260px] md:min-w-[320px]">
+  const nfcInputRef = useRef(null);
+
             <CardContent className="p-5 flex items-center gap-5">
               <div>
                 <p className="text-xs font-medium text-muted-foreground tracking-wide uppercase">Total Siswa PMQ</p>
