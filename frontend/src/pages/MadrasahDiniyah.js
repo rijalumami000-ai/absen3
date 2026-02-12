@@ -484,7 +484,7 @@ const MadrasahDiniyah = () => {
                   <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">NIS</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Gender</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Kelas</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Status</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">NFC Status</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Aksi</th>
                 </tr>
               </thead>
