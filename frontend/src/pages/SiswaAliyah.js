@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, QrCode, Search, Link, UserPlus, Users, FileDown } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Plus, Edit2, Trash2, QrCode, Search, Link, UserPlus, Users, FileDown, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -39,6 +39,10 @@ const SiswaAliyah = () => {
   const [qrPreviewUrl, setQrPreviewUrl] = useState('');
   const [qrPreviewSiswa, setQrPreviewSiswa] = useState(null);
   const [linkSantriSearch, setLinkSantriSearch] = useState('');
+  const [nfcDialogOpen, setNfcDialogOpen] = useState(false);
+  const [selectedNfcSiswa, setSelectedNfcSiswa] = useState(null);
+  const [nfcValue, setNfcValue] = useState('');
+  const nfcInputRef = useRef(null);
   const [formData, setFormData] = useState({
     nama: '',
     nis: '',
