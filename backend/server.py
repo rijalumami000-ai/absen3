@@ -5034,6 +5034,9 @@ async def create_siswa_madrasah(data: SiswaMadrasahCreate, _: dict = Depends(get
         existing = await db.siswa_madrasah.find_one({"santri_id": data.santri_id})
         if existing:
             raise HTTPException(status_code=400, detail="Santri sudah terdaftar sebagai siswa Madrasah")
+        # NFC ikut santri jika ada
+        if santri.get("nfc_uid"):
+            data.nfc_uid = santri["nfc_uid"].strip()
 
     if data.nfc_uid:
         nfc_uid = data.nfc_uid.strip()
