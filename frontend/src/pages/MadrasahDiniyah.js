@@ -508,18 +508,28 @@ const MadrasahDiniyah = () => {
                       )}
                     </td>
                     <td className="px-6 py-4 text-sm">
-                      {siswa.santri_id ? (
-                        <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">
-                          Linked
+                      {siswa.nfc_uid ? (
+                        <span className="px-2 py-1 rounded-full text-xs bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          NFC Terdaftar
                         </span>
                       ) : (
-                        <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">
-                          Standalone
-                        </span>
+                        <span className="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-500">Belum</span>
                       )}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            setSelectedNfcSiswa(siswa);
+                            setNfcValue(siswa.nfc_uid || '');
+                            setNfcDialogOpen(true);
+                            setTimeout(() => nfcInputRef.current?.focus(), 200);
+                          }}
+                          className="p-2 hover:bg-blue-100 text-blue-700 rounded-lg transition-colors"
+                          title="Atur NFC"
+                        >
+                          <CreditCard className="w-4 h-4" />
+                        </button>
                         {siswa.has_qr && (
                           <button
                             onClick={() => downloadQRCode(siswa.id, siswa.nama)}
