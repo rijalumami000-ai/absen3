@@ -418,6 +418,17 @@ const SiswaPMQ = () => {
                         {!s.santri_id && (
                           <Button
                             variant="outline"
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setNfcDialog({ open: true, siswa: s, value: s.nfc_uid || '' });
+                            setTimeout(() => nfcInputRef.current?.focus(), 200);
+                          }}
+                        >
+                          Atur NFC
+                        </Button>
+
                             size="sm"
                             onClick={() => handleEdit(s)}
                           >
