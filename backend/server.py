@@ -4996,6 +4996,16 @@ async def get_kelas_saya(current_pengabsen: dict = Depends(get_current_pengabsen
 @api_router.get("/siswa-madrasah", response_model=List[SiswaMadrasahResponse])
 async def get_siswa_madrasah_list(_: dict = Depends(get_current_admin)):
     siswa_list = await db.siswa_madrasah.find({}, {"_id": 0}).to_list(1000)
+    # Map santri NFC ke siswa yang link (untuk kasus santri dapat NFC belakangan)
+    santri_ids = [s["santri_id"] for s in siswa_list if s.get("santri_id")]
+    santri_nfc_map = {}
+    if santri_ids:
+        santri_docs = await db.santri.find({"id": {"$in": santri_ids}}, {"_id": 0, "id": 1, "nfc_uid": 1}).to_list(5000)
+        for santri in santri_docs:
+            if santri.get("nfc_uid"):
+                santri_nfc_map[santri["id"]] = santri["nfc_uid"].strip()
+
+
     
     # Get kelas names
     kelas_map = {}
