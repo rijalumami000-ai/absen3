@@ -38,6 +38,8 @@ const SiswaPMQ = () => {
   const [qrPreview, setQrPreview] = useState({ open: false, siswa: null });
   const [availableSantri, setAvailableSantri] = useState([]);
   const [editingId, setEditingId] = useState(null);
+  const nfcInputRef = useRef(null);
+
 
   const filteredAvailableSantri = availableSantri.filter((s) => {
     const q = linkSantriSearch.toLowerCase();
