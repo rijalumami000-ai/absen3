@@ -5119,6 +5119,9 @@ async def create_siswa_aliyah(data: SiswaAliyahCreate, _: dict = Depends(get_cur
         santri = await db.santri.find_one({"id": data.santri_id}, {"_id": 0})
         if not santri:
             raise HTTPException(status_code=404, detail="Santri tidak ditemukan")
+        # NFC ikut santri jika ada
+        if santri.get("nfc_uid"):
+            data.nfc_uid = santri["nfc_uid"].strip()
 
     if data.nfc_uid:
         nfc_uid = data.nfc_uid.strip()
