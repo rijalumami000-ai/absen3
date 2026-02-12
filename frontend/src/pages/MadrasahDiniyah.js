@@ -131,6 +131,21 @@ const MadrasahDiniyah = () => {
     }
   };
 
+  const handleUpdateNfc = async () => {
+    try {
+      await api.put(`/siswa-madrasah/${selectedNfcSiswa.id}/nfc`, {
+        nfc_uid: nfcValue || null
+      });
+      toast.success('NFC berhasil diupdate');
+      setNfcDialogOpen(false);
+      setSelectedNfcSiswa(null);
+      setNfcValue('');
+      fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Gagal update NFC');
+    }
+  };
+
   const openEditDialog = (siswa) => {
     setSelectedSiswa(siswa);
     setFormData({
