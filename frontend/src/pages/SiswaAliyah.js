@@ -567,6 +567,7 @@ const SiswaAliyah = () => {
                   <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Kelas</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Nama Wali</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">No. WA Wali</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">NFC</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Aksi</th>
                 </tr>
               </thead>
