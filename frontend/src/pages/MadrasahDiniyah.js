@@ -674,6 +674,45 @@ const MadrasahDiniyah = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* NFC Dialog */}
+      <Dialog open={nfcDialogOpen} onOpenChange={setNfcDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Atur NFC untuk {selectedNfcSiswa?.nama}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>NFC UID</Label>
+              <Input
+                ref={nfcInputRef}
+                placeholder="Scan atau ketik NFC UID..."
+                value={nfcValue}
+                onChange={(e) => setNfcValue(e.target.value)}
+                className="font-mono"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Kosongkan untuk menghapus NFC yang terdaftar
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={handleUpdateNfc} className="flex-1">
+                Simpan
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setNfcDialogOpen(false);
+                  setSelectedNfcSiswa(null);
+                  setNfcValue('');
+                }}
+              >
+                Batal
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
