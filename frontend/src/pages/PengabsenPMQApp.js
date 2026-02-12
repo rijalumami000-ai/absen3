@@ -166,6 +166,10 @@ const PengabsenPMQApp = () => {
         title: 'Error',
         description: e.response?.data?.detail || 'Gagal mencatat absensi via scan',
         variant: 'destructive',
+      });
+    }
+  };
+
   const handleNfcSubmit = async (rawValue) => {
     const nfcUid = (rawValue || '').trim();
     if (!nfcUid) {
