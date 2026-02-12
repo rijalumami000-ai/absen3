@@ -243,6 +243,11 @@ export const pengabsenPMQAppAPI = {
       params,
       headers: getPengabsenPMQAuthHeader(),
     }),
+  nfcAbsensi: (payload, params) =>
+    axios.post(`${API}/pmq/pengabsen/absensi/nfc`, payload, {
+      params,
+      headers: getPengabsenPMQAuthHeader(),
+    }),
   riwayat: (params) =>
     axios.get(`${API}/pmq/pengabsen/riwayat`, {
       params,

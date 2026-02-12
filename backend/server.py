@@ -1752,7 +1752,8 @@ async def pengabsen_pmq_absensi_nfc(
     if not nfc_uid:
         raise HTTPException(status_code=400, detail="NFC UID wajib diisi")
 
-    if sesi not in ["pagi", "sore"]:
+    # Validasi sesi mengikuti konfigurasi PMQWaktuSettings (misalnya: pagi, malam)
+    if sesi not in ["pagi", "malam"]:
         raise HTTPException(status_code=400, detail="Sesi tidak valid")
 
     siswa = await db.siswa_pmq.find_one({"nfc_uid": nfc_uid}, {"_id": 0})
