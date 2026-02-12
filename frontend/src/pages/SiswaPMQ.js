@@ -20,6 +20,7 @@ const SiswaPMQ = () => {
   const [filterGender, setFilterGender] = useState('all');
   const [loading, setLoading] = useState(true);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [nfcDialog, setNfcDialog] = useState({ open: false, siswa: null, value: '' });
   const [isLinkSantriOpen, setIsLinkSantriOpen] = useState(false);
   const [formData, setFormData] = useState({
     nama: '',
