@@ -277,6 +277,33 @@ const PengabsenPortal = () => {
                     {loading ? 'Memproses...' : 'Masuk'}
                   </Button>
                 </form>
+      {/* Dialog Pilih Instansi */}
+      <Dialog open={instansiDialogOpen} onOpenChange={setInstansiDialogOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Pilih Instansi Pengabsen</DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+            {instansiOptions.map((opt) => (
+              <Button
+                key={opt.value}
+                type="button"
+                variant={instansi === opt.value ? 'default' : 'outline'}
+                className="w-full h-20 flex flex-col items-start justify-center gap-1 text-left"
+                onClick={() => {
+                  handleInstansiChange(opt.value);
+                  setInstansiDialogOpen(false);
+                }}
+                data-testid={`pengabsen-portal-instansi-option-${opt.value}`}
+              >
+                <span className="text-sm font-semibold">{opt.label}</span>
+                <span className="text-[11px] text-slate-500">Klik untuk memilih</span>
+              </Button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
               )}
             </div>
           </div>
