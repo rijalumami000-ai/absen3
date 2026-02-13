@@ -88,7 +88,6 @@ const Santri = () => {
     try {
       const submitData = { ...formData };
       if (!submitData.email_wali) delete submitData.email_wali;
-      if (!submitData.nomor_hp_wali) delete submitData.nomor_hp_wali;
       
       if (editMode) {
         await santriAPI.update(selectedSantri.id, submitData);
@@ -520,7 +519,6 @@ const Santri = () => {
                       value={formData.nomor_hp_wali}
                       onChange={(e) => setFormData({ ...formData, nomor_hp_wali: e.target.value })}
                       placeholder="08xxxxxxxxxx"
-                      required
                       data-testid="wali-hp-input"
                     />
                   </div>
