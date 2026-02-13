@@ -604,17 +604,30 @@ const PengabsenApp = () => {
             </div>
           ) : (
             <div className="max-h-[50vh] overflow-y-auto space-y-4 pb-16" data-testid="pengabsen-santri-list">
-              {groupedList.map((group) => (
-                <div key={group.asramaId || 'tanpa-asrama'} className="border rounded-lg overflow-hidden bg-white">
-                  <div className="px-3 py-2 bg-gray-50 border-b flex items-center justify-between">
+              {groupedList.map((group) => {
+                const groupId = group.asramaId || 'tanpa-asrama';
+                const isCollapsed = collapsedGroups[groupId] ?? true;
+                return (
+                <div key={groupId} className="border rounded-lg overflow-hidden bg-white">
+                  <div 
+                    className="px-3 py-2 bg-gray-50 border-b flex items-center justify-between cursor-pointer hover:bg-gray-100 transition-colors"
+                    onClick={() => setCollapsedGroups(prev => ({...prev, [groupId]: !isCollapsed}))}
+                  >
                     <div className="text-xs font-semibold text-gray-700 flex items-center gap-2">
                       <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">
                         {group.namaAsrama?.[0] || 'A'}
                       </span>
                       <span>{group.namaAsrama}</span>
                     </div>
-                    <div className="text-[10px] text-gray-500">
-                      {group.items.length} santri
+                    <div className="flex items-center gap-2">
+                      <div className="text-[10px] text-gray-500">
+                        {group.items.length} santri
+                      </div>
+                      {isCollapsed ? (
+                        <ChevronRight className="w-4 h-4 text-gray-500" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4 text-gray-500" />
+                      )}
                     </div>
                   </div>
                   <table className="w-full text-sm">
