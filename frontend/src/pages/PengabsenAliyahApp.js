@@ -51,6 +51,10 @@ const PengabsenAliyahApp = () => {
   const [collapsedHistoryGroups, setCollapsedHistoryGroups] = useState({});
 
   const [nfcValue, setNfcValue] = useState('');
+  const [nfcSupported, setNfcSupported] = useState(false);
+  const [nfcScanning, setNfcScanning] = useState(false);
+  const [nfcStatus, setNfcStatus] = useState('');
+  const nfcReaderRef = React.useRef(null);
 
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -72,6 +76,10 @@ const PengabsenAliyahApp = () => {
       }
     };
     loadKelas();
+  }, []);
+
+  useEffect(() => {
+    setNfcSupported(typeof window !== 'undefined' && 'NDEFReader' in window);
   }, []);
 
   useEffect(() => {
@@ -152,8 +160,36 @@ const PengabsenAliyahApp = () => {
     }
   };
 
+  const normalizeNfcUid = (raw) => {
+    if (!raw) return '';
+    const value = raw.toString().trim();
+
+    // Jika hanya berisi angka, anggap ini format decimal langsung dari reader USB
+    if (/^\d+$/.test(value)) {
+      return value;
+    }
+
+    // Selain itu, anggap sebagai representasi hex (misalnya "c1:dd:23:e2")
+    const hex = value.toUpperCase().replace(/[^0-9A-F]/g, '');
+    if (!hex) return '';
+
+    // Bagi menjadi byte (2 digit), lalu balik urutan byte untuk samakan dengan reader USB
+    const bytes = hex.match(/.{1,2}/g) || [hex];
+    const reversedHex = bytes.reverse().join('');
+
+    // Konversi ke decimal string
+    try {
+      const dec = BigInt('0x' + reversedHex).toString();
+      return dec;
+    } catch (e) {
+      console.error('Gagal mengonversi UID hex ke desimal', e, { hex, reversedHex });
+      return '';
+    }
+  };
+
   const handleNfcSubmit = async (rawValue) => {
-    const nfcUid = (rawValue || '').trim();
+    const raw = (rawValue || '').trim();
+    const nfcUid = normalizeNfcUid(raw);
     if (!nfcUid) {
       toast({ title: 'Error', description: 'NFC kosong, tempelkan kartu terlebih dahulu', variant: 'destructive' });
       return;
@@ -164,11 +200,87 @@ const PengabsenAliyahApp = () => {
       await loadData(jenis, tanggal);
       toast({ title: 'Sukses', description: 'Absensi NFC berhasil dicatat' });
     } catch (error) {
+      console.error('NFC submit error', error);
       toast({
         title: 'Error',
         description: error.response?.data?.detail || 'Gagal mencatat absensi NFC',
         variant: 'destructive',
       });
+    }
+  };
+
+  const startNfcScan = async () => {
+    if (!nfcSupported) {
+      toast({ title: 'NFC tidak tersedia', description: 'Perangkat ini belum mendukung Web NFC.', variant: 'destructive' });
+      return;
+    }
+    try {
+      setNfcScanning(true);
+      const reader = new window.NDEFReader();
+      nfcReaderRef.current = reader;
+      await reader.scan();
+      setNfcStatus('Menunggu kartu NFC...');
+      toast({ title: 'NFC aktif', description: 'Tempelkan kartu NFC ke perangkat.' });
+
+      reader.onreading = (event) => {
+        try {
+          const serial = event.serialNumber || '';
+          if (serial) {
+            setNfcStatus(`UID terbaca: ${serial}`);
+            handleNfcSubmit(serial);
+            setNfcScanning(false);
+            return;
+          }
+
+          if (event.message?.records?.length) {
+            for (const record of event.message.records) {
+              if (record.recordType === 'text') {
+                const textDecoder = new TextDecoder(record.encoding || 'utf-8');
+                const text = textDecoder.decode(record.data || new ArrayBuffer(0));
+                if (text) {
+                  setNfcStatus(`Data NDEF terbaca: ${text}`);
+                  handleNfcSubmit(text);
+                  setNfcScanning(false);
+                  return;
+                }
+              }
+            }
+          }
+
+          setNfcStatus('Kartu NFC tidak berisi UID / teks yang bisa dibaca.');
+          toast({
+            title: 'NFC tidak terbaca',
+            description: 'Pastikan kartu NFC berisi UID yang didukung atau data teks (NDEF).',
+            variant: 'destructive',
+          });
+        } catch (err) {
+          console.error('Error saat memproses NFC event', err);
+          setNfcStatus('Terjadi kesalahan saat membaca NFC.');
+          toast({
+            title: 'NFC gagal',
+            description: 'Terjadi kesalahan saat memproses data NFC.',
+            variant: 'destructive',
+          });
+        } finally {
+          setNfcScanning(false);
+        }
+      };
+
+      reader.onreadingerror = (ev) => {
+        console.warn('NFC reading error', ev);
+        setNfcStatus('Gagal membaca kartu NFC.');
+        toast({ title: 'NFC gagal', description: 'Tidak bisa membaca kartu NFC.', variant: 'destructive' });
+        setNfcScanning(false);
+      };
+    } catch (error) {
+      console.error('Gagal mengaktifkan NFC', error);
+      setNfcStatus('Tidak bisa mengaktifkan NFC.');
+      toast({
+        title: 'NFC gagal',
+        description: error?.message || 'Tidak bisa mengaktifkan NFC di perangkat ini.',
+        variant: 'destructive',
+      });
+      setNfcScanning(false);
     }
   };
 
