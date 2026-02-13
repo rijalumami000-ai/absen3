@@ -202,16 +202,7 @@ const WhatsAppRekap = () => {
           </p>
         </div>
         </div>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => navigate('/whatsapp/history')}
-          className="gap-2"
-          data-testid="whatsapp-rekap-history-button"
-        >
-          <History className="w-4 h-4" />
-          History Notifikasi
-        </Button>
+        {/* Tombol History Notifikasi dihapus sesuai permintaan */}
       </div>
 
       {!canSend && (
