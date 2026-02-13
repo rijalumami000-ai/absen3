@@ -630,42 +630,45 @@ const PengabsenApp = () => {
                       )}
                     </div>
                   </div>
-                  <table className="w-full text-sm">
-                    <thead className="bg-gray-50 border-b text-xs text-gray-500">
-                      <tr>
-                        <th className="px-3 py-2 text-left">Nama</th>
-                        <th className="px-3 py-2 text-left">NIS</th>
-                        <th className="px-3 py-2 text-left">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y">
-                      {group.items.map((row) => (
-                        <tr key={row.santri_id}>
-                          <td className="px-3 py-2 text-gray-800">{row.nama}</td>
-                          <td className="px-3 py-2 text-gray-600">{row.nis}</td>
-                          <td className="px-3 py-2">
-                            <Select
-                              value={row.status ?? 'null'}
-                              onValueChange={(val) => handleStatusChange(row.santri_id, val)}
-                            >
-                              <SelectTrigger className="w-32 h-8 text-xs">
-                                <SelectValue placeholder="Pilih status" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {STATUS_OPTIONS.map((opt) => (
-                                  <SelectItem key={opt.value} value={opt.value}>
-                                    {opt.label}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </td>
+                  {!isCollapsed && (
+                    <table className="w-full text-sm">
+                      <thead className="bg-gray-50 border-b text-xs text-gray-500">
+                        <tr>
+                          <th className="px-3 py-2 text-left">Nama</th>
+                          <th className="px-3 py-2 text-left">NIS</th>
+                          <th className="px-3 py-2 text-left">Status</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody className="divide-y">
+                        {group.items.map((row) => (
+                          <tr key={row.santri_id}>
+                            <td className="px-3 py-2 text-gray-800">{row.nama}</td>
+                            <td className="px-3 py-2 text-gray-600">{row.nis}</td>
+                            <td className="px-3 py-2">
+                              <Select
+                                value={row.status ?? 'null'}
+                                onValueChange={(val) => handleStatusChange(row.santri_id, val)}
+                              >
+                                <SelectTrigger className="w-32 h-8 text-xs">
+                                  <SelectValue placeholder="Pilih status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {STATUS_OPTIONS.map((opt) => (
+                                    <SelectItem key={opt.value} value={opt.value}>
+                                      {opt.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </section>
