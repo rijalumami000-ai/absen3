@@ -88,6 +88,7 @@ const Santri = () => {
     try {
       const submitData = { ...formData };
       if (!submitData.email_wali) delete submitData.email_wali;
+      if (!submitData.nomor_hp_wali) delete submitData.nomor_hp_wali;
       
       if (editMode) {
         await santriAPI.update(selectedSantri.id, submitData);
