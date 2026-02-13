@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff, QrCode, ShieldCheck } from 'lucide-react';
 
@@ -19,6 +20,7 @@ const PengabsenPortal = () => {
   const [kodeAkses, setKodeAkses] = useState('');
   const [showKode, setShowKode] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [instansiDialogOpen, setInstansiDialogOpen] = useState(false);
   const [formError, setFormError] = useState('');
   const [fieldErrors, setFieldErrors] = useState({ instansi: '', username: '', kode: '' });
   const { toast } = useToast();
