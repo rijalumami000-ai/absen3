@@ -411,6 +411,49 @@ const Santri = () => {
 
   return (
     <div data-testid="santri-page" className="animate-fade-in">
+      {/* Kartu Statistik Santri */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <Card className="shadow-sm">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div>
+              <p className="text-xs text-gray-500">Total Santri</p>
+              <p className="text-2xl font-bold text-gray-800 mt-1">{santriList.length}</p>
+            </div>
+            <div className="p-3 rounded-full bg-blue-50 text-blue-600">
+              <Users className="w-5 h-5" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div>
+              <p className="text-xs text-gray-500">Santri Putra</p>
+              <p className="text-2xl font-bold text-gray-800 mt-1">
+                {santriList.filter((s) => s.gender === 'putra').length}
+              </p>
+            </div>
+            <div className="p-3 rounded-full bg-emerald-50 text-emerald-600">
+              <Users className="w-5 h-5" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div>
+              <p className="text-xs text-gray-500">Santri Putri</p>
+              <p className="text-2xl font-bold text-gray-800 mt-1">
+                {santriList.filter((s) => s.gender === 'putri').length}
+              </p>
+            </div>
+            <div className="p-3 rounded-full bg-rose-50 text-rose-600">
+              <Users className="w-5 h-5" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       <div className="flex justify-between items-center mb-6 animate-slide-in-left">
         <div>
           <h1 className="text-3xl font-bold text-gray-800 font-display">Kelola Database Santri/Siswa</h1>
