@@ -399,6 +399,36 @@ const PengabsenPMQApp = () => {
               </p>
             )}
 
+            {/* NFC Section */}
+            <div className="mt-4 border-t pt-4">
+              <h3 className="text-xs font-semibold text-gray-700 mb-2">Scan NFC Siswa</h3>
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                <Input
+                  placeholder="Tempelkan kartu NFC pada USB reader..."
+                  value={nfcValue}
+                  onChange={(e) => setNfcValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleNfcSubmit(nfcValue);
+                    }
+                  }}
+                  className="h-8 text-xs"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleNfcSubmit(nfcValue)}
+                >
+                  Kirim NFC
+                </Button>
+              </div>
+              <p className="text-[11px] text-gray-500 mt-1">
+                Pastikan sesi sudah dipilih. USB NFC Reader akan mengetik UID otomatis ke kolom ini.
+              </p>
+            </div>
+
             <div className="mt-4" data-testid="pmq-student-list-section">
               {loadingData ? (
                 <div className="text-center text-xs text-gray-500 py-4" data-testid="pmq-loading-state">
