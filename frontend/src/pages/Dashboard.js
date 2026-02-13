@@ -6,10 +6,13 @@ import { useToast } from '@/hooks/use-toast';
 
 const Dashboard = () => {
   const LOGO_PESANTREN_MADIN = 'https://customer-assets.emergentagent.com/job_pesantren-app-3/artifacts/pjy9w2wa_Pesantren%20dan%20Madin.jpg';
+  const LOGO_PMQ = 'https://customer-assets.emergentagent.com/job_pesantren-app-3/artifacts/9xgnnnsa_LOGO%20PMQ.png';
+  const LOGO_ALIYAH = 'https://customer-assets.emergentagent.com/job_pesantren-app-3/artifacts/89w18wrw_Madrasah%20Aliyah.jpg';
   const [stats, setStats] = useState(null);
   const [totalSantri, setTotalSantri] = useState(0);
-  const [totalSantriPutra, setTotalSantriPutra] = useState(0);
-  const [totalSantriPutri, setTotalSantriPutri] = useState(0);
+  const [totalSiswaMadin, setTotalSiswaMadin] = useState(0);
+  const [totalSiswaAliyah, setTotalSiswaAliyah] = useState(0);
+  const [totalSiswaPMQ, setTotalSiswaPMQ] = useState(0);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
