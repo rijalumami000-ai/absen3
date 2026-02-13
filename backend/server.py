@@ -1817,11 +1817,10 @@ async def pengabsen_pmq_absensi_nfc(
             status="hadir",
             kelompok_id=siswa.get("kelompok_id"),
             pengabsen_id=current_pengabsen["id"],
-            waktu_absen=now,
+            waktu_absen=now.isoformat(),
         )
         doc = absensi.model_dump()
         doc["created_at"] = doc["created_at"].isoformat()
-        doc["waktu_absen"] = doc["waktu_absen"].isoformat()
         await db.absensi_pmq.insert_one(doc)
 
     return {"message": "Absensi NFC berhasil dicatat"}
