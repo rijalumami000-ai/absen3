@@ -479,8 +479,24 @@ const PengabsenAliyahApp = () => {
                     Kirim NFC
                   </Button>
                 </div>
+                <div className="flex flex-wrap gap-2 mt-3 items-center">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={startNfcScan}
+                    disabled={!nfcSupported || nfcScanning}
+                  >
+                    {nfcSupported ? (nfcScanning ? 'NFC aktif...' : 'Aktifkan NFC (Android)') : 'NFC tidak tersedia'}
+                  </Button>
+                  {nfcStatus && (
+                    <span className="text-xs text-emerald-700">
+                      {nfcStatus}
+                    </span>
+                  )}
+                </div>
                 <p className="text-[11px] text-gray-500 mt-1">
-                  USB NFC Reader akan mengetik UID otomatis ke kolom ini. Tekan Enter untuk menyimpan absensi.
+                  USB NFC Reader akan mengetik UID otomatis ke kolom ini, atau gunakan tombol NFC Android di atas.
                 </p>
               </div>
 
