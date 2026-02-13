@@ -163,22 +163,24 @@ const PengabsenPortal = () => {
                 </div>
                 <div>
                   <p className="text-xs text-emerald-600 font-semibold">Langkah 1</p>
-                  <h2 className="text-lg font-semibold text-slate-900">Masuk sebagai pengabsen?</h2>
+                  <h2 className="text-lg font-semibold text-slate-900">Pilih instansi pengabsen</h2>
                 </div>
               </div>
-              <Label className="text-sm">Pilih instansi</Label>
-              <Select value={instansi} onValueChange={handleInstansiChange}>
-                <SelectTrigger className="mt-2" data-testid="pengabsen-portal-instansi-select">
-                  <SelectValue placeholder="Pilih instansi" />
-                </SelectTrigger>
-                <SelectContent>
-                  {instansiOptions.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value} data-testid={`pengabsen-portal-instansi-${opt.value}`}>
-                      {opt.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+
+              <p className="text-sm text-slate-600 mb-4">
+                Tekan tombol di bawah ini untuk memilih instansi. Setelah dipilih, form login akan menyesuaikan otomatis.
+              </p>
+
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full h-11 font-semibold"
+                onClick={() => setInstansiDialogOpen(true)}
+                data-testid="pengabsen-portal-instansi-open-dialog"
+              >
+                {selectedInstansi ? selectedInstansi.label : 'Pilih Instansi Pengabsen'}
+              </Button>
+
               {fieldErrors.instansi && (
                 <p className="text-xs text-red-600 mt-2" data-testid="pengabsen-portal-instansi-error">
                   {fieldErrors.instansi}
