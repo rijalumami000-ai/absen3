@@ -129,8 +129,29 @@ const PengabsenApp = () => {
 
   const normalizeNfcUid = (raw) => {
     if (!raw) return '';
-    // Hilangkan pemisah seperti ':' dan jadikan uppercase agar konsisten dengan UID dari reader USB
-    return raw.toString().trim().toUpperCase().replace(/[^0-9A-F]/g, '');
+    const value = raw.toString().trim();
+
+    // Jika hanya berisi angka, anggap ini format decimal langsung dari reader USB
+    if (/^\d+$/.test(value)) {
+      return value;
+    }
+
+    // Selain itu, anggap sebagai representasi hex (misalnya "c1:dd:23:e2")
+    const hex = value.toUpperCase().replace(/[^0-9A-F]/g, '');
+    if (!hex) return '';
+
+    // Bagi menjadi byte (2 digit), lalu balik urutan byte untuk samakan dengan reader USB
+    const bytes = hex.match(/.{1,2}/g) || [hex];
+    const reversedHex = bytes.reverse().join('');
+
+    // Konversi ke decimal string
+    try {
+      const dec = BigInt('0x' + reversedHex).toString();
+      return dec;
+    } catch (e) {
+      console.error('Gagal mengonversi UID hex ke desimal', e, { hex, reversedHex });
+      return '';
+    }
   };
 
   const handleNfcSubmit = async (rawValue) => {
