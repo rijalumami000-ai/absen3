@@ -530,7 +530,7 @@ const PengabsenApp = () => {
             {inputMode === 'nfc' && (
               <section className="bg-white rounded-lg shadow p-4" data-testid="pengabsen-nfc-section">
                 <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-sm font-semibold text-gray-700">Input NFC Santri</h2>
+                  <h2 className="text-sm font-semibold text-gray-700">Scan NFC Santri</h2>
                   <Button
                     variant="outline"
                     size="sm"
@@ -540,10 +540,6 @@ const PengabsenApp = () => {
                     Fokus Input
                   </Button>
                 </div>
-                <p className="text-xs text-gray-500 mb-3">
-                  Gunakan NFC Reader USB (seperti keyboard) atau NFC Android. Untuk Android, kartu harus bertipe NDEF
-                  (berisi teks UID). Tempel kartu lalu tekan Enter.
-                </p>
                 <div className="flex flex-col md:flex-row gap-2">
                   <input
                     ref={nfcInputRef}
@@ -559,9 +555,6 @@ const PengabsenApp = () => {
                     className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm"
                     data-testid="pengabsen-nfc-input"
                   />
-                  <Button type="button" onClick={() => handleNfcSubmit(nfcValue)} data-testid="pengabsen-nfc-submit">
-                    Simpan NFC
-                  </Button>
                 </div>
                 <div className="flex flex-wrap gap-2 mt-3">
                   <Button
