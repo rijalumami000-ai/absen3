@@ -1783,7 +1783,13 @@ async def pengabsen_pmq_absensi_nfc(
 
     siswa = await db.siswa_pmq.find_one({"nfc_uid": nfc_uid}, {"_id": 0})
     if not siswa:
-        raise HTTPException(status_code=404, detail="Kartu NFC belum terdaftar")
+        # Fallback: cari santri yang memiliki NFC ini lalu temukan siswa PMQ yang link ke santri tersebut
+        santri = await db.santri.find_one({"nfc_uid": nfc_uid}, {"_id": 0})
+        if not santri:
+            raise HTTPException(status_code=404, detail="Kartu NFC belum terdaftar")
+        siswa = await db.siswa_pmq.find_one({"santri_id": santri["id"]}, {"_id": 0})
+        if not siswa:
+            raise HTTPException(status_code=404, detail="Kartu NFC belum terdaftar")
 
     if siswa.get("tingkatan_key") not in current_pengabsen.get("tingkatan_keys", []):
         raise HTTPException(status_code=403, detail="Siswa bukan tingkatan yang Anda kelola")
@@ -1835,7 +1841,13 @@ async def pengabsen_aliyah_absensi_nfc(
 
     siswa = await db.siswa_aliyah.find_one({"nfc_uid": nfc_uid}, {"_id": 0})
     if not siswa:
-        raise HTTPException(status_code=404, detail="Kartu NFC belum terdaftar")
+        # Fallback: cari santri yang memiliki NFC ini lalu temukan siswa Aliyah yang link ke santri tersebut
+        santri = await db.santri.find_one({"nfc_uid": nfc_uid}, {"_id": 0})
+        if not santri:
+            raise HTTPException(status_code=404, detail="Kartu NFC belum terdaftar")
+        siswa = await db.siswa_aliyah.find_one({"santri_id": santri["id"]}, {"_id": 0})
+        if not siswa:
+            raise HTTPException(status_code=404, detail="Kartu NFC belum terdaftar")
 
     kelas_ids = current_pengabsen.get("kelas_ids", []) or []
     if siswa.get("kelas_id") not in kelas_ids:
