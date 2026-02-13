@@ -244,10 +244,13 @@ export const pengabsenPMQAppAPI = {
       headers: getPengabsenPMQAuthHeader(),
     }),
   nfcAbsensi: (payload, params) =>
-    axios.post(`${API}/pmq/pengabsen/absensi/nfc`, payload, {
-      params,
-      headers: getPengabsenPMQAuthHeader(),
-    }),
+    axios.post(
+      `${API}/pmq/pengabsen/absensi/nfc`,
+      { ...(payload || {}), ...(params || {}) },
+      {
+        headers: getPengabsenPMQAuthHeader(),
+      }
+    ),
   riwayat: (params) =>
     axios.get(`${API}/pmq/pengabsen/riwayat`, {
       params,
@@ -289,10 +292,13 @@ export const pengabsenAliyahAppAPI = {
       headers: getPengabsenAliyahAuthHeader(),
     }),
   nfcAbsensi: (data, params) =>
-    axios.post(`${API}/aliyah/pengabsen/absensi/nfc`, data, {
-      params,
-      headers: getPengabsenAliyahAuthHeader(),
-    }),
+    axios.post(
+      `${API}/aliyah/pengabsen/absensi/nfc`,
+      { ...(data || {}), ...(params || {}) },
+      {
+        headers: getPengabsenAliyahAuthHeader(),
+      }
+    ),
   riwayat: (params) =>
     axios.get(`${API}/aliyah/pengabsen/riwayat`, {
       params,
