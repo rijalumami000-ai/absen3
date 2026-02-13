@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Scanner } from '@yudiel/react-qr-scanner';
-import { Sunrise, Sun, CloudSun, Sunset, MoonStar, History } from 'lucide-react';
+import { Sunrise, Sun, CloudSun, Sunset, MoonStar, History, ChevronDown, ChevronRight } from 'lucide-react';
 
 const WAKTU_OPTIONS = [
   { value: 'subuh', label: 'Subuh' },
@@ -69,6 +69,7 @@ const PengabsenApp = () => {
   const [historyEnd, setHistoryEnd] = useState(() => getTodayLocalYMD());
   const [historyDetail, setHistoryDetail] = useState(null);
   const [loadingHistoryDetail, setLoadingHistoryDetail] = useState(false);
+  const [collapsedGroups, setCollapsedGroups] = useState({});
   const { toast } = useToast();
   const navigate = useNavigate();
 
