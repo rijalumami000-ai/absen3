@@ -150,6 +150,8 @@ const PengabsenAliyahApp = () => {
         variant: 'destructive',
       });
     }
+  };
+
   const handleNfcSubmit = async (rawValue) => {
     const nfcUid = (rawValue || '').trim();
     if (!nfcUid) {
@@ -168,9 +170,6 @@ const PengabsenAliyahApp = () => {
         variant: 'destructive',
       });
     }
-  };
-
-
   };
 
   const filteredData = data.filter((row) => {

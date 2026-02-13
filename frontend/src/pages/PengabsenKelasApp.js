@@ -185,6 +185,11 @@ const PengabsenKelasApp = () => {
       });
       toast.success('Absensi dihapus');
       loadGridData();
+    } catch (error) {
+      toast.error('Gagal menghapus absensi');
+    }
+  };
+
   const handleNfcSubmit = async (rawValue) => {
     const nfcUid = (rawValue || '').trim();
     if (!nfcUid) {
@@ -207,11 +212,6 @@ const PengabsenKelasApp = () => {
       }
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Gagal mencatat absensi NFC');
-    }
-  };
-
-    } catch (error) {
-      toast.error('Gagal menghapus absensi');
     }
   };
 
