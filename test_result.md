@@ -450,6 +450,43 @@ frontend:
           agent: "testing"
           comment: "✅ Admin login page UI/UX testing completed successfully. Verified: beautiful gradient background (bg-gradient-to-br), h1 has font-display class, login form has shadow-card class, login button has active scale effect. Modern design with Islamic pattern background, proper typography, and excellent visual hierarchy. Login functionality working correctly with admin/admin123 credentials."
 
+  - task: "Web NFC PWA Madin (PengabsenKelasApp)"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/PengabsenKelasApp.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Menambahkan dukungan Web NFC (NDEFReader) + normalizeNfcUid ke PWA Pengabsen Kelas Madin. UI memiliki input NFC untuk USB reader dan tombol 'Aktifkan NFC (Android)' dengan status singkat. Perlu diuji flow login pengabsen_kelas, pemilihan mode NFC, dan pencatatan absensi ketika kartu ditempel via HP maupun USB."
+
+  - task: "Web NFC PWA Aliyah (PengabsenAliyahApp)"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/PengabsenAliyahApp.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Menambahkan dukungan Web NFC (NDEFReader) + normalizeNfcUid ke PWA Pengabsen Aliyah. UI punya input NFC untuk USB reader serta tombol 'Aktifkan NFC (Android)' dan status singkat. Perlu diuji flow scan NFC via HP di kedua jenis absensi (pagi/dzuhur) dan memastikan absensi tercatat dan muncul di daftar hari ini."
+
+  - task: "Web NFC PWA PMQ (PengabsenPMQApp)"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/PengabsenPMQApp.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Menambahkan dukungan Web NFC (NDEFReader) + normalizeNfcUid ke PWA Pengabsen PMQ. UI punya input NFC untuk USB reader dan tombol 'Aktifkan NFC (Android)' dengan status singkat. Perlu diuji flow login pengabsen PMQ, pemilihan sesi, dan scan NFC via HP/USB untuk memastikan absensi tercatat dan daftar siswa ter-update."
+
+
 metadata:
   created_by: "testing_agent"
   version: "3.0"
