@@ -10,9 +10,8 @@ const Dashboard = () => {
   const LOGO_ALIYAH = 'https://customer-assets.emergentagent.com/job_pesantren-app-3/artifacts/89w18wrw_Madrasah%20Aliyah.jpg';
   const [stats, setStats] = useState(null);
   const [totalSantri, setTotalSantri] = useState(0);
-  const [totalSiswaMadin, setTotalSiswaMadin] = useState(0);
-  const [totalSiswaAliyah, setTotalSiswaAliyah] = useState(0);
-  const [totalSiswaPMQ, setTotalSiswaPMQ] = useState(0);
+  const [totalSantriPutra, setTotalSantriPutra] = useState(0);
+  const [totalSantriPutri, setTotalSantriPutri] = useState(0);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
@@ -23,19 +22,16 @@ const Dashboard = () => {
   const loadData = async () => {
     try {
       const today = new Date().toISOString().split('T')[0];
-      const [statsRes, santriRes, siswaMadinRes, siswaAliyahRes, siswaPMQRes] = await Promise.all([
+      const [statsRes, santriRes] = await Promise.all([
         absensiAPI.getStats({ tanggal_start: today, tanggal_end: today }),
         santriAPI.getAll({}),
-        api.get('/siswa-madrasah'),
-        api.get('/aliyah/siswa'),
-        api.get('/pmq/siswa'),
       ]);
 
       setStats(statsRes.data);
-      setTotalSantri(santriRes.data.length);
-      setTotalSiswaMadin(siswaMadinRes.data.length || 0);
-      setTotalSiswaAliyah(siswaAliyahRes.data.length || 0);
-      setTotalSiswaPMQ(siswaPMQRes.data.length || 0);
+      const allSantri = santriRes.data || [];
+      setTotalSantri(allSantri.length);
+      setTotalSantriPutra(allSantri.filter((s) => s.gender === 'putra').length);
+      setTotalSantriPutri(allSantri.filter((s) => s.gender === 'putri').length);
     } catch (error) {
       toast({
         title: "Error",
