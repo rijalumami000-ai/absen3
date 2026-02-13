@@ -127,8 +127,15 @@ const PengabsenApp = () => {
     }
   };
 
+  const normalizeNfcUid = (raw) => {
+    if (!raw) return '';
+    // Hilangkan pemisah seperti ':' dan jadikan uppercase agar konsisten dengan UID dari reader USB
+    return raw.toString().trim().toUpperCase().replace(/[^0-9A-F]/g, '');
+  };
+
   const handleNfcSubmit = async (rawValue) => {
-    const nfcUid = (rawValue || '').trim();
+    const raw = (rawValue || '').trim();
+    const nfcUid = normalizeNfcUid(raw);
     if (!nfcUid) {
       toast({ title: 'NFC kosong', description: 'Tempelkan kartu NFC terlebih dahulu.', variant: 'destructive' });
       return;
@@ -141,13 +148,14 @@ const PengabsenApp = () => {
       });
       setNfcValue('');
       await loadData(waktu);
-      setNfcStatus(`Kartu terbaca: ${nfcUid}`);
+      setNfcStatus(`UID terbaca & cocok: ${nfcUid}`);
       toast({ title: 'NFC berhasil', description: 'Absensi tercatat dari kartu NFC.' });
     } catch (error) {
-      setNfcStatus('Gagal membaca NFC.');
+      console.error('NFC submit error', error);
+      setNfcStatus('Gagal mencocokkan UID dengan data santri.');
       toast({
         title: 'NFC gagal',
-        description: error.response?.data?.detail || 'Gagal mencatat absensi NFC',
+        description: error.response?.data?.detail || 'Gagal mencatat absensi NFC. Pastikan kartu sudah didaftarkan.',
         variant: 'destructive',
       });
     }
