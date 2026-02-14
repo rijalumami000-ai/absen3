@@ -535,7 +535,6 @@ const PengabsenKelasApp = () => {
                   {nfcPanelState === 'success' ? '✓' : nfcPanelState === 'error' ? '!' : 'N'}
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-xs font-medium text-gray-700 uppercase tracking-wide">Status NFC</span>
                   <span className="text-sm font-semibold text-gray-900">
                     {nfcPanelText}
                   </span>
@@ -549,13 +548,10 @@ const PengabsenKelasApp = () => {
                   type="button"
                   onClick={startNfcScan}
                   disabled={!nfcSupported || nfcScanning}
-                  className="px-4 py-2 rounded-full text-xs font-semibold border border-emerald-500 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="px-3 py-2 rounded-full text-xs font-semibold border border-emerald-500 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  {nfcSupported ? (nfcScanning ? 'NFC aktif...' : 'Aktifkan NFC (Android)') : 'NFC tidak tersedia'}
+                  <span className="inline-block w-3 h-3 rounded-full bg-emerald-500" />
                 </button>
-                <span className="text-[10px] text-gray-500 text-right">
-                  Gunakan tombol ini untuk scan via HP Android.
-                </span>
               </div>
             </div>
 
