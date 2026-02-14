@@ -591,8 +591,8 @@ const PengabsenPMQApp = () => {
                 </div>
               </div>
 
-              {/* Input tersembunyi untuk USB reader */}
-              <div className="hidden">
+              {/* Input USB reader (hanya terlihat di desktop) */}
+              <div className="hidden md:block mt-1">
                 <Input
                   placeholder="Tempelkan kartu NFC pada USB reader..."
                   value={nfcValue}
