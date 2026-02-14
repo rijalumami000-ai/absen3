@@ -600,8 +600,8 @@ const PengabsenApp = () => {
                         handleNfcSubmit(nfcValue);
                       }
                     }}
-                    placeholder="Tempel kartu NFC di reader..."
-                    className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm"
+                    placeholder="Tempel kartu NFC di USB reader..."
+                    className="w-full max-w-xs border border-gray-200 rounded px-3 py-1.5 text-xs text-gray-600 bg-gray-50"
                     data-testid="pengabsen-nfc-input"
                   />
                 </div>
