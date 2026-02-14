@@ -1861,7 +1861,7 @@ async def pengabsen_aliyah_absensi_nfc(
     if existing:
         await db.absensi_aliyah.update_one(
             {"id": existing["id"]},
-            {"$set": {"status": "hadir", "kelas_id": siswa.get("kelas_id"), "waktu_absen": now}},
+            {"$set": {"status": "hadir", "kelas_id": siswa.get("kelas_id"), "waktu_absen": now.isoformat()}},
         )
     else:
         absensi = AbsensiAliyah(
@@ -1876,7 +1876,7 @@ async def pengabsen_aliyah_absensi_nfc(
         doc["waktu_absen"] = now.isoformat()
         await db.absensi_aliyah.insert_one(doc)
 
-    return {"message": "Absensi NFC berhasil dicatat"}
+    return {"message": "Absensi NFC berhasil dicatat", "siswa_nama": siswa.get("nama")}
 
 
 class MonitoringAliyahUpdate(BaseModel):
