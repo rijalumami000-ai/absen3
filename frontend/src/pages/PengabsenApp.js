@@ -577,7 +577,8 @@ const PengabsenApp = () => {
                     </Button>
                   </div>
                 </div>
-                <div className="hidden">
+                {/* Input USB reader (hanya terlihat di desktop) */}
+                <div className="hidden md:block mt-1">
                   <input
                     ref={nfcInputRef}
                     value={nfcValue}
