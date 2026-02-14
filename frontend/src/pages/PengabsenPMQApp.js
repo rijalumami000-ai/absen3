@@ -545,7 +545,7 @@ const PengabsenPMQApp = () => {
 
               {/* Panel interaktif NFC */}
               <div
-                className={`relative w-full rounded-2xl border px-4 py-4 mb-3 transition-colors duration-200 flex items-center justify-between gap-4 ${
+                className={`relative w-full h-32 rounded-2xl border px-6 py-4 mb-4 transition-colors duration-200 flex items-center justify-between gap-6 ${
                   nfcPanelState === 'scanning'
                     ? 'border-emerald-400 bg-emerald-50'
                     : nfcPanelState === 'success'
