@@ -497,8 +497,70 @@ const PengabsenKelasApp = () => {
         {/* NFC Input Section */}
         {inputMode === 'nfc' && (
           <section className="bg-white rounded-lg shadow p-4 mb-4">
-            <h3 className="text-sm font-semibold text-gray-700 mb-2">Scan NFC Siswa</h3>
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-gray-800">Scan NFC Siswa</h3>
+              <button
+                type="button"
+                onClick={() => nfcInputRef.current?.focus()}
+                className="px-3 py-1.5 text-xs rounded-full border border-gray-300 text-gray-600 hover:bg-gray-50"
+              >
+                Fokus ke Reader USB
+              </button>
+            </div>
+
+            {/* Panel interaktif NFC */}
+            <div
+              className={`relative w-full rounded-2xl border px-4 py-4 mb-3 transition-colors duration-200 flex items-center justify-between gap-4 ${
+                nfcPanelState === 'scanning'
+                  ? 'border-emerald-400 bg-emerald-50'
+                  : nfcPanelState === 'success'
+                  ? 'border-emerald-500 bg-emerald-50'
+                  : nfcPanelState === 'error'
+                  ? 'border-red-400 bg-red-50'
+                  : 'border-dashed border-gray-300 bg-gray-50'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className={`flex h-10 w-10 items-center justify-center rounded-xl border text-lg font-semibold ${
+                    nfcPanelState === 'scanning'
+                      ? 'border-emerald-500 text-emerald-600 bg-white'
+                      : nfcPanelState === 'success'
+                      ? 'border-emerald-600 text-emerald-700 bg-emerald-50'
+                      : nfcPanelState === 'error'
+                      ? 'border-red-500 text-red-600 bg-white'
+                      : 'border-gray-300 text-gray-500 bg-white'
+                  }`}
+                >
+                  {nfcPanelState === 'success' ? '✓' : nfcPanelState === 'error' ? '!' : 'N'}
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xs font-medium text-gray-700 uppercase tracking-wide">Status NFC</span>
+                  <span className="text-sm font-semibold text-gray-900">
+                    {nfcPanelText}
+                  </span>
+                  {nfcPanelName && (
+                    <span className="text-xs text-emerald-700 mt-0.5">{nfcPanelName}</span>
+                  )}
+                </div>
+              </div>
+              <div className="flex flex-col items-end gap-2 min-w-[140px]">
+                <button
+                  type="button"
+                  onClick={startNfcScan}
+                  disabled={!nfcSupported || nfcScanning}
+                  className="px-4 py-2 rounded-full text-xs font-semibold border border-emerald-500 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {nfcSupported ? (nfcScanning ? 'NFC aktif...' : 'Aktifkan NFC (Android)') : 'NFC tidak tersedia'}
+                </button>
+                <span className="text-[10px] text-gray-500 text-right">
+                  Gunakan tombol ini untuk scan via HP Android.
+                </span>
+              </div>
+            </div>
+
+            {/* Input tersembunyi untuk USB reader */}
+            <div className="hidden">
               <input
                 ref={nfcInputRef}
                 type="text"
@@ -511,33 +573,12 @@ const PengabsenKelasApp = () => {
                   }
                 }}
                 placeholder="Tempelkan kartu NFC pada USB reader..."
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
-              <button
-                type="button"
-                onClick={() => handleNfcSubmit(nfcValue)}
-                className="px-4 py-2 bg-emerald-500 text-white rounded-lg text-sm hover:bg-emerald-600 transition-colors"
-              >
-                Kirim NFC
-              </button>
             </div>
-            <div className="flex flex-wrap gap-2 mt-3 items-center">
-              <button
-                type="button"
-                onClick={startNfcScan}
-                disabled={!nfcSupported || nfcScanning}
-                className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-xs text-gray-700 hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {nfcSupported ? (nfcScanning ? 'NFC aktif...' : 'Aktifkan NFC (Android)') : 'NFC tidak tersedia'}
-              </button>
-              {nfcStatus && (
-                <span className="text-xs text-emerald-700">
-                  {nfcStatus}
-                </span>
-              )}
-            </div>
+
             <p className="text-xs text-gray-500 mt-1">
-              USB NFC Reader akan mengetik UID otomatis ke kolom ini, atau gunakan tombol NFC Android di atas.
+              Panel di atas akan berubah warna sesuai status: menunggu, berhasil, atau gagal. USB NFC Reader tetap
+              didukung melalui input tersembunyi.
             </p>
           </section>
         )}
