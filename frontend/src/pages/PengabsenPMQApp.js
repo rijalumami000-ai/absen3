@@ -208,6 +208,25 @@ const PengabsenPMQApp = () => {
     }
   };
 
+  const playNfcSuccessBeep = () => {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.12);
+    } catch (e) {
+      console.error('Gagal memutar beep NFC', e);
+    }
+  };
+
   const handleNfcSubmit = async (rawValue) => {
     const raw = (rawValue || '').trim();
     const nfcUid = normalizeNfcUid(raw);
@@ -243,6 +262,7 @@ const PengabsenPMQApp = () => {
         setNfcPanelText('Kartu terbaca');
         setNfcPanelState('success');
       }
+      playNfcSuccessBeep();
       toast({ title: 'Sukses', description: 'Absensi NFC berhasil dicatat' });
     } catch (e) {
       console.error('NFC submit error', e);
