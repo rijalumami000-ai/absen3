@@ -550,11 +550,6 @@ const PengabsenAliyahApp = () => {
                     }}
                   />
                 </div>
-
-                <p className="text-[11px] text-gray-500 mt-1">
-                  Panel di atas akan berubah warna sesuai status: menunggu, berhasil, atau gagal. USB NFC Reader tetap
-                  didukung melalui input tersembunyi.
-                </p>
               </div>
 
               <div className="mt-4">

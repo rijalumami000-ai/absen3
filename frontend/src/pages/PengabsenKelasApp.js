@@ -575,11 +575,6 @@ const PengabsenKelasApp = () => {
                 placeholder="Tempelkan kartu NFC pada USB reader..."
               />
             </div>
-
-            <p className="text-xs text-gray-500 mt-1">
-              Panel di atas akan berubah warna sesuai status: menunggu, berhasil, atau gagal. USB NFC Reader tetap
-              didukung melalui input tersembunyi.
-            </p>
           </section>
         )}
       </main>
