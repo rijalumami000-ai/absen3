@@ -3438,6 +3438,8 @@ async def absensi_pengabsen_nfc(
         doc["id"] = str(uuid.uuid4())
         await db.absensi.insert_one(doc)
 
+    response_payload = {"message": "Absensi tersimpan", "tanggal": tanggal, "santri_nama": santri.get("nama")}
+
     try:
         wali_list = await db.wali_santri.find({"anak_ids": santri["id"]}, {"_id": 0}).to_list(100)
         if wali_list:
