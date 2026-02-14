@@ -510,7 +510,7 @@ const PengabsenKelasApp = () => {
 
             {/* Panel interaktif NFC */}
             <div
-              className={`relative w-full h-32 rounded-2xl border px-6 py-4 mb-4 transition-colors duration-200 flex items-center justify-between gap-6 ${
+              className={`relative w-full h-32 rounded-2xl border px-6 py-4 mb-2 transition-colors duration-200 flex items-center justify-between gap-6 ${
                 nfcPanelState === 'scanning'
                   ? 'border-emerald-400 bg-emerald-50'
                   : nfcPanelState === 'success'
@@ -555,8 +555,8 @@ const PengabsenKelasApp = () => {
               </div>
             </div>
 
-            {/* Input tersembunyi untuk USB reader */}
-            <div className="hidden">
+            {/* Input USB reader (hanya terlihat di desktop) */}
+            <div className="hidden md:block mt-1">
               <input
                 ref={nfcInputRef}
                 type="text"
