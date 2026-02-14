@@ -5438,7 +5438,7 @@ async def scan_qr_absensi_kelas(
     }, {"_id": 0})
     
     if existing:
-        return {"message": "Siswa sudah diabsen hari ini", "status": existing["status"]}
+        return {"message": "Siswa sudah diabsen hari ini", "status": existing["status"], "siswa_nama": siswa["nama"]}
     
     # Create new absensi
     absensi = AbsensiKelas(
@@ -5485,7 +5485,7 @@ async def absensi_kelas_nfc(
     }, {"_id": 0})
 
     if existing:
-        return {"message": "Siswa sudah diabsen hari ini", "status": existing["status"]}
+        return {"message": "Siswa sudah diabsen hari ini", "status": existing["status"], "siswa_nama": siswa["nama"]}
 
     now = datetime.now(timezone.utc)
     doc = {
