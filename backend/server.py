@@ -2489,9 +2489,7 @@ async def update_asrama(asrama_id: str, data: AsramaUpdate, _: dict = Depends(ge
     if "nfc_uid" in update_data:
         nfc_uid = (update_data.get("nfc_uid") or "").strip()
         if nfc_uid:
-            existing_nfc = await db.siswa_aliyah.find_one({"nfc_uid": nfc_uid, "id": {"$ne": siswa_id}})
-            if existing_nfc:
-                raise HTTPException(status_code=400, detail="NFC UID sudah digunakan")
+            # Catatan: asrama saat ini tidak menggunakan nfc_uid, blok ini diabaikan
             update_data["nfc_uid"] = nfc_uid
         else:
             update_data["nfc_uid"] = None
