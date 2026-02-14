@@ -570,7 +570,6 @@ const PengabsenPMQApp = () => {
                     {nfcPanelState === 'success' ? '✓' : nfcPanelState === 'error' ? '!' : 'N'}
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[11px] font-medium text-gray-700 uppercase tracking-wide">Status NFC</span>
                     <span className="text-sm font-semibold text-gray-900">
                       {nfcPanelText}
                     </span>
@@ -587,11 +586,8 @@ const PengabsenPMQApp = () => {
                     onClick={startNfcScan}
                     disabled={!nfcSupported || nfcScanning}
                   >
-                    {nfcSupported ? (nfcScanning ? 'NFC aktif...' : 'Aktifkan NFC (Android)') : 'NFC tidak tersedia'}
+                    <span className="inline-block w-3 h-3 rounded-full bg-emerald-500" />
                   </Button>
-                  <span className="text-[10px] text-gray-500 text-right">
-                    Pastikan sesi sudah dipilih, lalu gunakan tombol ini untuk scan via HP Android.
-                  </span>
                 </div>
               </div>
 
