@@ -543,8 +543,12 @@ const PengabsenApp = () => {
                 </div>
                 <div
                   className={`relative w-full h-32 rounded-2xl border px-6 py-4 mb-2 transition-colors duration-200 flex items-center justify-between gap-6 ${
-                    nfcScanning
+                    nfcPanelState === 'scanning'
                       ? 'border-emerald-400 bg-emerald-50'
+                      : nfcPanelState === 'success'
+                      ? 'border-emerald-500 bg-emerald-50'
+                      : nfcPanelState === 'error'
+                      ? 'border-red-400 bg-red-50'
                       : 'border-dashed border-gray-300 bg-gray-50'
                   }`}
                 >
