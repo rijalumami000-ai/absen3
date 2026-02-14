@@ -62,6 +62,9 @@ const PengabsenKelasApp = () => {
   const [nfcScanning, setNfcScanning] = useState(false);
   const [nfcStatus, setNfcStatus] = useState('');
   const nfcReaderRef = useRef(null);
+  const [nfcPanelState, setNfcPanelState] = useState('idle'); // idle | scanning | success | error
+  const [nfcPanelText, setNfcPanelText] = useState('Tempelkan kartu NFC');
+  const [nfcPanelName, setNfcPanelName] = useState('');
 
   useEffect(() => {
     setNfcSupported(typeof window !== 'undefined' && 'NDEFReader' in window);

@@ -55,6 +55,9 @@ const PengabsenAliyahApp = () => {
   const [nfcScanning, setNfcScanning] = useState(false);
   const [nfcStatus, setNfcStatus] = useState('');
   const nfcReaderRef = React.useRef(null);
+  const [nfcPanelState, setNfcPanelState] = useState('idle'); // idle | scanning | success | error
+  const [nfcPanelText, setNfcPanelText] = useState('Tempelkan kartu NFC');
+  const [nfcPanelName, setNfcPanelName] = useState('');
 
   const { toast } = useToast();
   const navigate = useNavigate();
