@@ -1726,7 +1726,7 @@ async def scan_aliyah_absensi(
     if existing:
         await db.absensi_aliyah.update_one(
             {"id": existing["id"]},
-            {"$set": {"status": "hadir", "kelas_id": siswa.get("kelas_id"), "waktu_absen": now}},
+            {"$set": {"status": "hadir", "kelas_id": siswa.get("kelas_id"), "waktu_absen": now.isoformat()}},
         )
     else:
         absensi = AbsensiAliyah(
@@ -1736,6 +1736,10 @@ async def scan_aliyah_absensi(
             jenis=jenis,
             status="hadir",
         )
+        doc = absensi.model_dump()
+        doc["created_at"] = doc["created_at"].isoformat()
+        doc["waktu_absen"] = now.isoformat()
+        await db.absensi_aliyah.insert_one(doc)
 
 # ==================== AUTH PENGABSEN PMQ (PWA) ====================
 
