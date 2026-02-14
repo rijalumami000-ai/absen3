@@ -531,16 +531,48 @@ const PengabsenApp = () => {
               <section className="bg-white rounded-lg shadow p-4" data-testid="pengabsen-nfc-section">
                 <div className="flex items-center justify-between mb-3">
                   <h2 className="text-sm font-semibold text-gray-700">Scan NFC Santri</h2>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => nfcInputRef.current?.focus()}
-                    data-testid="pengabsen-nfc-focus"
-                  >
-                    Fokus Input
-                  </Button>
                 </div>
-                <div className="flex flex-col md:flex-row gap-2">
+                <div
+                  className={`relative w-full h-32 rounded-2xl border px-6 py-4 mb-4 transition-colors duration-200 flex items-center justify-between gap-6 ${
+                    nfcScanning
+                      ? 'border-emerald-400 bg-emerald-50'
+                      : 'border-dashed border-gray-300 bg-gray-50'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`flex h-10 w-10 items-center justify-center rounded-xl border text-lg font-semibold ${
+                        nfcScanning
+                          ? 'border-emerald-500 text-emerald-600 bg-white'
+                          : 'border-gray-300 text-gray-500 bg-white'
+                      }`}
+                    >
+                      {nfcScanning ? '✓' : 'N'}
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-xs font-medium text-gray-700 uppercase tracking-wide">Status NFC</span>
+                      <span className="text-sm font-semibold text-gray-900">
+                        {nfcScanning ? 'Tempelkan kartu NFC...' : 'Tempelkan kartu NFC'}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-2 min-w-[140px]">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={startNfcScan}
+                      disabled={!nfcSupported || nfcScanning}
+                      data-testid="pengabsen-nfc-start"
+                    >
+                      {nfcSupported ? (nfcScanning ? 'NFC aktif...' : 'Aktifkan NFC (Android)') : 'NFC tidak tersedia'}
+                    </Button>
+                    <span className="text-[10px] text-gray-500 text-right">
+                      Gunakan tombol ini untuk scan via HP Android.
+                    </span>
+                  </div>
+                </div>
+                <div className="hidden">
                   <input
                     ref={nfcInputRef}
                     value={nfcValue}
@@ -555,22 +587,6 @@ const PengabsenApp = () => {
                     className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm"
                     data-testid="pengabsen-nfc-input"
                   />
-                </div>
-                <div className="flex flex-wrap gap-2 mt-3">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={startNfcScan}
-                    disabled={!nfcSupported || nfcScanning}
-                    data-testid="pengabsen-nfc-start"
-                  >
-                    {nfcSupported ? (nfcScanning ? 'NFC aktif...' : 'Aktifkan NFC (Android)') : 'NFC tidak tersedia'}
-                  </Button>
-                  {nfcStatus && (
-                    <span className="text-xs text-emerald-700" data-testid="pengabsen-nfc-status">
-                      {nfcStatus}
-                    </span>
-                  )}
                 </div>
               </section>
             )}
