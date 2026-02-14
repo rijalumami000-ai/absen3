@@ -1762,13 +1762,6 @@ async def get_current_pengabsen_pmq(credentials: HTTPAuthorizationCredentials = 
 
 
 
-        doc = absensi.model_dump()
-        doc["created_at"] = doc["created_at"].isoformat()
-        doc["waktu_absen"] = now.isoformat()
-        await db.absensi_aliyah.insert_one(doc)
-
-    return {"message": "Absensi berhasil dicatat"}
-
 
 @api_router.post("/pmq/pengabsen/absensi/nfc")
 async def pengabsen_pmq_absensi_nfc(
