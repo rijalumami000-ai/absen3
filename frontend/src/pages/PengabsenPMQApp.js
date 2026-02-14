@@ -259,11 +259,17 @@ const PengabsenPMQApp = () => {
 
   const startNfcScan = async () => {
     if (!nfcSupported) {
+      setNfcPanelState('error');
+      setNfcPanelText('Perangkat tidak mendukung Web NFC.');
+      setNfcPanelName('');
       toast({ title: 'NFC tidak tersedia', description: 'Perangkat ini belum mendukung Web NFC.', variant: 'destructive' });
       return;
     }
     try {
       setNfcScanning(true);
+      setNfcPanelState('scanning');
+      setNfcPanelText('Tempelkan kartu NFC...');
+      setNfcPanelName('');
       const reader = new window.NDEFReader();
       nfcReaderRef.current = reader;
       await reader.scan();

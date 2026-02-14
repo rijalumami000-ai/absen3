@@ -273,10 +273,16 @@ const PengabsenKelasApp = () => {
   const startNfcScan = async () => {
     if (!nfcSupported) {
       toast.error('Perangkat ini belum mendukung Web NFC.');
+      setNfcPanelState('error');
+      setNfcPanelText('Perangkat tidak mendukung Web NFC.');
+      setNfcPanelName('');
       return;
     }
     try {
       setNfcScanning(true);
+      setNfcPanelState('scanning');
+      setNfcPanelText('Tempelkan kartu NFC...');
+      setNfcPanelName('');
       const reader = new window.NDEFReader();
       nfcReaderRef.current = reader;
       await reader.scan();
