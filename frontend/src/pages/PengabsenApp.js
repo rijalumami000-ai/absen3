@@ -555,17 +555,24 @@ const PengabsenApp = () => {
                   <div className="flex items-center gap-3">
                     <div
                       className={`flex h-10 w-10 items-center justify-center rounded-xl border text-lg font-semibold ${
-                        nfcScanning
+                        nfcPanelState === 'scanning'
                           ? 'border-emerald-500 text-emerald-600 bg-white'
+                          : nfcPanelState === 'success'
+                          ? 'border-emerald-600 text-emerald-700 bg-emerald-50'
+                          : nfcPanelState === 'error'
+                          ? 'border-red-500 text-red-600 bg-white'
                           : 'border-gray-300 text-gray-500 bg-white'
                       }`}
                     >
-                      {nfcScanning ? '✓' : 'N'}
+                      {nfcPanelState === 'success' ? '✓' : nfcPanelState === 'error' ? '!' : 'N'}
                     </div>
                     <div className="flex flex-col">
                       <span className="text-sm font-semibold text-gray-900">
-                        {nfcScanning ? 'Tempelkan kartu NFC...' : 'Tempelkan kartu NFC'}
+                        {nfcPanelText}
                       </span>
+                      {nfcPanelName && (
+                        <span className="text-xs text-emerald-700 mt-0.5">{nfcPanelName}</span>
+                      )}
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-2 min-w-[140px]">
