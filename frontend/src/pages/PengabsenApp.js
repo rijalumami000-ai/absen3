@@ -50,6 +50,9 @@ const PengabsenApp = () => {
   const [nfcSupported, setNfcSupported] = useState(false);
   const [nfcScanning, setNfcScanning] = useState(false);
   const [nfcStatus, setNfcStatus] = useState('');
+  const [nfcPanelState, setNfcPanelState] = useState('idle'); // idle | scanning | success | error
+  const [nfcPanelText, setNfcPanelText] = useState('Tempelkan kartu NFC');
+  const [nfcPanelName, setNfcPanelName] = useState('');
   const nfcInputRef = useRef(null);
   const nfcReaderRef = useRef(null);
   const [lastScan, setLastScan] = useState(null);
@@ -155,10 +158,32 @@ const PengabsenApp = () => {
     }
   };
 
+  const playNfcSuccessBeep = () => {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.12);
+    } catch (e) {
+      console.error('Gagal memutar beep NFC', e);
+    }
+  };
+
   const handleNfcSubmit = async (rawValue) => {
     const raw = (rawValue || '').trim();
     const nfcUid = normalizeNfcUid(raw);
     if (!nfcUid) {
+      setNfcPanelState('error');
+      setNfcPanelText('Kartu tidak terbaca. Coba lagi.');
+      setNfcPanelName('');
       toast({ title: 'NFC kosong', description: 'Tempelkan kartu NFC terlebih dahulu.', variant: 'destructive' });
       return;
     }
@@ -171,10 +196,17 @@ const PengabsenApp = () => {
       setNfcValue('');
       await loadData(waktu);
       setNfcStatus(`UID terbaca & cocok: ${nfcUid}`);
+      setNfcPanelState('success');
+      setNfcPanelText('Kartu terbaca');
+      // Jika nanti backend mengirim nama santri, bisa setNfcPanelName di sini
+      playNfcSuccessBeep();
       toast({ title: 'NFC berhasil', description: 'Absensi tercatat dari kartu NFC.' });
     } catch (error) {
       console.error('NFC submit error', error);
       setNfcStatus('Gagal mencocokkan UID dengan data santri.');
+      setNfcPanelState('error');
+      setNfcPanelText(error.response?.data?.detail || 'Gagal mencatat absensi NFC');
+      setNfcPanelName('');
       toast({
         title: 'NFC gagal',
         description: error.response?.data?.detail || 'Gagal mencatat absensi NFC. Pastikan kartu sudah didaftarkan.',
@@ -185,11 +217,17 @@ const PengabsenApp = () => {
 
   const startNfcScan = async () => {
     if (!nfcSupported) {
+      setNfcPanelState('error');
+      setNfcPanelText('Perangkat tidak mendukung Web NFC.');
+      setNfcPanelName('');
       toast({ title: 'NFC tidak tersedia', description: 'Perangkat ini belum mendukung Web NFC.', variant: 'destructive' });
       return;
     }
     try {
       setNfcScanning(true);
+      setNfcPanelState('scanning');
+      setNfcPanelText('Tempelkan kartu NFC...');
+      setNfcPanelName('');
       const reader = new window.NDEFReader();
       nfcReaderRef.current = reader;
       await reader.scan();
