@@ -531,9 +531,18 @@ const PengabsenApp = () => {
               <section className="bg-white rounded-lg shadow p-4" data-testid="pengabsen-nfc-section">
                 <div className="flex items-center justify-between mb-3">
                   <h2 className="text-sm font-semibold text-gray-700">Scan NFC Santri</h2>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => nfcInputRef.current?.focus()}
+                    className="hidden md:inline-flex"
+                    data-testid="pengabsen-nfc-focus"
+                  >
+                    Fokus Reader USB
+                  </Button>
                 </div>
                 <div
-                  className={`relative w-full h-32 rounded-2xl border px-6 py-4 mb-4 transition-colors duration-200 flex items-center justify-between gap-6 ${
+                  className={`relative w-full h-32 rounded-2xl border px-6 py-4 mb-2 transition-colors duration-200 flex items-center justify-between gap-6 ${
                     nfcScanning
                       ? 'border-emerald-400 bg-emerald-50'
                       : 'border-dashed border-gray-300 bg-gray-50'
