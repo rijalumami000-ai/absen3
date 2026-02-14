@@ -194,16 +194,32 @@ const PengabsenAliyahApp = () => {
     const raw = (rawValue || '').trim();
     const nfcUid = normalizeNfcUid(raw);
     if (!nfcUid) {
+      setNfcPanelState('error');
+      setNfcPanelText('Kartu tidak terbaca. Coba lagi.');
+      setNfcPanelName('');
       toast({ title: 'Error', description: 'NFC kosong, tempelkan kartu terlebih dahulu', variant: 'destructive' });
       return;
     }
     try {
-      await pengabsenAliyahAppAPI.nfcAbsensi({ nfc_uid: nfcUid }, { jenis, tanggal });
+      const resp = await pengabsenAliyahAppAPI.nfcAbsensi({ nfc_uid: nfcUid }, { jenis, tanggal });
       setNfcValue('');
       await loadData(jenis, tanggal);
+      const siswaNama = resp.data?.siswa_nama || '';
+      if (siswaNama) {
+        setNfcPanelName(siswaNama);
+        setNfcPanelText('Kartu terbaca');
+        setNfcPanelState('success');
+      } else {
+        setNfcPanelName('');
+        setNfcPanelText('Kartu terbaca');
+        setNfcPanelState('success');
+      }
       toast({ title: 'Sukses', description: 'Absensi NFC berhasil dicatat' });
     } catch (error) {
       console.error('NFC submit error', error);
+      setNfcPanelState('error');
+      setNfcPanelText(error.response?.data?.detail || 'Gagal mencatat absensi NFC');
+      setNfcPanelName('');
       toast({
         title: 'Error',
         description: error.response?.data?.detail || 'Gagal mencatat absensi NFC',

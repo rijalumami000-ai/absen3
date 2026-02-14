@@ -212,10 +212,16 @@ const PengabsenPMQApp = () => {
     const raw = (rawValue || '').trim();
     const nfcUid = normalizeNfcUid(raw);
     if (!nfcUid) {
+      setNfcPanelState('error');
+      setNfcPanelText('Kartu tidak terbaca. Coba lagi.');
+      setNfcPanelName('');
       toast({ title: 'Error', description: 'NFC kosong, tempelkan kartu terlebih dahulu', variant: 'destructive' });
       return;
     }
     if (!sesiKey) {
+      setNfcPanelState('error');
+      setNfcPanelText('Pilih sesi terlebih dahulu.');
+      setNfcPanelName('');
       toast({
         title: 'Sesi belum dipilih',
         description: 'Silakan pilih sesi terlebih dahulu.',
@@ -224,12 +230,25 @@ const PengabsenPMQApp = () => {
       return;
     }
     try {
-      await pengabsenPMQAppAPI.nfcAbsensi({ nfc_uid: nfcUid }, { tanggal, sesi: sesiKey });
+      const resp = await pengabsenPMQAppAPI.nfcAbsensi({ nfc_uid: nfcUid }, { tanggal, sesi: sesiKey });
       setNfcValue('');
       await loadData();
+      const siswaNama = resp.data?.siswa_nama || '';
+      if (siswaNama) {
+        setNfcPanelName(siswaNama);
+        setNfcPanelText('Kartu terbaca');
+        setNfcPanelState('success');
+      } else {
+        setNfcPanelName('');
+        setNfcPanelText('Kartu terbaca');
+        setNfcPanelState('success');
+      }
       toast({ title: 'Sukses', description: 'Absensi NFC berhasil dicatat' });
     } catch (e) {
       console.error('NFC submit error', e);
+      setNfcPanelState('error');
+      setNfcPanelText(e.response?.data?.detail || 'Gagal mencatat absensi NFC');
+      setNfcPanelName('');
       toast({
         title: 'Error',
         description: e.response?.data?.detail || 'Gagal mencatat absensi NFC',

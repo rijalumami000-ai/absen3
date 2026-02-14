@@ -232,16 +232,29 @@ const PengabsenKelasApp = () => {
     const nfcUid = normalizeNfcUid(raw);
     if (!nfcUid) {
       toast.error('NFC kosong, tempelkan kartu terlebih dahulu');
+      setNfcPanelState('error');
+      setNfcPanelText('Kartu tidak terbaca. Coba lagi.');
+      setNfcPanelName('');
       return;
     }
     try {
       const token = localStorage.getItem('pengabsen_kelas_token');
-      await axios.post(
+      const resp = await axios.post(
         `${API_URL}/api/absensi-kelas/nfc`,
         { nfc_uid: nfcUid },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setNfcValue('');
+      const siswaNama = resp.data?.siswa_nama || '';
+      if (siswaNama) {
+        setNfcPanelName(siswaNama);
+        setNfcPanelText('Kartu terbaca');
+        setNfcPanelState('success');
+      } else {
+        setNfcPanelName('');
+        setNfcPanelText('Kartu terbaca');
+        setNfcPanelState('success');
+      }
       toast.success('Absensi NFC berhasil dicatat');
       // refresh manual list & grid agar sinkron
       loadManualStudents();
@@ -250,6 +263,9 @@ const PengabsenKelasApp = () => {
       }
     } catch (error) {
       console.error('NFC submit error', error);
+      setNfcPanelState('error');
+      setNfcPanelText(error.response?.data?.detail || 'Gagal mencatat absensi NFC');
+      setNfcPanelName('');
       toast.error(error.response?.data?.detail || 'Gagal mencatat absensi NFC');
     }
   };
