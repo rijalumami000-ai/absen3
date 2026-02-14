@@ -1823,7 +1823,7 @@ async def pengabsen_pmq_absensi_nfc(
         doc["created_at"] = doc["created_at"].isoformat()
         await db.absensi_pmq.insert_one(doc)
 
-    return {"message": "Absensi NFC berhasil dicatat"}
+    return {"message": "Absensi NFC berhasil dicatat", "siswa_nama": siswa.get("nama")}
 
 
 @api_router.post("/aliyah/pengabsen/absensi/nfc")
