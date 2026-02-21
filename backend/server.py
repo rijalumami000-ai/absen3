@@ -3385,7 +3385,7 @@ async def upsert_absensi_pengabsen(
     except Exception as e:
         logging.error(f"Failed to send wali notification: {e}")
 
-    return {"message": "Absensi tersimpan", "tanggal": today}
+    return response_payload
 
 
 @api_router.post("/pengabsen/absensi/nfc")
