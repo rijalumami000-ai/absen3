@@ -188,19 +188,20 @@ const PengabsenApp = () => {
       return;
     }
     try {
-      await pengabsenAppAPI.nfcAbsensi({
+      const resp = await pengabsenAppAPI.nfcAbsensi({
         nfc_uid: nfcUid,
         waktu_sholat: waktu,
         status: 'hadir',
       });
       setNfcValue('');
       await loadData(waktu);
+      const santriNama = resp.data?.santri_nama || '';
       setNfcStatus(`UID terbaca & cocok: ${nfcUid}`);
       setNfcPanelState('success');
       setNfcPanelText('Kartu terbaca');
-      // Jika nanti backend mengirim nama santri, bisa setNfcPanelName di sini
+      setNfcPanelName(santriNama);
       playNfcSuccessBeep();
-      toast({ title: 'NFC berhasil', description: 'Absensi tercatat dari kartu NFC.' });
+      toast({ title: 'NFC berhasil', description: santriNama ? `Absensi tercatat untuk ${santriNama}.` : 'Absensi tercatat dari kartu NFC.' });
     } catch (error) {
       console.error('NFC submit error', error);
       setNfcStatus('Gagal mencocokkan UID dengan data santri.');
