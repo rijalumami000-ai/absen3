@@ -244,6 +244,7 @@ const PengabsenPMQProtectedRoute = ({ children }) => {
 };
 
 function AppRoutes() {
+  useAutoReloadOnNewVersion();
   return (
     <Routes>
       {/* PWA Routes - PRIORITAS PERTAMA */}
