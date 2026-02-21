@@ -3434,7 +3434,7 @@ async def absensi_pengabsen_nfc(
 
     if existing:
         await db.absensi.update_one({"id": existing.get("id")}, {"$set": doc})
-        response_payload = {
+        return {
             "message": "Santri sudah diabsen pada waktu ini",
             "status": existing.get("status"),
             "tanggal": tanggal,
@@ -3443,7 +3443,7 @@ async def absensi_pengabsen_nfc(
     else:
         doc["id"] = str(uuid.uuid4())
         await db.absensi.insert_one(doc)
-        response_payload = {
+        return {
             "message": "Absensi tersimpan",
             "tanggal": tanggal,
             "santri_nama": santri.get("nama"),
