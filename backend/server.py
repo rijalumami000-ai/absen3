@@ -3434,9 +3434,20 @@ async def absensi_pengabsen_nfc(
 
     if existing:
         await db.absensi.update_one({"id": existing.get("id")}, {"$set": doc})
+        response_payload = {
+            "message": "Santri sudah diabsen pada waktu ini",
+            "status": existing.get("status"),
+            "tanggal": tanggal,
+            "santri_nama": santri.get("nama"),
+        }
     else:
         doc["id"] = str(uuid.uuid4())
         await db.absensi.insert_one(doc)
+        response_payload = {
+            "message": "Absensi tersimpan",
+            "tanggal": tanggal,
+            "santri_nama": santri.get("nama"),
+        }
 
     try:
         wali_list = await db.wali_santri.find({"anak_ids": santri["id"]}, {"_id": 0}).to_list(100)
