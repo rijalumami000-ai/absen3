@@ -5,6 +5,7 @@ import { AppSettingsProvider } from '@/contexts/AppSettingsContext';
 import { Toaster } from '@/components/ui/sonner';
 import Layout from '@/components/Layout';
 import Login from '@/pages/Login';
+import { useAutoReloadOnNewVersion } from '@/hooks/useAutoReloadOnNewVersion';
 import Dashboard from '@/pages/Dashboard';
 import Asrama from '@/pages/Asrama';
 import Santri from '@/pages/Santri';
